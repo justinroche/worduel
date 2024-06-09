@@ -10,6 +10,8 @@ const currentGuess = reactive({
 const guesses = ref<string[][]>([])
 
 const handleKeyPress = (event: KeyboardEvent) => {
+  console.log(event.key)
+
   if (currentGuess.row >= 6) return
 
   if (event.key === 'Enter') {
@@ -20,6 +22,12 @@ const handleKeyPress = (event: KeyboardEvent) => {
       currentGuess.row++
       currentGuess.letters = ['', '', '', '', '']
     }
+  } else if (event.key === 'Backspace') {
+    let lastIndex = currentGuess.letters.findIndex((letter) => letter === '')
+    if (lastIndex === -1) {
+      lastIndex = 5
+    }
+    currentGuess.letters[lastIndex - 1] = ''
   } else if (
     /^[a-zA-Z]$/.test(event.key) &&
     currentGuess.letters.join('').length < 5
