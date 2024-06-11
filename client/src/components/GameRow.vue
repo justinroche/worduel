@@ -7,6 +7,7 @@ const props = defineProps<{
     row: number
     letters: string[]
   }
+  results: string[]
   guessNumber: number
 }>()
 
@@ -25,7 +26,12 @@ watch(
 
 <template>
   <div class="row">
-    <game-cell v-for="(letter, index) in guess" :key="index" :letter="letter" />
+    <game-cell
+      v-for="(letter, index) in guess"
+      :key="index"
+      :letter="letter"
+      :result="results[index] ? results[index] : 'empty'"
+    />
   </div>
 </template>
 
