@@ -38,7 +38,7 @@ watch(
 <style scoped>
 .row {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin: 0 auto;
 }
 </style>
