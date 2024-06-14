@@ -3,10 +3,6 @@ const props = defineProps<{
   letter: string
   result: string
 }>()
-
-if (props.result) {
-  console.log(props.result)
-}
 </script>
 
 <template>
@@ -39,11 +35,11 @@ if (props.result) {
 }
 
 .correct {
-  background-color: #64b35d;
+  background-color: #55be4c;
 }
 
 .misplaced {
-  background-color: #d4bc51;
+  background-color: #f0d354;
 }
 
 .incorrect {
