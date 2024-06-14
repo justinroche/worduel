@@ -48,11 +48,11 @@ const props = defineProps<{
 }
 
 .correct {
-  background-color: #64b35d;
+  background-color: #55be4c;
 }
 
 .misplaced {
-  background-color: #d4bc51;
+  background-color: #f0d354;
 }
 
 .incorrect {
