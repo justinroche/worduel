@@ -3,9 +3,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import GameTable from './components/GameTable.vue'
 import Keyboard from './components/Keyboard.vue'
+import dictionary from './resources/dictionary.json'
 
 /* State */
-const secretWord = 'APPLE'
+const secretWord = 'MAKER'
 const currentGuess = reactive({
   row: 0,
   letters: ['', '', '', '', ''],
@@ -20,12 +21,15 @@ const letters: string[][] = [
   'ZXCVBNM'.split(''),
 ]
 
+const dictionarySet = new Set(Object.keys(dictionary))
+
+/* Keyboard label state */
 const letterLabels = ref<string[][]>(
   letters.map((row) => row.map(() => 'unused'))
 )
 
-function updateLabels(updates: string[][]) {
-  const [guessedLetters, results] = updates
+/* Update keyboard labels */
+function updateLabels(guessedLetters: string[], results: string[]) {
   guessedLetters.forEach((letter, index) => {
     const result = results[index]
 
@@ -55,8 +59,12 @@ const handleKeyPress = (event: KeyboardEvent) => {
   if (currentGuess.row >= 6) return
 
   if (event.key === 'Enter') {
-    if (currentGuess.letters.join('').length !== 5) return
-    else {
+    if (currentGuess.letters.join('').length !== 5) {
+      return
+    } else {
+      if (!dictionarySet.has(currentGuess.letters.join('').toLowerCase())) {
+        return
+      }
       if (currentGuess.letters.join('') === secretWord) {
         gameState.value = 'solved'
       }
@@ -112,17 +120,13 @@ function getResults(guess: string[], secretWord: string) {
     }
   }
 
-  const keyboardLabelUpdates: string[][] = []
-  keyboardLabelUpdates.push(guess)
-  keyboardLabelUpdates.push(results)
-
-  updateLabels(keyboardLabelUpdates)
+  updateLabels(guess, results)
 
   return results
 }
 
 onMounted(() => {
-  window.addEventListener('keyup', handleKeyPress)
+  window.addEventListener('keydown', handleKeyPress)
 })
 </script>
 
