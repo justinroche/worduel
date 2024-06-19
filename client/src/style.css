@@ -10,6 +10,7 @@
 }
 
 body {
+  background-color: #fdfffc;
   margin: 0;
   display: flex;
   min-width: 320px;
