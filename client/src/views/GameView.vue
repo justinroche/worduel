@@ -56,11 +56,11 @@ function updateLabels(guessedLetters: string[], results: string[]) {
 }
 
 /* Keyboard event handler */
-const handleKeyPress = (event: KeyboardEvent) => {
+const handleKeyEvent = (key: string) => {
   if (currentGuess.row >= 6) return
   if (gameState.value === 'solved') return
 
-  if (event.key === 'Enter') {
+  if (key === 'Enter') {
     if (currentGuess.letters.join('').length !== 5) {
       return
     } else {
@@ -76,21 +76,25 @@ const handleKeyPress = (event: KeyboardEvent) => {
       currentGuess.row++
       currentGuess.letters = ['', '', '', '', '']
     }
-  } else if (event.key === 'Backspace') {
+  } else if (key === 'Backspace') {
     let lastIndex = currentGuess.letters.findIndex((letter) => letter === '')
     if (lastIndex === -1) {
       lastIndex = 5
     }
     currentGuess.letters[lastIndex - 1] = ''
   } else if (
-    /^[a-zA-Z]$/.test(event.key) &&
+    /^[a-zA-Z]$/.test(key) &&
     currentGuess.letters.join('').length < 5
   ) {
     const index = currentGuess.letters.findIndex((letter) => letter === '')
     if (index !== -1) {
-      currentGuess.letters[index] = event.key.toUpperCase()
+      currentGuess.letters[index] = key.toUpperCase()
     }
   }
+}
+
+const handleKeyPress = (event: KeyboardEvent) => {
+  handleKeyEvent(event.key)
 }
 
 /* Submit word event handler */
@@ -142,7 +146,12 @@ async function testAPI() {
   <h1>Worduel</h1>
   <game-table :currentGuess="currentGuess" :results="results" />
   <div id="keyboardContainer">
-    <keyboard id="keyboard" :letters="letters" :letterLabels="letterLabels" />
+    <keyboard
+      id="keyboard"
+      :letters="letters"
+      :letterLabels="letterLabels"
+      @key-event="handleKeyEvent"
+    />
   </div>
 </template>
 

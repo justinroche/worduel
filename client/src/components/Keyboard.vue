@@ -3,18 +3,26 @@ const props = defineProps<{
   letters: string[][]
   letterLabels: string[][]
 }>()
+
+const emit = defineEmits(['key-event'])
+
+function emitKeyEvent(key: string, event: Event) {
+  ;(event.target as HTMLElement).blur()
+  emit('key-event', key)
+}
 </script>
 
 <template>
   <div v-for="(row, rowIndex) in props.letters" class="row">
-    <div
+    <button
       v-for="(letter, letterIndex) in row"
       :key="letter"
       class="letter"
       :class="props.letterLabels[rowIndex][letterIndex]"
+      @click="(event) => emitKeyEvent(letter, event)"
     >
       {{ letter }}
-    </div>
+    </button>
   </div>
 </template>
 
@@ -27,9 +35,12 @@ const props = defineProps<{
 }
 
 .letter {
+  cursor: pointer;
+  font-family: inherit;
   font-weight: 600;
   font-size: 24px;
 
+  border: 0;
   border-radius: 3px;
   box-sizing: border-box;
 
