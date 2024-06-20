@@ -3,9 +3,17 @@ import { ref, watch } from 'vue'
 
 const joinCode = ref('')
 
+// Convert join code to uppercase
 watch(joinCode, (newValue) => {
   joinCode.value = newValue.toUpperCase()
 })
+
+// Only allow alphanumeric characters in the join code input
+const filterInput = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const filteredValue = input.value.replace(/[^a-zA-Z0-9]/g, '')
+  joinCode.value = filteredValue
+}
 
 const handleHostButton = () => {
   console.log('Host button clicked')
@@ -32,6 +40,7 @@ const handleJoinButton = () => {
         class="join-code-input"
         :class="{ 'join-code-input-spacing': joinCode.length > 0 }"
         v-model="joinCode"
+        @input="filterInput"
         placeholder="Enter code..."
         maxlength="4"
         tabindex="2"
