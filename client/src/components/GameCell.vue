@@ -14,7 +14,7 @@ const props = defineProps<{
 <style scoped>
 .card {
   font-weight: 600;
-  font-size: 28px;
+  font-size: 32px;
   color: #fff;
 
   border-radius: 3px;
