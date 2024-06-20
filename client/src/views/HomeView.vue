@@ -72,6 +72,8 @@ h1 {
 }
 
 .home-button {
+  font-family: inherit;
+  font-weight: 600;
   background-color: #3a3335;
   color: #fff;
   border: none;
@@ -104,10 +106,13 @@ h1 {
 }
 
 .join-code-input {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.5rem;
+
   border: 1px solid #3a3335;
   border-radius: 0.25rem;
-  padding: 0.5rem;
-  font-size: 1rem;
+
   width: 120px;
   margin-right: 10px;
   box-sizing: border-box;
