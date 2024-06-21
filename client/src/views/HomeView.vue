@@ -2,8 +2,13 @@
 import { ref, watch } from 'vue'
 import InfoBox from '../components/InfoBox.vue'
 
+const wordleUrl = 'https://www.nytimes.com/games/wordle/index.html'
+const githubUrl = 'https://github.com/justinroche/worduel'
+const emailUrl = 'mailto:justinroche03@gmail.com'
 const joinCode = ref('')
 const showInfoBox = ref(false)
+const showInfoContent = ref(false)
+const showHelpContent = ref(false)
 
 // Convert join code to uppercase
 watch(joinCode, (newValue) => {
@@ -26,7 +31,35 @@ const handleJoinButton = () => {
 }
 
 const handleInfoButton = () => {
-  showInfoBox.value = !showInfoBox.value
+  if (showInfoContent.value) {
+    // Closing info content
+    showInfoBox.value = false
+    showInfoContent.value = false
+  } else if (showHelpContent.value) {
+    // Switching from help to info content
+    showHelpContent.value = false
+    showInfoContent.value = true
+  } else {
+    // Opening info box
+    showInfoBox.value = true
+    showInfoContent.value = true
+  }
+}
+
+const handleHelpButton = () => {
+  if (showHelpContent.value) {
+    // Closing help content
+    showInfoBox.value = false
+    showHelpContent.value = false
+  } else if (showInfoContent.value) {
+    // Switching from info to help content
+    showInfoContent.value = false
+    showHelpContent.value = true
+  } else {
+    // Opening help box
+    showInfoBox.value = true
+    showHelpContent.value = true
+  }
 }
 </script>
 
@@ -64,12 +97,44 @@ const handleInfoButton = () => {
     <div class="info-section">
       <transition name="info-box">
         <info-box v-if="showInfoBox" class="info-box">
-          This is some information.
+          <div v-if="showInfoContent" class="info-content">
+            <h3>Welcome to Worduel!</h3>
+            <p>
+              This game works just like
+              <a :href="wordleUrl" target="_blank" rel="noreferrer noopener"
+                >Wordle</a
+              >, except you play head-to-head against a friend. Start by hosting
+              a lobby, then share the code with your friend to join.
+            </p>
+            <p>
+              You will each come up with words for your opponent to guess,
+              Wordle-style. Scores are tallied over the course of multiple
+              rounds. Good luck!
+            </p>
+          </div>
+          <div v-if="showHelpContent" class="help-content">
+            <p>
+              <a :href="githubUrl" target="_blank" ref="noreferrer noopener"
+                >GitHub Repository</a
+              >
+            </p>
+            <p>
+              Feel free to reach out with any questions or suggestions:
+              <a :href="emailUrl" target="_blank" ref="noreferrer noopener"
+                >justinroche03@gmail.com</a
+              >
+            </p>
+          </div>
         </info-box>
       </transition>
-      <button @click="handleInfoButton" class="info-button" tabindex="4">
-        <font-awesome-icon :icon="['fas', 'circle-info']" size="2x" />
-      </button>
+      <div class="info-button-container">
+        <button @click="handleInfoButton" class="info-button" tabindex="4">
+          <font-awesome-icon :icon="['fas', 'circle-info']" size="2x" />
+        </button>
+        <button @click="handleHelpButton" class="help-button" tab-index="5">
+          <font-awesome-icon :icon="['fas', 'circle-question']" size="2x" />
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -155,14 +220,22 @@ h1 {
   bottom: 10vh;
 }
 
-.info-button {
+.info-button-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.info-button,
+.help-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
 }
 
-.info-button:hover .fa-circle-info {
+.info-button:hover .fa-circle-info,
+.help-button:hover .fa-circle-question {
   color: #443b3d;
 }
 
@@ -189,5 +262,10 @@ h1 {
 .info-box-leave-from {
   opacity: 1;
   transform: translateY(-10px);
+}
+
+a:link,
+a:visited {
+  color: #800080;
 }
 </style>

@@ -14,7 +14,7 @@
   border: 1px solid #3a3335;
   border-radius: 0.25rem;
   padding: 1rem;
-  width: 200px;
+  width: 400px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
