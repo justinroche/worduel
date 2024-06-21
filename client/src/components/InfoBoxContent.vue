@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const wordleUrl = 'https://www.nytimes.com/games/wordle/index.html'
 </script>
 
