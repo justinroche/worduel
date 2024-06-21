@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import InfoBox from '../components/InfoBox.vue'
+import HelpBoxContent from '../components/HelpBoxContent.vue'
+import InfoBoxContent from '../components/InfoBoxContent.vue'
 
-const wordleUrl = 'https://www.nytimes.com/games/wordle/index.html'
-const githubUrl = 'https://github.com/justinroche/worduel'
-const emailUrl = 'mailto:justinroche03@gmail.com'
 const joinCode = ref('')
 const showInfoBox = ref(false)
 const showInfoContent = ref(false)
@@ -97,34 +96,8 @@ const handleHelpButton = () => {
     <div class="info-section">
       <transition name="info-box">
         <info-box v-if="showInfoBox" class="info-box">
-          <div v-if="showInfoContent" class="info-content">
-            <h3>Welcome to Worduel!</h3>
-            <p>
-              This game works just like
-              <a :href="wordleUrl" target="_blank" rel="noreferrer noopener"
-                >Wordle</a
-              >, except you play head-to-head against a friend. Start by hosting
-              a lobby, then share the code with your friend to join.
-            </p>
-            <p>
-              You will each come up with words for your opponent to guess,
-              Wordle-style. Scores are tallied over the course of multiple
-              rounds. Good luck!
-            </p>
-          </div>
-          <div v-if="showHelpContent" class="help-content">
-            <p>
-              <a :href="githubUrl" target="_blank" ref="noreferrer noopener"
-                >GitHub Repository</a
-              >
-            </p>
-            <p>
-              Feel free to reach out with any questions or suggestions:
-              <a :href="emailUrl" target="_blank" ref="noreferrer noopener"
-                >justinroche03@gmail.com</a
-              >
-            </p>
-          </div>
+          <info-box-content v-if="showInfoContent" />
+          <help-box-content v-if="showHelpContent" />
         </info-box>
       </transition>
       <div class="info-button-container">
@@ -262,10 +235,5 @@ h1 {
 .info-box-leave-from {
   opacity: 1;
   transform: translateY(-10px);
-}
-
-a:link,
-a:visited {
-  color: #800080;
 }
 </style>
