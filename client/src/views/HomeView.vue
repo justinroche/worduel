@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import InfoBox from '../components/InfoBox.vue'
 import HelpBoxContent from '../components/HelpBoxContent.vue'
 import InfoBoxContent from '../components/InfoBoxContent.vue'
 
+const router = useRouter()
 const joinCode = ref('')
 const showInfoBox = ref(false)
 const showInfoContent = ref(false)
@@ -22,7 +24,10 @@ const filterInput = (event: Event) => {
 }
 
 const handleHostButton = () => {
-  console.log('Host button clicked')
+  // Using a placeholder code for testing
+  // TODO: Implement backend call for hosting game that returns a game code
+  const gameCode = 'ABCD'
+  router.push({ name: 'lobby', query: { gameCode } })
 }
 
 const handleJoinButton = () => {
