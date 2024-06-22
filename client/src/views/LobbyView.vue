@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -6,6 +7,11 @@ const gameCode = route.query.gameCode || 'No game code provided'
 
 const player1Name = 'Player 1'
 const player2Name = 'Player 2'
+const playerIsHost = ref(false)
+
+const handleKickButtonClicked = () => {
+  console.log('Kick button clicked')
+}
 </script>
 
 <template>
@@ -15,11 +21,19 @@ const player2Name = 'Player 2'
         <h2>Players</h2>
         <div class="player-container">
           <p class="player-name">{{ player1Name }}</p>
-          <p class="player-tag"><b>HOST</b></p>
+          <p v-if="playerIsHost" class="player-tag"><b>HOST (YOU)</b></p>
+          <p v-else class="player-tag"><b>HOST</b></p>
         </div>
         <div class="player-container player2-container">
           <p class="player-name">{{ player2Name }}</p>
-          <p class="player-tag"><b>YOU</b></p>
+          <button
+            v-if="playerIsHost"
+            class="player-tag kick-button"
+            @click="handleKickButtonClicked"
+          >
+            KICK
+          </button>
+          <p v-else class="player-tag"><b>YOU</b></p>
         </div>
       </div>
       <div class="lobby-section">
@@ -92,6 +106,25 @@ const player2Name = 'Player 2'
 
 .player-tag {
   font-size: 0.8rem;
+}
+
+.kick-button {
+  font-family: inherit;
+  font-weight: 600;
+  background-color: #d21b27;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.kick-button:hover {
+  background-color: #e12531;
+}
+
+.kick-button:active {
+  background-color: #f02f3b;
 }
 
 .host-buttons {
