@@ -3,28 +3,36 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const gameCode = route.query.gameCode || 'No game code provided'
+
+const player1Name = 'Player 1'
+const player2Name = 'Player 2'
 </script>
 
 <template>
   <div class="lobby-view">
     <div class="top-row">
-      <div class="player-container">
-        <h2>Player 1</h2>
-        <p>Host</p>
-        <h2>Player 2</h2>
-        <p>You</p>
+      <div class="players-section">
+        <h2>Players</h2>
+        <div class="player-container">
+          <p class="player-name">{{ player1Name }}</p>
+          <p class="player-tag"><b>HOST</b></p>
+        </div>
+        <div class="player-container player2-container">
+          <p class="player-name">{{ player2Name }}</p>
+          <p class="player-tag"><b>YOU</b></p>
+        </div>
       </div>
-      <div class="lobby-details">
-        <h1>Lobby Code</h1>
+      <div class="lobby-section">
+        <h2>Lobby Code</h2>
         <p>{{ gameCode }}</p>
       </div>
     </div>
     <div class="bottom-row">
-      <div class="host-buttons">
+      <div class="host-buttons-section">
         <button class="lobby-button start-button">Start Game</button>
         <button class="lobby-button cancel-button">Cancel Game</button>
       </div>
-      <div class="server-options">
+      <div class="server-options-section">
         <h2>Server Options</h2>
         <p>Rounds</p>
         <p>Use Spell Check</p>
@@ -50,9 +58,40 @@ const gameCode = route.query.gameCode || 'No game code provided'
 .top-row,
 .bottom-row {
   display: flex;
+  align-items: center;
+  gap: 150px;
+}
+
+.players-section,
+.lobby-section,
+.host-buttons-section,
+.server-options-section {
+  width: 250px;
+  height: 250px;
+}
+
+.player-container {
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 25vw;
+  background-color: #fff;
+  border: 1px solid #3a3335;
+  border-radius: 0.25rem;
+  padding: 0 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.player2-container {
+  margin-top: 25px;
+}
+
+.player-name {
+  font-size: 1.1rem;
+  line-height: 1rem;
+}
+
+.player-tag {
+  font-size: 0.8rem;
 }
 
 .host-buttons {
