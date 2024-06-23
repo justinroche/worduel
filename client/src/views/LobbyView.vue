@@ -1,57 +1,53 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
 
 const route = useRoute()
 const gameCode = route.query.gameCode || 'No game code provided'
 
-const player1Name = 'Player 1'
-const player2Name = 'Player 2'
-const playerIsHost = ref(false)
-
-const handleKickButtonClicked = () => {
-  console.log('Kick button clicked')
-}
+const rounds = ref(3)
 </script>
 
 <template>
   <div class="lobby-view">
     <div class="top-row">
-      <div class="players-section">
-        <h2>Players</h2>
-        <div class="player-container">
-          <p class="player-name">{{ player1Name }}</p>
-          <p v-if="playerIsHost" class="player-tag"><b>HOST (YOU)</b></p>
-          <p v-else class="player-tag"><b>HOST</b></p>
-        </div>
-        <div class="player-container player2-container">
-          <p class="player-name">{{ player2Name }}</p>
-          <button
-            v-if="playerIsHost"
-            class="player-tag kick-button"
-            @click="handleKickButtonClicked"
-          >
-            KICK
-          </button>
-          <p v-else class="player-tag"><b>YOU</b></p>
-        </div>
-      </div>
       <div class="lobby-section">
         <h2>Lobby Code</h2>
-        <p>{{ gameCode }}</p>
+        <p class="game-code">{{ gameCode }}</p>
+      </div>
+      <div class="players-section">
+        <lobby-players-section />
       </div>
     </div>
     <div class="bottom-row">
-      <div class="host-buttons-section">
-        <button class="lobby-button start-button">Start Game</button>
-        <button class="lobby-button cancel-button">Cancel Game</button>
-      </div>
-      <div class="server-options-section">
-        <h2>Server Options</h2>
-        <p>Rounds</p>
+      <div class="game-options-section">
+        <h2>Game Options</h2>
+        <div class="game-option">
+          <p>Rounds</p>
+          <div class="game-option-number-picker">
+            <button class="game-option-button">
+              <font-awesome-icon
+                :icon="['fas', 'circle-chevron-left']"
+                size="2x"
+              />
+            </button>
+            <p class="rounds-counter">{{ rounds }}</p>
+            <button class="game-option-button">
+              <font-awesome-icon
+                :icon="['fas', 'circle-chevron-right']"
+                size="2x"
+              />
+            </button>
+          </div>
+        </div>
         <p>Use Spell Check</p>
         <p>Block Swear Words</p>
         <p>Round Timer</p>
+      </div>
+      <div class="host-buttons-section">
+        <button class="lobby-button start-button">Start Game</button>
+        <button class="lobby-button cancel-button">Exit Lobby</button>
       </div>
     </div>
   </div>
@@ -79,57 +75,87 @@ const handleKickButtonClicked = () => {
 .players-section,
 .lobby-section,
 .host-buttons-section,
-.server-options-section {
+.game-options-section {
   width: 250px;
   height: 250px;
 }
 
-.player-container {
+.game-code {
+  font-size: 5rem;
+  margin: 0;
+  line-height: 8rem;
+  font-weight: 600;
+}
+
+.game-option {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff;
-  border: 1px solid #3a3335;
-  border-radius: 0.25rem;
-  padding: 0 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.player2-container {
-  margin-top: 25px;
+.game-option-number-picker {
+  display: flex;
+  gap: 10px;
 }
 
-.player-name {
-  font-size: 1.1rem;
-  line-height: 1rem;
+.game-option p {
+  text-align: left;
+  margin: 5px 0;
 }
 
-.player-tag {
-  font-size: 0.8rem;
+.game-option-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
-.kick-button {
+.rounds-counter {
+  font-size: 1.5rem;
+  margin: 0px;
+}
+
+.host-buttons-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.lobby-button {
   font-family: inherit;
   font-weight: 600;
-  background-color: #d21b27;
+  font-size: 1rem;
   color: #fff;
   border: none;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
+  width: 250px;
 }
 
-.kick-button:hover {
-  background-color: #e12531;
+.start-button {
+  background-color: rgb(86, 128, 56);
+  margin-bottom: 20px;
 }
 
-.kick-button:active {
-  background-color: #f02f3b;
+.start-button:hover {
+  background-color: rgb(108, 134, 64);
 }
 
-.host-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.start-button:active {
+  background-color: rgb(120, 139, 72);
+}
+
+.cancel-button {
+  background-color: #3a3335;
+}
+
+.cancel-button:hover {
+  background-color: #443b3d;
+}
+
+.cancel-button:active {
+  background-color: #504346;
 }
 </style>
