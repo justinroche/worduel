@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
+import MenuButton from '../components/MenuButton.vue'
 
 const route = useRoute()
 const gameCode = route.query.gameCode || 'No game code provided'
@@ -79,8 +80,21 @@ const toggleSpellCheckEnabled = () => {
         <p>Round Timer</p>
       </div>
       <div class="host-buttons-section">
-        <button class="lobby-button start-button">Start Game</button>
-        <button class="lobby-button cancel-button">Exit Lobby</button>
+        <menu-button
+          buttonText="Start Game"
+          fontSize="1rem"
+          buttonWidth="250px"
+          buttonHeight="40px"
+          buttonStyle="atomic-tangerine"
+          class="start-button"
+        />
+        <menu-button
+          buttonText="Exit Lobby"
+          fontSize="1rem"
+          buttonWidth="250px"
+          buttonHeight="40px"
+          buttonStyle="taupe"
+        />
       </div>
     </div>
   </div>
@@ -162,44 +176,7 @@ const toggleSpellCheckEnabled = () => {
   justify-content: center;
 }
 
-.lobby-button {
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 1rem;
-  color: #fff;
-  border: none;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  width: 250px;
-}
-
 .start-button {
-  background-color: var(--atomic-tangerine);
-  border: 2px solid var(--atomic-tangerine-border);
-  box-sizing: border-box;
   margin-bottom: 20px;
-}
-
-.start-button:hover {
-  background-color: var(--atomic-tangerine-hover);
-}
-
-.start-button:active {
-  background-color: var(--atomic-tangerine-active);
-}
-
-.cancel-button {
-  background-color: var(--taupe);
-  border: 2px solid var(--taupe-border);
-  box-sizing: border-box;
-}
-
-.cancel-button:hover {
-  background-color: var(--taupe-hover);
-}
-
-.cancel-button:active {
-  background-color: var(--taupe-active);
 }
 </style>

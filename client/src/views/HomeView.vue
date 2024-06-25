@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import InfoBox from '../components/InfoBox.vue'
 import HelpBoxContent from '../components/HelpBoxContent.vue'
 import InfoBoxContent from '../components/InfoBoxContent.vue'
+import MenuButton from '../components/MenuButton.vue'
 
 const router = useRouter()
 const joinCode = ref('')
@@ -71,13 +72,15 @@ const handleHelpButton = () => {
   <div class="home-view">
     <div class="main-content">
       <h1>Worduel</h1>
-      <button
+      <menu-button
+        buttonText="Host"
+        fontSize="1rem"
+        buttonWidth="250px"
+        buttonHeight="40px"
+        buttonStyle="atomic-tangerine"
         @click="handleHostButton"
-        class="home-button host-button"
-        tabindex="1"
-      >
-        Host
-      </button>
+        class="host-button"
+      />
       <div class="join-container">
         <input
           type="text"
@@ -89,13 +92,14 @@ const handleHelpButton = () => {
           maxlength="4"
           tabindex="2"
         />
-        <button
+        <menu-button
+          buttonText="Join"
+          fontSize="1rem"
+          buttonWidth="120px"
+          buttonHeight="40px"
+          buttonStyle="atomic-tangerine"
           @click="handleJoinButton"
-          class="home-button join-button"
-          tabindex="3"
-        >
-          Join
-        </button>
+        />
       </div>
     </div>
     <div class="info-section">
@@ -140,30 +144,7 @@ h1 {
   font-size: 3rem;
 }
 
-.home-button {
-  font-family: inherit;
-  font-weight: 600;
-  background-color: var(--atomic-tangerine);
-  color: #fff;
-  border: none;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-size: 1rem;
-  height: 40px;
-  transition: background-color 0.05s ease-in-out;
-}
-
-.home-button:hover {
-  background-color: var(--atomic-tangerine-hover);
-}
-
-.home-button:active {
-  background-color: var(--atomic-tangerine-active);
-}
-
 .host-button {
-  width: 250px;
   margin-bottom: 10px;
 }
 
@@ -178,7 +159,7 @@ h1 {
   font-family: inherit;
   font-size: 1rem;
   padding: 0.5rem;
-  border: 1px solid var(--taupe);
+  border: 1px solid var(--taupe-default);
   border-radius: 0.25rem;
   width: 120px;
   margin-right: 10px;
@@ -187,10 +168,6 @@ h1 {
 
 .join-code-input-spacing {
   letter-spacing: 0.2rem;
-}
-
-.join-button {
-  flex: 1;
 }
 
 .info-section {

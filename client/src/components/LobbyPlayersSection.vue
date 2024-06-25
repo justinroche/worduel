@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import MenuButton from './MenuButton.vue'
 
 const player1Name = 'Player 1'
 const player2Name = 'Player 2'
@@ -19,13 +20,15 @@ const handleKickButtonClicked = () => {
   </div>
   <div class="player-container player2-container">
     <p class="player-name">{{ player2Name }}</p>
-    <button
+    <menu-button
       v-if="playerIsHost"
-      class="player-tag kick-button"
+      buttonText="KICK"
+      fontSize="0.8rem"
+      buttonWidth="65px"
+      buttonHeight="30px"
+      buttonStyle="auburn"
       @click="handleKickButtonClicked"
-    >
-      KICK
-    </button>
+    />
     <p v-else class="player-tag"><b>YOU</b></p>
   </div>
 </template>
@@ -53,25 +56,5 @@ const handleKickButtonClicked = () => {
 
 .player-tag {
   font-size: 0.8rem;
-}
-
-.kick-button {
-  font-family: inherit;
-  font-weight: 600;
-  background-color: var(--auburn);
-  border: 2px solid var(--auburn-border);
-  box-sizing: border-box;
-  color: #fff;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-}
-
-.kick-button:hover {
-  background-color: var(--auburn-hover);
-}
-
-.kick-button:active {
-  background-color: var(--auburn-active);
 }
 </style>
