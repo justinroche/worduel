@@ -59,7 +59,7 @@ const handleKickButtonClicked = () => {
   font-family: inherit;
   font-weight: 600;
   background-color: var(--auburn);
-  border: 1px solid var(--auburn-border);
+  border: 2px solid var(--auburn-border);
   box-sizing: border-box;
   color: #fff;
   border-radius: 0.25rem;

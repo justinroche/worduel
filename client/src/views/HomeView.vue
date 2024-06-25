@@ -178,7 +178,7 @@ h1 {
   font-family: inherit;
   font-size: 1rem;
   padding: 0.5rem;
-  border: 1px solid #3a3335;
+  border: 1px solid var(--taupe);
   border-radius: 0.25rem;
   width: 120px;
   margin-right: 10px;
