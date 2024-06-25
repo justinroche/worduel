@@ -7,6 +7,22 @@ const route = useRoute()
 const gameCode = route.query.gameCode || 'No game code provided'
 
 const rounds = ref(3)
+const MAX_ROUNDS = 10
+const spellCheckEnabled = ref(true)
+const swearBlockEnabled = ref(false)
+const roundTimerEnabled = ref(false)
+
+const handleAddRoundButton = () => {
+  if (rounds.value < MAX_ROUNDS) rounds.value++
+}
+
+const handleSubtractRoundButton = () => {
+  if (rounds.value > 1) rounds.value--
+}
+
+const toggleSpellCheckEnabled = () => {
+  spellCheckEnabled.value = !spellCheckEnabled.value
+}
 </script>
 
 <template>
@@ -26,14 +42,17 @@ const rounds = ref(3)
         <div class="game-option">
           <p>Rounds</p>
           <div class="game-option-number-picker">
-            <button class="game-option-button">
+            <button
+              class="game-option-button"
+              @click="handleSubtractRoundButton"
+            >
               <font-awesome-icon
                 :icon="['fas', 'circle-chevron-left']"
                 size="2x"
               />
             </button>
             <p class="rounds-counter">{{ rounds }}</p>
-            <button class="game-option-button">
+            <button class="game-option-button" @click="handleAddRoundButton">
               <font-awesome-icon
                 :icon="['fas', 'circle-chevron-right']"
                 size="2x"
@@ -41,7 +60,21 @@ const rounds = ref(3)
             </button>
           </div>
         </div>
-        <p>Use Spell Check</p>
+        <div class="game-option">
+          <p>Use Spell Check</p>
+          <button class="game-option-button" @click="toggleSpellCheckEnabled">
+            <font-awesome-icon
+              v-if="!spellCheckEnabled"
+              :icon="['far', 'square']"
+              size="2x"
+            />
+            <font-awesome-icon
+              v-else
+              :icon="['fas', 'square-check']"
+              size="2x"
+            />
+          </button>
+        </div>
         <p>Block Swear Words</p>
         <p>Round Timer</p>
       </div>
@@ -110,9 +143,16 @@ const rounds = ref(3)
   padding: 0;
 }
 
+.game-option-button:hover .fa-circle-chevron-right,
+.game-option-button:hover .fa-circle-chevron-left {
+  color: #443b3d;
+}
+
 .rounds-counter {
   font-size: 1.5rem;
   margin: 0px;
+  width: 30px;
+  text-align: center !important;
 }
 
 .host-buttons-section {
@@ -136,7 +176,7 @@ const rounds = ref(3)
 
 .start-button {
   background-color: var(--atomic-tangerine);
-  border: 1px solid var(--atomic-tangerine-border);
+  border: 2px solid var(--atomic-tangerine-border);
   box-sizing: border-box;
   margin-bottom: 20px;
 }
@@ -151,7 +191,7 @@ const rounds = ref(3)
 
 .cancel-button {
   background-color: var(--taupe);
-  border: 1px solid var(--taupe-border);
+  border: 2px solid var(--taupe-border);
   box-sizing: border-box;
 }
 
