@@ -58,19 +58,20 @@ const handleKickButtonClicked = () => {
 .kick-button {
   font-family: inherit;
   font-weight: 600;
-  background-color: rgb(170, 27, 39);
+  background-color: var(--auburn);
+  border: 1px solid var(--auburn-border);
+  box-sizing: border-box;
   color: #fff;
-  border: none;
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
 
 .kick-button:hover {
-  background-color: rgb(185, 37, 49);
+  background-color: var(--auburn-hover);
 }
 
 .kick-button:active {
-  background-color: rgb(200, 47, 59);
+  background-color: var(--auburn-active);
 }
 </style>

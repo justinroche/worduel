@@ -135,27 +135,31 @@ const rounds = ref(3)
 }
 
 .start-button {
-  background-color: rgb(86, 128, 56);
+  background-color: var(--atomic-tangerine);
+  border: 1px solid var(--atomic-tangerine-border);
+  box-sizing: border-box;
   margin-bottom: 20px;
 }
 
 .start-button:hover {
-  background-color: rgb(108, 134, 64);
+  background-color: var(--atomic-tangerine-hover);
 }
 
 .start-button:active {
-  background-color: rgb(120, 139, 72);
+  background-color: var(--atomic-tangerine-active);
 }
 
 .cancel-button {
-  background-color: #3a3335;
+  background-color: var(--taupe);
+  border: 1px solid var(--taupe-border);
+  box-sizing: border-box;
 }
 
 .cancel-button:hover {
-  background-color: #443b3d;
+  background-color: var(--taupe-hover);
 }
 
 .cancel-button:active {
-  background-color: #504346;
+  background-color: var(--taupe-active);
 }
 </style>

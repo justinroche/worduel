@@ -143,7 +143,7 @@ h1 {
 .home-button {
   font-family: inherit;
   font-weight: 600;
-  background-color: #3a3335;
+  background-color: var(--atomic-tangerine);
   color: #fff;
   border: none;
   border-radius: 0.25rem;
@@ -155,11 +155,11 @@ h1 {
 }
 
 .home-button:hover {
-  background-color: #443b3d;
+  background-color: var(--atomic-tangerine-hover);
 }
 
 .home-button:active {
-  background-color: #504346;
+  background-color: var(--atomic-tangerine-active);
 }
 
 .host-button {
