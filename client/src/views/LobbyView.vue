@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
 import MenuButton from '../components/MenuButton.vue'
@@ -7,11 +7,19 @@ import MenuButton from '../components/MenuButton.vue'
 const route = useRoute()
 const gameCode = route.query.gameCode || 'No game code provided'
 
-const rounds = ref(3)
 const MAX_ROUNDS = 10
+const rounds = ref(3)
+
 const spellCheckEnabled = ref(true)
 const profanityBlockEnabled = ref(false)
 const roundTimerEnabled = ref(false)
+const roundTimer = ref(60)
+
+const roundTimerToDisplay = computed(() => {
+  const minutes = Math.floor(roundTimer.value / 60)
+  const seconds = roundTimer.value % 60
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+})
 
 const handleAddRoundButton = () => {
   if (rounds.value < MAX_ROUNDS) rounds.value++
@@ -23,6 +31,22 @@ const handleSubtractRoundButton = () => {
 
 const toggleSpellCheckEnabled = () => {
   spellCheckEnabled.value = !spellCheckEnabled.value
+}
+
+const toggleBlockProfanity = () => {
+  profanityBlockEnabled.value = !profanityBlockEnabled.value
+}
+
+const toggleRoundTimer = () => {
+  roundTimerEnabled.value = !roundTimerEnabled.value
+}
+
+const handleAddTimeButton = () => {
+  if (roundTimer.value < 300) roundTimer.value += 15
+}
+
+const handleSubtractTimeButton = () => {
+  if (roundTimer.value > 15) roundTimer.value -= 15
 }
 </script>
 
@@ -76,8 +100,51 @@ const toggleSpellCheckEnabled = () => {
             />
           </button>
         </div>
-        <p>Block Profanity</p>
-        <p>Round Timer</p>
+        <div class="game-option">
+          <p>Block Profanity</p>
+          <button class="game-option-button" @click="toggleBlockProfanity">
+            <font-awesome-icon
+              v-if="!profanityBlockEnabled"
+              :icon="['far', 'square']"
+              size="2x"
+            />
+            <font-awesome-icon
+              v-else
+              :icon="['fas', 'square-check']"
+              size="2x"
+            />
+          </button>
+        </div>
+        <div class="game-option">
+          <p>Round Timer</p>
+          <button class="game-option-button" @click="toggleRoundTimer">
+            <font-awesome-icon
+              v-if="!roundTimerEnabled"
+              :icon="['far', 'square']"
+              size="2x"
+            />
+            <font-awesome-icon
+              v-else
+              :icon="['fas', 'square-check']"
+              size="2x"
+            />
+          </button>
+        </div>
+        <div v-if="roundTimerEnabled" class="game-option">
+          <p></p>
+          <div class="game-option-number-picker">
+            <button
+              class="game-option-button"
+              @click="handleSubtractTimeButton"
+            >
+              <font-awesome-icon :icon="['fas', 'circle-minus']" size="2x" />
+            </button>
+            <p class="round-timer">{{ roundTimerToDisplay }}</p>
+            <button class="game-option-button" @click="handleAddTimeButton">
+              <font-awesome-icon :icon="['fas', 'circle-plus']" size="2x" />
+            </button>
+          </div>
+        </div>
       </div>
       <div class="host-buttons-section">
         <menu-button
@@ -138,6 +205,7 @@ const toggleSpellCheckEnabled = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 40px;
 }
 
 .game-option-number-picker {
@@ -147,7 +215,7 @@ const toggleSpellCheckEnabled = () => {
 
 .game-option p {
   text-align: left;
-  margin: 5px 0;
+  margin: 0;
 }
 
 .game-option-button {
@@ -158,22 +226,33 @@ const toggleSpellCheckEnabled = () => {
 }
 
 .game-option-button:hover .fa-circle-chevron-right,
-.game-option-button:hover .fa-circle-chevron-left {
+.game-option-button:hover .fa-circle-chevron-left,
+.game-option-button:hover .fa-square-check,
+.game-option-button:hover .fa-square,
+.game-option-button:hover .fa-circle-plus,
+.game-option-button:hover .fa-circle-minus {
   color: #443b3d;
 }
 
 .rounds-counter {
   font-size: 1.5rem;
-  margin: 0px;
   width: 30px;
+  text-align: center !important;
+}
+
+.round-timer {
+  font-size: 1.5rem;
+  width: 65px;
   text-align: center !important;
 }
 
 .host-buttons-section {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: center;
+  padding-bottom: 25px;
+  box-sizing: border-box;
 }
 
 .start-button {
