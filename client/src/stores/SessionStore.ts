@@ -9,9 +9,10 @@ export const useSessionStore = defineStore('session', {
     playerIsHost: false,
 
     rounds: 3,
+    MAX_ROUNDS: 10,
     spellCheckEnabled: true,
     blockProfanityEnabled: false,
-    roundTimerEnabled: false,
+    roundTimerEnabled: true,
     roundTimerDuration: 120,
   }),
 
@@ -21,6 +22,7 @@ export const useSessionStore = defineStore('session', {
     getPlayer2Name: (state) => state.player2Name,
     getPlayerIsHost: (state) => state.playerIsHost,
     getRounds: (state) => state.rounds,
+    getMaxRounds: (state) => state.MAX_ROUNDS,
     getSpellCheckEnabled: (state) => state.spellCheckEnabled,
     getBlockProfanityEnabled: (state) => state.blockProfanityEnabled,
     getRoundTimerEnabled: (state) => state.roundTimerEnabled,
