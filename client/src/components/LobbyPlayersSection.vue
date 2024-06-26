@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useSessionStore } from '../stores/SessionStore'
 import MenuButton from './MenuButton.vue'
+import { updatePlayer1Name, updatePlayer2Name } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const player1Name = computed(() => sessionStore.player1Name)
@@ -23,18 +24,18 @@ const togglePlayer2Editing = () => {
   player2Editing.value = !player2Editing.value
 }
 
-const updatePlayer1Name = (event: Event) => {
+const handleUpdatePlayer1Name = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.value.length > 0) {
-    sessionStore.setPlayer1Name(input.value)
+    updatePlayer1Name(input.value)
     player1Editing.value = false
   }
 }
 
-const updatePlayer2Name = (event: Event) => {
+const handleUpdatePlayer2Name = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.value.length > 0) {
-    sessionStore.setPlayer2Name(input.value)
+    updatePlayer2Name(input.value)
     player2Editing.value = false
   }
 }
@@ -55,7 +56,7 @@ window.addEventListener('keyup', (event) => {
         type="text"
         :value="player1Name"
         @blur="player1Editing = false"
-        @keyup.enter="updatePlayer1Name"
+        @keyup.enter="handleUpdatePlayer1Name"
         class="player-name-input"
       />
     </div>
@@ -78,7 +79,7 @@ window.addEventListener('keyup', (event) => {
         type="text"
         :value="player2Name"
         @blur="player2Editing = false"
-        @keyup.enter="updatePlayer2Name"
+        @keyup.enter="handleUpdatePlayer2Name"
         class="player-name-input"
       />
     </div>

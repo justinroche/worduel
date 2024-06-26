@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useSessionStore } from '../stores/SessionStore'
+import {
+  updateRounds,
+  updateSpellCheckEnabled,
+  updateBlockProfanityEnabled,
+  updateRoundTimerEnabled,
+  updateRoundTimerDuration,
+} from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const playerIsHost = computed(() => sessionStore.playerIsHost)
@@ -17,43 +24,43 @@ const roundTimerDurationFormatted = computed(
 
 const handleAddRoundButton = () => {
   if (playerIsHost.value && rounds.value < MAX_ROUNDS) {
-    sessionStore.setRounds(rounds.value + 1)
+    updateRounds(rounds.value + 1)
   }
 }
 
 const handleSubtractRoundButton = () => {
   if (playerIsHost.value && rounds.value > 1) {
-    sessionStore.setRounds(rounds.value - 1)
+    updateRounds(rounds.value - 1)
   }
 }
 
 const toggleSpellCheckEnabled = () => {
   if (playerIsHost.value) {
-    sessionStore.setSpellCheckEnabled(!spellCheckEnabled.value)
+    updateSpellCheckEnabled(!spellCheckEnabled.value)
   }
 }
 
 const toggleBlockProfanity = () => {
   if (playerIsHost.value) {
-    sessionStore.setBlockProfanityEnabled(!blockProfanityEnabled.value)
+    updateBlockProfanityEnabled(!blockProfanityEnabled.value)
   }
 }
 
 const toggleRoundTimer = () => {
   if (playerIsHost.value) {
-    sessionStore.setRoundTimerEnabled(!roundTimerEnabled.value)
+    updateRoundTimerEnabled(!roundTimerEnabled.value)
   }
 }
 
 const handleAddTimeButton = () => {
   if (playerIsHost.value && roundTimerDuration.value < 300) {
-    sessionStore.setRoundTimerDuration(roundTimerDuration.value + 15)
+    updateRoundTimerDuration(roundTimerDuration.value + 15)
   }
 }
 
 const handleSubtractTimeButton = () => {
   if (playerIsHost.value && roundTimerDuration.value > 15) {
-    sessionStore.setRoundTimerDuration(roundTimerDuration.value - 15)
+    updateRoundTimerDuration(roundTimerDuration.value - 15)
   }
 }
 </script>
@@ -166,7 +173,9 @@ const handleSubtractTimeButton = () => {
         size="2x"
         class="game-option-check"
       />
-      <p class="round-timer-not-host">{{ roundTimerDurationFormatted }}</p>
+      <p v-else class="round-timer-not-host">
+        {{ roundTimerDurationFormatted }}
+      </p>
     </div>
   </div>
 </template>
