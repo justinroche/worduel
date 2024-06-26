@@ -1,52 +1,68 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
 import MenuButton from '../components/MenuButton.vue'
+import { useSessionStore } from '../stores/SessionStore'
 
 const route = useRoute()
-const gameCode = route.query.gameCode || 'No game code provided'
-
 const MAX_ROUNDS = 10
-const rounds = ref(3)
 
-const spellCheckEnabled = ref(true)
-const profanityBlockEnabled = ref(false)
-const roundTimerEnabled = ref(false)
-const roundTimer = ref(60)
+const sessionStore = useSessionStore()
 
-const roundTimerToDisplay = computed(() => {
-  const minutes = Math.floor(roundTimer.value / 60)
-  const seconds = roundTimer.value % 60
-  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
-})
+const sessionCode = computed(() => sessionStore.sessionCode)
+const rounds = computed(() => sessionStore.rounds)
+
+const playerIsHost = computed(() => sessionStore.playerIsHost)
+
+const spellCheckEnabled = computed(() => sessionStore.spellCheckEnabled)
+const blockProfanityEnabled = computed(() => sessionStore.blockProfanityEnabled)
+const roundTimerEnabled = computed(() => sessionStore.roundTimerEnabled)
+const roundTimerDuration = computed(() => sessionStore.roundTimerDuration)
+const roundTimerDurationFormatted = computed(
+  () => sessionStore.getRoundTimerDurationFormatted
+)
 
 const handleAddRoundButton = () => {
-  if (rounds.value < MAX_ROUNDS) rounds.value++
+  if (playerIsHost.value && rounds.value < MAX_ROUNDS) {
+    sessionStore.setRounds(rounds.value + 1)
+  }
 }
 
 const handleSubtractRoundButton = () => {
-  if (rounds.value > 1) rounds.value--
+  if (playerIsHost.value && rounds.value > 1) {
+    sessionStore.setRounds(rounds.value - 1)
+  }
 }
 
 const toggleSpellCheckEnabled = () => {
-  spellCheckEnabled.value = !spellCheckEnabled.value
+  if (playerIsHost.value) {
+    sessionStore.setSpellCheckEnabled(!spellCheckEnabled.value)
+  }
 }
 
 const toggleBlockProfanity = () => {
-  profanityBlockEnabled.value = !profanityBlockEnabled.value
+  if (playerIsHost.value) {
+    sessionStore.setBlockProfanityEnabled(!blockProfanityEnabled.value)
+  }
 }
 
 const toggleRoundTimer = () => {
-  roundTimerEnabled.value = !roundTimerEnabled.value
+  if (playerIsHost) {
+    sessionStore.setRoundTimerEnabled(!roundTimerEnabled.value)
+  }
 }
 
 const handleAddTimeButton = () => {
-  if (roundTimer.value < 300) roundTimer.value += 15
+  if (playerIsHost.value && roundTimerDuration.value < 300) {
+    sessionStore.setRoundTimerDuration(roundTimerDuration.value + 15)
+  }
 }
 
 const handleSubtractTimeButton = () => {
-  if (roundTimer.value > 15) roundTimer.value -= 15
+  if (playerIsHost.value && roundTimerDuration.value > 15) {
+    sessionStore.setRoundTimerDuration(roundTimerDuration.value - 15)
+  }
 }
 </script>
 
@@ -55,7 +71,7 @@ const handleSubtractTimeButton = () => {
     <div class="top-row">
       <div class="lobby-section">
         <h2>Lobby Code</h2>
-        <p class="game-code">{{ gameCode }}</p>
+        <p class="session-code">{{ sessionCode }}</p>
       </div>
       <div class="players-section">
         <lobby-players-section />
@@ -69,6 +85,7 @@ const handleSubtractTimeButton = () => {
           <div class="game-option-number-picker">
             <button
               class="game-option-button"
+              :class="{ 'game-option-button-disabled': !playerIsHost }"
               @click="handleSubtractRoundButton"
             >
               <font-awesome-icon
@@ -77,7 +94,11 @@ const handleSubtractTimeButton = () => {
               />
             </button>
             <p class="rounds-counter">{{ rounds }}</p>
-            <button class="game-option-button" @click="handleAddRoundButton">
+            <button
+              class="game-option-button"
+              :class="{ 'game-option-button-disabled': !playerIsHost }"
+              @click="handleAddRoundButton"
+            >
               <font-awesome-icon
                 :icon="['fas', 'circle-chevron-right']"
                 size="2x"
@@ -87,7 +108,11 @@ const handleSubtractTimeButton = () => {
         </div>
         <div class="game-option">
           <p>Use Spell Check</p>
-          <button class="game-option-button" @click="toggleSpellCheckEnabled">
+          <button
+            class="game-option-button"
+            :class="{ 'game-option-button-disabled': !playerIsHost }"
+            @click="toggleSpellCheckEnabled"
+          >
             <font-awesome-icon
               v-if="!spellCheckEnabled"
               :icon="['far', 'square']"
@@ -102,9 +127,13 @@ const handleSubtractTimeButton = () => {
         </div>
         <div class="game-option">
           <p>Block Profanity</p>
-          <button class="game-option-button" @click="toggleBlockProfanity">
+          <button
+            class="game-option-button"
+            :class="{ 'game-option-button-disabled': !playerIsHost }"
+            @click="toggleBlockProfanity"
+          >
             <font-awesome-icon
-              v-if="!profanityBlockEnabled"
+              v-if="!blockProfanityEnabled"
               :icon="['far', 'square']"
               size="2x"
             />
@@ -117,7 +146,11 @@ const handleSubtractTimeButton = () => {
         </div>
         <div class="game-option">
           <p>Round Timer</p>
-          <button class="game-option-button" @click="toggleRoundTimer">
+          <button
+            class="game-option-button"
+            :class="{ 'game-option-button-disabled': !playerIsHost }"
+            @click="toggleRoundTimer"
+          >
             <font-awesome-icon
               v-if="!roundTimerEnabled"
               :icon="['far', 'square']"
@@ -135,12 +168,17 @@ const handleSubtractTimeButton = () => {
           <div class="game-option-number-picker">
             <button
               class="game-option-button"
+              :class="{ 'game-option-button-disabled': !playerIsHost }"
               @click="handleSubtractTimeButton"
             >
               <font-awesome-icon :icon="['fas', 'circle-minus']" size="2x" />
             </button>
-            <p class="round-timer">{{ roundTimerToDisplay }}</p>
-            <button class="game-option-button" @click="handleAddTimeButton">
+            <p class="round-timer">{{ roundTimerDurationFormatted }}</p>
+            <button
+              class="game-option-button"
+              :class="{ 'game-option-button-disabled': !playerIsHost }"
+              @click="handleAddTimeButton"
+            >
               <font-awesome-icon :icon="['fas', 'circle-plus']" size="2x" />
             </button>
           </div>
@@ -194,7 +232,7 @@ const handleSubtractTimeButton = () => {
   height: 250px;
 }
 
-.game-code {
+.session-code {
   font-size: 5rem;
   margin: 0;
   line-height: 8rem;
@@ -232,6 +270,10 @@ const handleSubtractTimeButton = () => {
 .game-option-button:hover .fa-circle-plus,
 .game-option-button:hover .fa-circle-minus {
   color: #443b3d;
+}
+
+.game-option-button-disabled {
+  cursor: not-allowed;
 }
 
 .rounds-counter {

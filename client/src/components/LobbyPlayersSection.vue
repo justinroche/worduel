@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useSessionStore } from '../stores/SessionStore'
 import MenuButton from './MenuButton.vue'
 
-const player1Name = ref('Player 1')
-const player2Name = ref('Player 2')
-const playerIsHost = ref(true)
+const sessionStore = useSessionStore()
+const player1Name = computed(() => sessionStore.player1Name)
+const player2Name = computed(() => sessionStore.player2Name)
+const playerIsHost = computed(() => sessionStore.playerIsHost)
 
 const player1Editing = ref(false)
 const player2Editing = ref(false)
@@ -14,21 +16,17 @@ const handleKickButtonClicked = () => {
 }
 
 const togglePlayer1Editing = () => {
-  if (playerIsHost.value) {
-    player1Editing.value = !player1Editing.value
-  }
+  player1Editing.value = !player1Editing.value
 }
 
 const togglePlayer2Editing = () => {
-  if (!playerIsHost.value) {
-    player2Editing.value = !player2Editing.value
-  }
+  player2Editing.value = !player2Editing.value
 }
 
 const updatePlayer1Name = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.value.length > 0) {
-    player1Name.value = input.value
+    sessionStore.setPlayer1Name(input.value)
     player1Editing.value = false
   }
 }
@@ -36,7 +34,7 @@ const updatePlayer1Name = (event: Event) => {
 const updatePlayer2Name = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.value.length > 0) {
-    player2Name.value = input.value
+    sessionStore.setPlayer2Name(input.value)
     player2Editing.value = false
   }
 }
@@ -63,7 +61,7 @@ window.addEventListener('keyup', (event) => {
     </div>
     <div v-else class="player-name-container">
       <p
-        @click="togglePlayer1Editing"
+        @click="playerIsHost ? togglePlayer1Editing() : null"
         class="player-name"
         :class="{ notEditable: !playerIsHost }"
       >
@@ -86,7 +84,7 @@ window.addEventListener('keyup', (event) => {
     </div>
     <div v-else class="player-name-container">
       <p
-        @click="togglePlayer2Editing"
+        @click="!playerIsHost ? togglePlayer2Editing() : null"
         class="player-name"
         :class="{ notEditable: playerIsHost }"
       >
