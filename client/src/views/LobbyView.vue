@@ -10,7 +10,7 @@ const gameCode = route.query.gameCode || 'No game code provided'
 const rounds = ref(3)
 const MAX_ROUNDS = 10
 const spellCheckEnabled = ref(true)
-const swearBlockEnabled = ref(false)
+const profanityBlockEnabled = ref(false)
 const roundTimerEnabled = ref(false)
 
 const handleAddRoundButton = () => {
@@ -76,7 +76,7 @@ const toggleSpellCheckEnabled = () => {
             />
           </button>
         </div>
-        <p>Block Swear Words</p>
+        <p>Block Profanity</p>
         <p>Round Timer</p>
       </div>
       <div class="host-buttons-section">
