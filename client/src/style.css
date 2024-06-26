@@ -5,8 +5,8 @@
 
   --taupe-default: rgb(74, 62, 53);
   --taupe-light: rgb(85, 72, 62);
-  --taupe-active: rgb(103, 89, 78);
-  --taupe-hover-border: rgb(124, 112, 103);
+  --taupe-active: rgb(113, 99, 88);
+  --taupe-hover-border: rgb(144, 132, 123);
 
   --atomic-tangerine-default: rgb(240, 123, 87);
   --atomic-tangerine-light: rgb(250, 133, 97);
@@ -14,9 +14,9 @@
   --atomic-tangerine-hover-border: rgb(255, 162, 140);
 
   --auburn-default: rgb(170, 27, 39);
-  --auburn-light: rgb(185, 37, 49);
-  --auburn-active: rgb(200, 47, 59);
-  --auburn-hover-border: rgb(230, 77, 89);
+  --auburn-light: rgb(190, 42, 54);
+  --auburn-active: rgb(215, 57, 69);
+  --auburn-hover-border: rgb(245, 87, 99);
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
