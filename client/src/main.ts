@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import './style.css'
 import App from './App.vue'
 import router from './router'
+import { initializeSessionClient } from './clients/SessionClient'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -18,4 +19,7 @@ const pinia = createPinia()
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(router)
 app.use(pinia)
+
+initializeSessionClient()
+
 app.mount('#app')
