@@ -35,6 +35,87 @@ module.exports = (socket, io) => {
     }
   });
 
+  socket.on('updatePlayer1Name', ([name, sessionCode], callback) => {
+    try {
+      sessionController.updateSession(sessionCode, { player1Name: name });
+      io.to(sessionCode).emit('player1NameUpdated', name);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
+  socket.on('updatePlayer2Name', ([name, sessionCode], callback) => {
+    try {
+      sessionController.updateSession(sessionCode, { player2Name: name });
+      io.to(sessionCode).emit('player2NameUpdated', name);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
+  socket.on('updateRounds', ([rounds, sessionCode], callback) => {
+    try {
+      sessionController.updateSession(sessionCode, { rounds });
+      io.to(sessionCode).emit('roundsUpdated', rounds);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
+  socket.on('updateSpellCheckEnabled', ([enabled, sessionCode], callback) => {
+    try {
+      sessionController.updateSession(sessionCode, {
+        spellCheckEnabled: enabled,
+      });
+      io.to(sessionCode).emit('spellCheckEnabledUpdated', enabled);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
+  socket.on(
+    'updateBlockProfanityEnabled',
+    ([enabled, sessionCode], callback) => {
+      try {
+        sessionController.updateSession(sessionCode, {
+          blockProfanityEnabled: enabled,
+        });
+        io.to(sessionCode).emit('blockProfanityEnabledUpdated', enabled);
+        callback();
+      } catch (error) {
+        callback(error.message);
+      }
+    }
+  );
+
+  socket.on('updateRoundTimerEnabled', ([enabled, sessionCode], callback) => {
+    try {
+      sessionController.updateSession(sessionCode, {
+        roundTimerEnabled: enabled,
+      });
+      io.to(sessionCode).emit('roundTimerEnabledUpdated', enabled);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
+  socket.on('updateRoundTimerDuration', ([duration, sessionCode], callback) => {
+    try {
+      sessionController.updateSession(sessionCode, {
+        roundTimerDuration: duration,
+      });
+      io.to(sessionCode).emit('roundTimerDurationUpdated', duration);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });

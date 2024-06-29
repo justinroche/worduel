@@ -28,40 +28,6 @@ io.on('connection', (socket) => {
   console.log('A user connected');
 
   sessionSocket(socket, io);
-
-  /*
-  socket.on('updatePlayer1Name', (name) => {
-    io.emit('player1NameUpdated', name);
-  });
-
-  socket.on('updatePlayer2Name', (name) => {
-    io.emit('player2NameUpdated', name);
-  });
-
-  socket.on('updateSessionCode', (code) => {
-    io.emit('sessionCodeUpdated', code);
-  });
-
-  socket.on('updateRounds', (rounds) => {
-    io.emit('roundsUpdated', rounds);
-  });
-
-  socket.on('updateSpellCheckEnabled', (enabled) => {
-    io.emit('spellCheckEnabledUpdated', enabled);
-  });
-
-  socket.on('updateBlockProfanityEnabled', (enabled) => {
-    io.emit('blockProfanityEnabledUpdated', enabled);
-  });
-
-  socket.on('updateRoundTimerEnabled', (enabled) => {
-    io.emit('roundTimerEnabledUpdated', enabled);
-  });
-
-  socket.on('updateRoundTimerDuration', (duration) => {
-    io.emit('roundTimerDurationUpdated', duration);
-  });
-  */
 });
 
 server.listen(PORT, () => {

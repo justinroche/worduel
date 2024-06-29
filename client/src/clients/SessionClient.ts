@@ -1,8 +1,8 @@
-import { io } from 'socket.io-client'
 import { useSessionStore } from '../stores/SessionStore'
 import { Session } from '../types/Session'
 
-const socket = io('http://localhost:8080')
+import { emitAsync } from '../utils/socketUtils'
+import { socket } from '../utils/socketInstance'
 
 let sessionStore: ReturnType<typeof useSessionStore>
 
@@ -10,15 +10,15 @@ export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
 
   socket.on('sessionCreated', (session: Session) => {
-    console.log(session)
     sessionStore.setSessionCode(session.sessionCode)
     sessionStore.setPlayerIsHost(true)
   })
 
   socket.on('sessionJoined', (session: Session) => {
-    console.log(session)
-    sessionStore.setSessionCode(session.sessionCode)
-    sessionStore.setPlayer1Name(session.player1Name)
+    if (!sessionStore.getPlayerIsHost) {
+      sessionStore.setSessionCode(session.sessionCode)
+      sessionStore.setPlayer1Name(session.player1Name)
+    }
     sessionStore.setPlayer2Connected(true)
   })
 
@@ -55,66 +55,56 @@ export const initializeSessionClient = () => {
   })
 }
 
-export const updatePlayer1Name = (name: string) => {
-  sessionStore.setPlayer1Name(name)
-  socket.emit('updatePlayer1Name', name)
+export const updatePlayer1Name = async (name: string) => {
+  return await emitAsync('updatePlayer1Name', [
+    name,
+    sessionStore.getSessionCode,
+  ])
 }
 
-export const updatePlayer2Name = (name: string) => {
-  sessionStore.setPlayer2Name(name)
-  socket.emit('updatePlayer2Name', name)
+export const updatePlayer2Name = async (name: string) => {
+  return await emitAsync('updatePlayer2Name', [
+    name,
+    sessionStore.getSessionCode,
+  ])
 }
 
-export const updateSessionCode = (sessionCode: string) => {
-  sessionStore.setSessionCode(sessionCode)
-  socket.emit('updateSessionCode', sessionCode)
+export const updateRounds = async (rounds: number) => {
+  return await emitAsync('updateRounds', [rounds, sessionStore.getSessionCode])
 }
 
-export const updateRounds = (rounds: number) => {
-  sessionStore.setRounds(rounds)
-  socket.emit('updateRounds', rounds)
-}
-
-export const updateSpellCheckEnabled = (enabled: boolean) => {
-  sessionStore.setSpellCheckEnabled(enabled)
-  socket.emit('updateSpellCheckEnabled', enabled)
+export const updateSpellCheckEnabled = async (enabled: boolean) => {
+  return await emitAsync('updateSpellCheckEnabled', [
+    enabled,
+    sessionStore.getSessionCode,
+  ])
 }
 
 export const updateBlockProfanityEnabled = (enabled: boolean) => {
-  sessionStore.setBlockProfanityEnabled(enabled)
-  socket.emit('updateBlockProfanityEnabled', enabled)
+  return emitAsync('updateBlockProfanityEnabled', [
+    enabled,
+    sessionStore.getSessionCode,
+  ])
 }
 
 export const updateRoundTimerEnabled = (enabled: boolean) => {
-  sessionStore.setRoundTimerEnabled(enabled)
-  socket.emit('updateRoundTimerEnabled', enabled)
+  return emitAsync('updateRoundTimerEnabled', [
+    enabled,
+    sessionStore.getSessionCode,
+  ])
 }
 
 export const updateRoundTimerDuration = (duration: number) => {
-  sessionStore.setRoundTimerDuration(duration)
-  socket.emit('updateRoundTimerDuration', duration)
+  return emitAsync('updateRoundTimerDuration', [
+    duration,
+    sessionStore.getSessionCode,
+  ])
 }
 
-export const createSession = (): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    socket.emit('createSession', (error: any) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve()
-      }
-    })
-  })
+export const createSession = async () => {
+  return await emitAsync('createSession')
 }
 
-export const joinSession = (sessionCode: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    socket.emit('joinSession', sessionCode, (error: any) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve()
-      }
-    })
-  })
+export const joinSession = async (sessionCode: string) => {
+  return await emitAsync('joinSession', sessionCode)
 }

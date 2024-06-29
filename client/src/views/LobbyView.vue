@@ -36,6 +36,7 @@ const handleExitLobbyButtonClicked = () => {
       </div>
       <div class="host-buttons-section">
         <menu-button
+          v-if="playerIsHost"
           buttonText="Start Game"
           fontSize="1rem"
           buttonWidth="250px"
@@ -43,8 +44,11 @@ const handleExitLobbyButtonClicked = () => {
           buttonStyle="atomic-tangerine"
           class="start-button"
           @click="handleStartGameButtonClicked"
-          :disabled="!player2Connected || !playerIsHost"
+          :disabled="!player2Connected"
         />
+        <div v-else>
+          <p>Waiting for host to start the game...</p>
+        </div>
         <menu-button
           buttonText="Exit Lobby"
           fontSize="1rem"

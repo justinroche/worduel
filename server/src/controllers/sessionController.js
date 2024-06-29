@@ -15,7 +15,6 @@ exports.createSession = async () => {
 
   while (sessionExists) {
     sessionCode = generateSessionCode();
-    console.log('sessionCode:', sessionCode);
     const existingSession = await Session.findOne({ sessionCode });
     if (!existingSession) {
       sessionExists = false;
