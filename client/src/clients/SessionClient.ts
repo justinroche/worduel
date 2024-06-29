@@ -8,6 +8,19 @@ let sessionStore: ReturnType<typeof useSessionStore>
 export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
 
+  socket.on('sessionCreated', (session) => {
+    console.log(session)
+    sessionStore.setSessionCode(session.sessionCode)
+    sessionStore.setPlayerIsHost(true)
+  })
+
+  socket.on('sessionJoined', (session) => {
+    console.log(session)
+    sessionStore.setSessionCode(session.sessionCode)
+    sessionStore.setPlayer1Name(session.player1Name)
+    sessionStore.setPlayer2Connected(true)
+  })
+
   socket.on('player1NameUpdated', (name: string) => {
     sessionStore.setPlayer1Name(name)
   })
@@ -81,4 +94,26 @@ export const updateRoundTimerDuration = (duration: number) => {
   socket.emit('updateRoundTimerDuration', duration)
 }
 
-export default socket
+export const createSession = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    socket.emit('createSession', (error: any) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
+    })
+  })
+}
+
+export const joinSession = (sessionCode: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    socket.emit('joinSession', sessionCode, (error: any) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
+    })
+  })
+}

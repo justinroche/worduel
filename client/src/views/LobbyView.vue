@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
 import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
 import LobbyGameOptionsSection from '../components/LobbyGameOptionsSection.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { useSessionStore } from '../stores/SessionStore'
 
-const route = useRoute()
 const sessionStore = useSessionStore()
 const sessionCode = computed(() => sessionStore.sessionCode)
 const playerIsHost = computed(() => sessionStore.playerIsHost)
+const player2Connected = computed(() => sessionStore.player2Connected)
+
+const handleStartGameButtonClicked = () => {
+  console.log('Start game button clicked')
+}
+
+const handleExitLobbyButtonClicked = () => {
+  console.log('Exit lobby button clicked')
+}
 </script>
 
 <template>
@@ -35,6 +42,8 @@ const playerIsHost = computed(() => sessionStore.playerIsHost)
           buttonHeight="40px"
           buttonStyle="atomic-tangerine"
           class="start-button"
+          @click="handleStartGameButtonClicked"
+          :disabled="!player2Connected || !playerIsHost"
         />
         <menu-button
           buttonText="Exit Lobby"
@@ -42,6 +51,7 @@ const playerIsHost = computed(() => sessionStore.playerIsHost)
           buttonWidth="250px"
           buttonHeight="40px"
           buttonStyle="taupe"
+          @click="handleExitLobbyButtonClicked"
         />
       </div>
     </div>

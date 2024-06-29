@@ -1,11 +1,17 @@
 <script setup lang="ts">
-const props = defineProps<{
-  buttonText: string
-  fontSize: string
-  buttonWidth: string
-  buttonHeight: string
-  buttonStyle: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    buttonText: string
+    fontSize: string
+    buttonWidth: string
+    buttonHeight: string
+    buttonStyle: string
+    disabled?: boolean
+  }>(),
+  {
+    disabled: false,
+  }
+)
 </script>
 
 <template>
@@ -16,6 +22,7 @@ const props = defineProps<{
       height: `${props.buttonHeight}`,
       fontSize: `${props.fontSize}`,
     }"
+    :disabled="props.disabled"
   >
     {{ buttonText }}
   </button>
@@ -33,47 +40,55 @@ const props = defineProps<{
   transition: background-color 0.1s ease, border 0.1s ease;
 }
 
-.atomic-tangerine {
+.menu-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  border: 0px;
+  cursor: default;
+  opacity: 0.6;
+}
+
+.atomic-tangerine:not(:disabled) {
   background-color: var(--atomic-tangerine-default);
   border: 1px solid var(--atomic-tangerine-light);
 }
 
-.atomic-tangerine:hover {
+.atomic-tangerine:not(:disabled):hover {
   background-color: var(--atomic-tangerine-light);
   border: 2px solid var(--atomic-tangerine-hover-border);
 }
 
-.atomic-tangerine:active {
+.atomic-tangerine:not(:disabled):active {
   background-color: var(--atomic-tangerine-active);
   border: 1px solid white;
 }
 
-.taupe {
+.taupe:not(:disabled) {
   background-color: var(--taupe-default);
   border: 1px solid var(--taupe-light);
 }
 
-.taupe:hover {
+.taupe:not(:disabled):hover {
   background-color: var(--taupe-light);
   border: 2px solid var(--taupe-hover-border);
 }
 
-.taupe:active {
+.taupe:not(:disabled):active {
   background-color: var(--taupe-active);
   border: 1px solid white;
 }
 
-.auburn {
+.auburn:not(:disabled) {
   background-color: var(--auburn-default);
   border: 1px solid var(--auburn-light);
 }
 
-.auburn:hover {
+.auburn:not(:disabled):hover {
   background-color: var(--auburn-light);
   border: 2px solid var(--auburn-hover-border);
 }
 
-.auburn:active {
+.auburn:not(:disabled):active {
   background-color: var(--auburn-active);
   border: 1px solid white;
 }

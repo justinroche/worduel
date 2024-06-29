@@ -5,6 +5,7 @@ import InfoBox from '../components/InfoBox.vue'
 import HelpBoxContent from '../components/HelpBoxContent.vue'
 import InfoBoxContent from '../components/InfoBoxContent.vue'
 import MenuButton from '../components/MenuButton.vue'
+import { createSession, joinSession } from '../clients/SessionClient'
 
 const router = useRouter()
 const joinCode = ref('')
@@ -24,15 +25,24 @@ const filterInput = (event: Event) => {
   joinCode.value = filteredValue
 }
 
-const handleHostButton = () => {
-  // Using a placeholder code for testing
-  // TODO: Implement backend call for hosting game that returns a game code
-  const gameCode = 'ABCD'
-  router.push({ name: 'lobby', query: { gameCode } })
+const handleHostButton = async () => {
+  try {
+    await createSession()
+    router.push({ name: 'lobby' })
+  } catch (error) {
+    console.error('Error creating session:', error)
+    // Optionally show an error message or handle differently
+  }
 }
 
-const handleJoinButton = () => {
-  console.log('Join button clicked')
+const handleJoinButton = async () => {
+  try {
+    await joinSession(joinCode.value)
+    router.push({ name: 'lobby' })
+  } catch (error) {
+    console.error('Error joining session:', error)
+    // Optionally show an error message or handle differently
+  }
 }
 
 const handleInfoButton = () => {

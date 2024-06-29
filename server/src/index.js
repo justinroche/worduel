@@ -3,18 +3,17 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const http = require('http');
 const { Server } = require('socket.io');
-require('dotenv').config();
+require('dotenv').config({ path: './config/.env' });
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 app.use(cors());
+app.use(express.json());
 
-/*
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-*/
+mongoose
+  .connect(process.env.MONGODB_URL, { dbName: 'worduel' })
+  .then(() => console.log('Connected to database'))
+  .catch((error) => console.log(error));
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -24,9 +23,13 @@ const io = new Server(server, {
   },
 });
 
+const sessionSocket = require('./socket/sessionSocket');
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log('A user connected');
 
+  sessionSocket(socket, io);
+
+  /*
   socket.on('updatePlayer1Name', (name) => {
     io.emit('player1NameUpdated', name);
   });
@@ -58,10 +61,7 @@ io.on('connection', (socket) => {
   socket.on('updateRoundTimerDuration', (duration) => {
     io.emit('roundTimerDurationUpdated', duration);
   });
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
+  */
 });
 
 server.listen(PORT, () => {

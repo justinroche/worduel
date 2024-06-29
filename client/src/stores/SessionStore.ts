@@ -2,10 +2,11 @@ import { defineStore } from 'pinia'
 
 export const useSessionStore = defineStore('session', {
   state: () => ({
-    sessionCode: 'ABCD',
+    sessionCode: '',
 
     player1Name: 'Player 1',
     player2Name: 'Player 2',
+    player2Connected: false,
     playerIsHost: false,
 
     rounds: 3,
@@ -20,6 +21,7 @@ export const useSessionStore = defineStore('session', {
     getSessionCode: (state) => state.sessionCode,
     getPlayer1Name: (state) => state.player1Name,
     getPlayer2Name: (state) => state.player2Name,
+    getPlayer2Connected: (state) => state.player2Connected,
     getPlayerIsHost: (state) => state.playerIsHost,
     getRounds: (state) => state.rounds,
     getMaxRounds: (state) => state.MAX_ROUNDS,
@@ -43,6 +45,9 @@ export const useSessionStore = defineStore('session', {
     },
     setPlayer2Name(player2Name: string) {
       this.player2Name = player2Name
+    },
+    setPlayer2Connected(player2Connected: boolean) {
+      this.player2Connected = player2Connected
     },
     setPlayerIsHost(playerIsHost: boolean) {
       this.playerIsHost = playerIsHost

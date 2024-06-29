@@ -8,6 +8,7 @@ const sessionStore = useSessionStore()
 const player1Name = computed(() => sessionStore.player1Name)
 const player2Name = computed(() => sessionStore.player2Name)
 const playerIsHost = computed(() => sessionStore.playerIsHost)
+const player2Connected = computed(() => sessionStore.player2Connected)
 
 const player1Editing = ref(false)
 const player2Editing = ref(false)
@@ -73,7 +74,7 @@ window.addEventListener('keyup', (event) => {
     <p v-if="playerIsHost" class="player-tag"><b>HOST (YOU)</b></p>
     <p v-else class="player-tag"><b>HOST</b></p>
   </div>
-  <div class="player-container player2-container">
+  <div v-if="player2Connected" class="player-container player2-container">
     <div v-if="player2Editing">
       <input
         type="text"
@@ -103,6 +104,9 @@ window.addEventListener('keyup', (event) => {
       @click="handleKickButtonClicked"
     />
     <p v-else class="player-tag"><b>YOU</b></p>
+  </div>
+  <div v-else>
+    <p>Waiting for opponent...</p>
   </div>
 </template>
 
