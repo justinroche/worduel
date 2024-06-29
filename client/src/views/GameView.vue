@@ -130,16 +130,6 @@ function getResults(guess: string[], secretWord: string) {
 
   return results
 }
-
-onMounted(() => {
-  window.addEventListener('keydown', handleKeyPress)
-  testAPI()
-})
-
-async function testAPI() {
-  const response = await axios.get('http://localhost:8080/services/test')
-  console.log(response.data)
-}
 </script>
 
 <template>
