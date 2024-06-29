@@ -31,17 +31,21 @@ const handleHostButton = async () => {
     router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error creating session:', error)
-    // Optionally show an error message or handle differently
+    // TODO: Show error message
   }
 }
 
 const handleJoinButton = async () => {
+  if (joinCode.value.length !== 4) {
+    // TODO: Show error message
+    return
+  }
   try {
     await joinSession(joinCode.value)
     router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error joining session:', error)
-    // Optionally show an error message or handle differently
+    // TODO: Show error message
   }
 }
 

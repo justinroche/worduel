@@ -10,12 +10,14 @@ export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
 
   socket.on('sessionCreated', (session: Session) => {
+    // TODO: Make a function to set all session data at once
     sessionStore.setSessionCode(session.sessionCode)
     sessionStore.setPlayerIsHost(true)
   })
 
   socket.on('sessionJoined', (session: Session) => {
     if (!sessionStore.getPlayerIsHost) {
+      // TODO: Make a function to set all session data at once
       sessionStore.setSessionCode(session.sessionCode)
       sessionStore.setPlayer1Name(session.player1Name)
     }
