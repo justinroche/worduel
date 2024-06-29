@@ -12,6 +12,8 @@ const joinCode = ref('')
 const showInfoBox = ref(false)
 const showInfoContent = ref(false)
 const showHelpContent = ref(false)
+const hostButtonLoading = ref(false)
+const joinButtonLoading = ref(false)
 
 // Convert join code to uppercase
 watch(joinCode, (newValue) => {
@@ -26,12 +28,15 @@ const filterInput = (event: Event) => {
 }
 
 const handleHostButton = async () => {
+  hostButtonLoading.value = true
   try {
     await createSession()
     router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error creating session:', error)
     // TODO: Show error message
+  } finally {
+    hostButtonLoading.value = false
   }
 }
 
@@ -40,12 +45,15 @@ const handleJoinButton = async () => {
     // TODO: Show error message
     return
   }
+  joinButtonLoading.value = true
   try {
     await joinSession(joinCode.value)
     router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error joining session:', error)
     // TODO: Show error message
+  } finally {
+    joinButtonLoading.value = false
   }
 }
 
@@ -93,7 +101,9 @@ const handleHelpButton = () => {
         buttonHeight="40px"
         buttonStyle="atomic-tangerine"
         @click="handleHostButton"
+        :loading="hostButtonLoading"
         class="host-button"
+        tabindex="1"
       />
       <div class="join-container">
         <input
@@ -113,6 +123,8 @@ const handleHelpButton = () => {
           buttonHeight="40px"
           buttonStyle="atomic-tangerine"
           @click="handleJoinButton"
+          :loading="joinButtonLoading"
+          tabindex="3"
         />
       </div>
     </div>
