@@ -116,7 +116,39 @@ module.exports = (socket, io) => {
     }
   });
 
+  socket.on('exitSession', ([playerNumber, sessionCode], callback) => {
+    // TODO: remove players from the socket io room once they disconnect
+    try {
+      const session = sessionController.getSessionFromCode(sessionCode);
+      if (playerNumber === 1) {
+        if (!session.player2Connected) {
+          sessionController.closeSession(sessionCode);
+        } else {
+          io.to(sessionCode).emit('player1Disconnected');
+          sessionController.updateSession(sessionCode, {
+            player2Connected: false,
+          });
+          sessionController.updateSession(sessionCode, {
+            player1Name: session.player2Name,
+          });
+        }
+        callback();
+      } else if (playerNumber === 2) {
+        sessionController.updateSession(sessionCode, {
+          player2Connected: false,
+        });
+        sessionController.updateSession(sessionCode, {
+          player2Name: 'Player 2',
+        });
+        io.to(sessionCode).emit('player2Disconnected');
+        callback();
+      }
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    console.log('A user disconnected');
   });
 };

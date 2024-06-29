@@ -1,21 +1,30 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
 import LobbyGameOptionsSection from '../components/LobbyGameOptionsSection.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { useSessionStore } from '../stores/SessionStore'
+import { exitSession } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const sessionCode = computed(() => sessionStore.sessionCode)
 const playerIsHost = computed(() => sessionStore.playerIsHost)
 const player2Connected = computed(() => sessionStore.player2Connected)
+const router = useRouter()
 
 const handleStartGameButtonClicked = () => {
   console.log('Start game button clicked')
 }
 
 const handleExitLobbyButtonClicked = () => {
-  console.log('Exit lobby button clicked')
+  try {
+    exitSession(playerIsHost.value ? 1 : 2)
+    router.push({ name: 'home' })
+  } catch (error) {
+    console.error('Error exiting session:', error)
+    // TODO: Show error message
+  }
 }
 </script>
 

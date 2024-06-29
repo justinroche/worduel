@@ -46,3 +46,7 @@ exports.updateSession = async (sessionCode, update) => {
     console.error('Error updating session:', error);
   }
 };
+
+exports.closeSession = async (sessionCode) => {
+  this.updateSession(sessionCode, { state: 'complete' });
+};

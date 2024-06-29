@@ -24,6 +24,21 @@ export const initializeSessionClient = () => {
     sessionStore.setPlayer2Connected(true)
   })
 
+  socket.on('player1Disconnected', () => {
+    if (!sessionStore.getPlayerIsHost) {
+      // TODO: Make a function to set all session data at once
+    }
+  })
+
+  socket.on('player2Disconnected', () => {
+    if (sessionStore.getPlayerIsHost) {
+      sessionStore.setPlayer2Connected(false)
+      sessionStore.setPlayer2Name('Player 2')
+    } else {
+      // TODO: Reset session data to default values
+    }
+  })
+
   socket.on('player1NameUpdated', (name: string) => {
     sessionStore.setPlayer1Name(name)
   })
@@ -99,6 +114,13 @@ export const updateRoundTimerEnabled = (enabled: boolean) => {
 export const updateRoundTimerDuration = (duration: number) => {
   return emitAsync('updateRoundTimerDuration', [
     duration,
+    sessionStore.getSessionCode,
+  ])
+}
+
+export const exitSession = async (playerNumber: 1 | 2) => {
+  return await emitAsync('exitSession', [
+    playerNumber,
     sessionStore.getSessionCode,
   ])
 }
