@@ -39,7 +39,7 @@ exports.getSessionFromCode = async (sessionCode) => {
 
 exports.updateSession = async (sessionCode, update) => {
   try {
-    const session = await Session.findOne({ sessionCode });
+    const session = await this.getSessionFromCode(sessionCode);
     session.set(update);
     await session.save();
     return session;

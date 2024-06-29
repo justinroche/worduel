@@ -1,5 +1,6 @@
 import { io } from 'socket.io-client'
 import { useSessionStore } from '../stores/SessionStore'
+import { Session } from '../types/Session'
 
 const socket = io('http://localhost:8080')
 
@@ -8,13 +9,13 @@ let sessionStore: ReturnType<typeof useSessionStore>
 export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
 
-  socket.on('sessionCreated', (session) => {
+  socket.on('sessionCreated', (session: Session) => {
     console.log(session)
     sessionStore.setSessionCode(session.sessionCode)
     sessionStore.setPlayerIsHost(true)
   })
 
-  socket.on('sessionJoined', (session) => {
+  socket.on('sessionJoined', (session: Session) => {
     console.log(session)
     sessionStore.setSessionCode(session.sessionCode)
     sessionStore.setPlayer1Name(session.player1Name)
