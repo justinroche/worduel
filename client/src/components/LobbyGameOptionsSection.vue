@@ -137,42 +137,18 @@ const handleSubtractTimeButton = () => {
     </div>
     <div class="game-option">
       <p>Use Spell Check</p>
-      <font-awesome-icon
-        v-if="!spellCheckEnabled"
-        :icon="['far', 'square']"
-        size="2x"
-        class="game-option-check"
-      />
-      <font-awesome-icon
-        v-else
-        :icon="['fas', 'square-check']"
-        size="2x"
-        class="game-option-check"
-      />
+      <p v-if="!spellCheckEnabled" class="setting-label-text"><b>OFF</b></p>
+      <p v-else class="setting-label-text"><b>ON</b></p>
     </div>
+
     <div class="game-option">
       <p>Block Profanity</p>
-      <font-awesome-icon
-        v-if="!blockProfanityEnabled"
-        :icon="['far', 'square']"
-        size="2x"
-        class="game-option-check"
-      />
-      <font-awesome-icon
-        v-else
-        :icon="['fas', 'square-check']"
-        size="2x"
-        class="game-option-check"
-      />
+      <p v-if="!blockProfanityEnabled" class="setting-label-text"><b>OFF</b></p>
+      <p v-else class="setting-label-text"><b>ON</b></p>
     </div>
     <div class="game-option">
       <p>Round Timer</p>
-      <font-awesome-icon
-        v-if="!roundTimerEnabled"
-        :icon="['far', 'square']"
-        size="2x"
-        class="game-option-check"
-      />
+      <p v-if="!roundTimerEnabled" class="setting-label-text"><b>OFF</b></p>
       <p v-else class="round-timer-not-host">
         {{ roundTimerDurationFormatted }}
       </p>
