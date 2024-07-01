@@ -10,23 +10,24 @@ export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
 
   socket.on('sessionCreated', (session: Session) => {
-    // TODO: Make a function to set all session data at once
-    sessionStore.setSessionCode(session.sessionCode)
+    sessionStore.setSession(session)
     sessionStore.setPlayerIsHost(true)
   })
 
   socket.on('sessionJoined', (session: Session) => {
     if (!sessionStore.getPlayerIsHost) {
-      // TODO: Make a function to set all session data at once
-      sessionStore.setSessionCode(session.sessionCode)
-      sessionStore.setPlayer1Name(session.player1Name)
+      sessionStore.setSession(session)
     }
     sessionStore.setPlayer2Connected(true)
   })
 
-  socket.on('player1Disconnected', () => {
+  socket.on('player1Disconnected', (session: Session) => {
     if (!sessionStore.getPlayerIsHost) {
-      // TODO: Make a function to set all session data at once
+      sessionStore.setSession(session)
+      sessionStore.setPlayerIsHost(true)
+    } else {
+      sessionStore.setPlayerIsHost(false)
+      // TODO: Reset session data to default values // Um do I have to?
     }
   })
 
@@ -90,6 +91,8 @@ export const updateRounds = async (rounds: number) => {
   return await emitAsync('updateRounds', [rounds, sessionStore.getSessionCode])
 }
 
+// TODO: make a different caller system for functions like update spell check that shouldn't be async on slower connections.
+// We should be sure that functions that need to be async aren't called first tho... Like we need these non-async ones to still happen.
 export const updateSpellCheckEnabled = async (enabled: boolean) => {
   return await emitAsync('updateSpellCheckEnabled', [
     enabled,

@@ -17,9 +17,9 @@ const handleStartGameButtonClicked = () => {
   console.log('Start game button clicked')
 }
 
-const handleExitLobbyButtonClicked = () => {
+const handleExitLobbyButtonClicked = async () => {
   try {
-    exitSession(playerIsHost.value ? 1 : 2)
+    await exitSession(playerIsHost.value ? 1 : 2)
     router.push({ name: 'home' })
   } catch (error) {
     console.error('Error exiting session:', error)

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { Session } from '../types/Session'
 
 export const useSessionStore = defineStore('session', {
   state: () => ({
@@ -66,6 +67,17 @@ export const useSessionStore = defineStore('session', {
     },
     setRoundTimerDuration(roundTimerDuration: number) {
       this.roundTimerDuration = roundTimerDuration
+    },
+    setSession(session: Session) {
+      this.sessionCode = session.sessionCode
+      this.player1Name = session.player1Name
+      this.player2Name = session.player2Name
+      this.player2Connected = session.player2Connected
+      this.rounds = session.rounds
+      this.spellCheckEnabled = session.spellCheckEnabled
+      this.blockProfanityEnabled = session.blockProfanityEnabled
+      this.roundTimerEnabled = session.roundTimerEnabled
+      this.roundTimerDuration = session.roundTimerDuration
     },
   },
 })

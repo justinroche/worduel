@@ -3,12 +3,17 @@ const sessionController = require('../controllers/sessionController');
 module.exports = (socket, io) => {
   socket.on('createSession', async (callback) => {
     try {
-      const session = await sessionController.createSession(); // Create a new session
-      socket.join(session.sessionCode); // Join the room for the session
-      socket.emit('sessionCreated', session); // Notify the client that the session was created
-      callback(); // Indicate success to the client
+      const session = await sessionController.createSession();
+
+      // Join the room for the session
+      socket.join(session.sessionCode);
+
+      // Notify the client that the session was created
+      socket.emit('sessionCreated', session);
+      console.log('Created new session:', session.sessionCode);
+      callback();
     } catch (error) {
-      callback(error.message); // Send error message to the client
+      callback(error.message);
     }
   });
 
@@ -27,17 +32,22 @@ module.exports = (socket, io) => {
       session = await sessionController.updateSession(sessionCode, {
         player2Connected: true,
       });
-      socket.join(session.sessionCode); // Join the room for the session
-      io.to(session.sessionCode).emit('sessionJoined', session); // Notify all clients in the room
-      callback(); // Indicate success to the client
+
+      // Join the room for the session
+      socket.join(session.sessionCode);
+
+      // Notify all clients in the room that the user joined the session
+      io.to(session.sessionCode).emit('sessionJoined', session);
+      console.log('User joined session', sessionCode);
+      callback();
     } catch (error) {
-      callback(error.message); // Send error message to the client
+      callback(error.message);
     }
   });
 
-  socket.on('updatePlayer1Name', ([name, sessionCode], callback) => {
+  socket.on('updatePlayer1Name', async ([name, sessionCode], callback) => {
     try {
-      sessionController.updateSession(sessionCode, { player1Name: name });
+      await sessionController.updateSession(sessionCode, { player1Name: name });
       io.to(sessionCode).emit('player1NameUpdated', name);
       callback();
     } catch (error) {
@@ -45,9 +55,9 @@ module.exports = (socket, io) => {
     }
   });
 
-  socket.on('updatePlayer2Name', ([name, sessionCode], callback) => {
+  socket.on('updatePlayer2Name', async ([name, sessionCode], callback) => {
     try {
-      sessionController.updateSession(sessionCode, { player2Name: name });
+      await sessionController.updateSession(sessionCode, { player2Name: name });
       io.to(sessionCode).emit('player2NameUpdated', name);
       callback();
     } catch (error) {
@@ -55,9 +65,9 @@ module.exports = (socket, io) => {
     }
   });
 
-  socket.on('updateRounds', ([rounds, sessionCode], callback) => {
+  socket.on('updateRounds', async ([rounds, sessionCode], callback) => {
     try {
-      sessionController.updateSession(sessionCode, { rounds });
+      await sessionController.updateSession(sessionCode, { rounds });
       io.to(sessionCode).emit('roundsUpdated', rounds);
       callback();
     } catch (error) {
@@ -65,23 +75,26 @@ module.exports = (socket, io) => {
     }
   });
 
-  socket.on('updateSpellCheckEnabled', ([enabled, sessionCode], callback) => {
-    try {
-      sessionController.updateSession(sessionCode, {
-        spellCheckEnabled: enabled,
-      });
-      io.to(sessionCode).emit('spellCheckEnabledUpdated', enabled);
-      callback();
-    } catch (error) {
-      callback(error.message);
+  socket.on(
+    'updateSpellCheckEnabled',
+    async ([enabled, sessionCode], callback) => {
+      try {
+        await sessionController.updateSession(sessionCode, {
+          spellCheckEnabled: enabled,
+        });
+        io.to(sessionCode).emit('spellCheckEnabledUpdated', enabled);
+        callback();
+      } catch (error) {
+        callback(error.message);
+      }
     }
-  });
+  );
 
   socket.on(
     'updateBlockProfanityEnabled',
-    ([enabled, sessionCode], callback) => {
+    async ([enabled, sessionCode], callback) => {
       try {
-        sessionController.updateSession(sessionCode, {
+        await sessionController.updateSession(sessionCode, {
           blockProfanityEnabled: enabled,
         });
         io.to(sessionCode).emit('blockProfanityEnabledUpdated', enabled);
@@ -92,57 +105,68 @@ module.exports = (socket, io) => {
     }
   );
 
-  socket.on('updateRoundTimerEnabled', ([enabled, sessionCode], callback) => {
-    try {
-      sessionController.updateSession(sessionCode, {
-        roundTimerEnabled: enabled,
-      });
-      io.to(sessionCode).emit('roundTimerEnabledUpdated', enabled);
-      callback();
-    } catch (error) {
-      callback(error.message);
+  socket.on(
+    'updateRoundTimerEnabled',
+    async ([enabled, sessionCode], callback) => {
+      try {
+        await sessionController.updateSession(sessionCode, {
+          roundTimerEnabled: enabled,
+        });
+        io.to(sessionCode).emit('roundTimerEnabledUpdated', enabled);
+        callback();
+      } catch (error) {
+        callback(error.message);
+      }
     }
-  });
+  );
 
-  socket.on('updateRoundTimerDuration', ([duration, sessionCode], callback) => {
-    try {
-      sessionController.updateSession(sessionCode, {
-        roundTimerDuration: duration,
-      });
-      io.to(sessionCode).emit('roundTimerDurationUpdated', duration);
-      callback();
-    } catch (error) {
-      callback(error.message);
+  socket.on(
+    'updateRoundTimerDuration',
+    async ([duration, sessionCode], callback) => {
+      try {
+        await sessionController.updateSession(sessionCode, {
+          roundTimerDuration: duration,
+        });
+        io.to(sessionCode).emit('roundTimerDurationUpdated', duration);
+        callback();
+      } catch (error) {
+        callback(error.message);
+      }
     }
-  });
+  );
 
-  socket.on('exitSession', ([playerNumber, sessionCode], callback) => {
-    // TODO: remove players from the socket io room once they disconnect
+  socket.on('exitSession', async ([playerNumber, sessionCode], callback) => {
     try {
-      const session = sessionController.getSessionFromCode(sessionCode);
+      socket.leave(sessionCode);
+
+      let session = await sessionController.getSessionFromCode(sessionCode);
+
       if (playerNumber === 1) {
         if (!session.player2Connected) {
           sessionController.closeSession(sessionCode);
+          console.log('Closed session', sessionCode);
         } else {
-          io.to(sessionCode).emit('player1Disconnected');
-          sessionController.updateSession(sessionCode, {
+          session = await sessionController.updateSession(sessionCode, {
             player2Connected: false,
+            player1Name:
+              session.player2Name === 'Player 2'
+                ? 'Player 1'
+                : session.player2Name,
+            player2Name: 'Player 2',
           });
-          sessionController.updateSession(sessionCode, {
-            player1Name: session.player2Name,
-          });
+
+          io.to(sessionCode).emit('player1Disconnected', session);
+          console.log('Host left', sessionCode);
         }
-        callback();
       } else if (playerNumber === 2) {
-        sessionController.updateSession(sessionCode, {
+        await sessionController.updateSession(sessionCode, {
           player2Connected: false,
-        });
-        sessionController.updateSession(sessionCode, {
           player2Name: 'Player 2',
         });
         io.to(sessionCode).emit('player2Disconnected');
-        callback();
+        console.log('Player 2 left', sessionCode);
       }
+      callback();
     } catch (error) {
       callback(error.message);
     }
