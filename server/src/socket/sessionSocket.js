@@ -137,8 +137,6 @@ module.exports = (socket, io) => {
 
   socket.on('exitSession', async ([playerNumber, sessionCode], callback) => {
     try {
-      socket.leave(sessionCode);
-
       let session = await sessionController.getSessionFromCode(sessionCode);
 
       if (playerNumber === 1) {
@@ -166,6 +164,7 @@ module.exports = (socket, io) => {
         io.to(sessionCode).emit('player2Disconnected');
         console.log('Player 2 left', sessionCode);
       }
+      socket.leave(sessionCode);
       callback();
     } catch (error) {
       callback(error.message);
