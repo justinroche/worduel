@@ -3,6 +3,7 @@ import { Session } from '../types/Session'
 
 import { emitAsync } from '../utils/socketUtils'
 import { socket } from '../utils/socketInstance'
+import router from '../router'
 
 let sessionStore: ReturnType<typeof useSessionStore>
 
@@ -27,7 +28,6 @@ export const initializeSessionClient = () => {
       sessionStore.setPlayerIsHost(true)
     } else {
       sessionStore.setPlayerIsHost(false)
-      // TODO: Reset session data to default values // Um do I have to?
     }
   })
 
@@ -35,8 +35,16 @@ export const initializeSessionClient = () => {
     if (sessionStore.getPlayerIsHost) {
       sessionStore.setPlayer2Connected(false)
       sessionStore.setPlayer2Name('Player 2')
+    }
+  })
+
+  socket.on('removePlayer2', async () => {
+    if (!sessionStore.getPlayerIsHost) {
+      await emitAsync('leaveRoom', sessionStore.getSessionCode)
+      router.push({ name: 'home' })
     } else {
-      // TODO: Reset session data to default values
+      sessionStore.setPlayer2Connected(false)
+      sessionStore.setPlayer2Name('Player 2')
     }
   })
 
@@ -126,6 +134,10 @@ export const exitSession = async (playerNumber: 1 | 2) => {
     playerNumber,
     sessionStore.getSessionCode,
   ])
+}
+
+export const kickPlayer2 = async () => {
+  return await emitAsync('kickPlayer2', sessionStore.getSessionCode)
 }
 
 export const createSession = async () => {

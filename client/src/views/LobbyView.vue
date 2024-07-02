@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import router from '../router'
 import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
 import LobbyGameOptionsSection from '../components/LobbyGameOptionsSection.vue'
 import MenuButton from '../components/MenuButton.vue'
@@ -11,7 +11,6 @@ const sessionStore = useSessionStore()
 const sessionCode = computed(() => sessionStore.sessionCode)
 const playerIsHost = computed(() => sessionStore.playerIsHost)
 const player2Connected = computed(() => sessionStore.player2Connected)
-const router = useRouter()
 
 const handleStartGameButtonClicked = () => {
   console.log('Start game button clicked')

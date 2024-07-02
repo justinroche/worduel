@@ -2,7 +2,11 @@
 import { computed, ref } from 'vue'
 import { useSessionStore } from '../stores/SessionStore'
 import MenuButton from './MenuButton.vue'
-import { updatePlayer1Name, updatePlayer2Name } from '../clients/SessionClient'
+import {
+  updatePlayer1Name,
+  updatePlayer2Name,
+  kickPlayer2,
+} from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const player1Name = computed(() => sessionStore.player1Name)
@@ -14,7 +18,7 @@ const player1Editing = ref(false)
 const player2Editing = ref(false)
 
 const handleKickButtonClicked = () => {
-  console.log('Kick button clicked')
+  kickPlayer2()
 }
 
 const togglePlayer1Editing = () => {

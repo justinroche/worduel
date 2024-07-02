@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import router from '../router'
 import InfoBox from '../components/InfoBox.vue'
 import HelpBoxContent from '../components/HelpBoxContent.vue'
 import InfoBoxContent from '../components/InfoBoxContent.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { createSession, joinSession } from '../clients/SessionClient'
 
-const router = useRouter()
 const joinCode = ref('')
 const showInfoBox = ref(false)
 const showInfoContent = ref(false)

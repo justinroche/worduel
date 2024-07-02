@@ -135,15 +135,31 @@ module.exports = (socket, io) => {
     }
   );
 
+  socket.on('kickPlayer2', async (sessionCode, callback) => {
+    try {
+      await sessionController.updateSession(sessionCode, {
+        player2Connected: false,
+        player2Name: 'Player 2',
+      });
+      io.to(sessionCode).emit('removePlayer2');
+      console.log('Player 2 kicked from', sessionCode);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
   socket.on('exitSession', async ([playerNumber, sessionCode], callback) => {
     try {
       let session = await sessionController.getSessionFromCode(sessionCode);
 
       if (playerNumber === 1) {
         if (!session.player2Connected) {
+          // Close the session if no other player is present
           sessionController.closeSession(sessionCode);
           console.log('Closed session', sessionCode);
         } else {
+          // Otherwise promote player 2 to player 1
           session = await sessionController.updateSession(sessionCode, {
             player2Connected: false,
             player1Name:
@@ -152,23 +168,33 @@ module.exports = (socket, io) => {
                 : session.player2Name,
             player2Name: 'Player 2',
           });
-
-          io.to(sessionCode).emit('player1Disconnected', session);
-          console.log('Host left', sessionCode);
         }
+        // Emit player 1 disconnected
+        io.to(sessionCode).emit('player1Disconnected', session);
+        console.log('Host left', sessionCode);
       } else if (playerNumber === 2) {
+        // Disconnect player 2 from the session
         await sessionController.updateSession(sessionCode, {
           player2Connected: false,
           player2Name: 'Player 2',
         });
+
+        // Emit player 2 disconnected
         io.to(sessionCode).emit('player2Disconnected');
         console.log('Player 2 left', sessionCode);
       }
+
+      // Leave the room for the session
       socket.leave(sessionCode);
       callback();
     } catch (error) {
       callback(error.message);
     }
+  });
+
+  socket.on('leaveRoom', (sessionCode, callback) => {
+    socket.leave(sessionCode);
+    callback();
   });
 
   socket.on('disconnect', () => {
