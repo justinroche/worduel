@@ -19,11 +19,16 @@ watch(joinCode, (newValue) => {
   joinCode.value = newValue.toUpperCase()
 })
 
-// Only allow alphanumeric characters in the join code input
-const filterInput = (event: Event) => {
+const handleJoinCodeInput = (event: Event) => {
+  // Only allow alphanumeric characters in the join code input
   const input = event.target as HTMLInputElement
   const filteredValue = input.value.replace(/[^a-zA-Z0-9]/g, '')
   joinCode.value = filteredValue
+
+  // Submit on enter pressed
+  if ((event as KeyboardEvent).key === 'Enter') {
+    handleJoinButton()
+  }
 }
 
 const handleHostButton = async () => {
@@ -110,7 +115,8 @@ const handleHelpButton = () => {
           class="join-code-input"
           :class="{ 'join-code-input-spacing': joinCode.length > 0 }"
           v-model="joinCode"
-          @input="filterInput"
+          @input="handleJoinCodeInput"
+          @keydown="handleJoinCodeInput"
           placeholder="Enter code..."
           maxlength="4"
           tabindex="2"
