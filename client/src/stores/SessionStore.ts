@@ -11,7 +11,7 @@ export const useSessionStore = defineStore('session', {
     playerIsHost: false,
 
     rounds: 3,
-    MAX_ROUNDS: 10,
+    MAX_ROUNDS: 5,
     spellCheckEnabled: true,
     blockProfanityEnabled: false,
     roundTimerEnabled: true,
