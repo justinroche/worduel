@@ -1,7 +1,7 @@
 import { useSessionStore } from '../stores/SessionStore'
 import { Session } from '../types/Session'
 
-import { emitAsync } from '../utils/socketUtils'
+import { emitAsync, enqueue } from '../utils/socketUtils'
 import { socket } from '../utils/socketInstance'
 import router from '../router'
 
@@ -10,6 +10,7 @@ let sessionStore: ReturnType<typeof useSessionStore>
 export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
 
+  /* Socket events */
   socket.on('sessionCreated', (session: Session) => {
     sessionStore.setSession(session)
     sessionStore.setPlayerIsHost(true)
@@ -27,7 +28,7 @@ export const initializeSessionClient = () => {
       sessionStore.setSession(session)
       sessionStore.setPlayerIsHost(true)
     } else {
-      sessionStore.setPlayerIsHost(false)
+      sessionStore.setPlayerIsHost(false) // Is this necessary?
     }
   })
 
@@ -40,110 +41,120 @@ export const initializeSessionClient = () => {
 
   socket.on('removePlayer2', async () => {
     if (!sessionStore.getPlayerIsHost) {
-      await emitAsync('leaveRoom', sessionStore.getSessionCode)
+      await enqueue(() => emitAsync('leaveRoom', sessionStore.getSessionCode))
       router.push({ name: 'home' })
     } else {
       sessionStore.setPlayer2Connected(false)
-      sessionStore.setPlayer2Name('Player 2')
+      sessionStore.setPlayer2Name('Player 2') // Is this necessary?
     }
   })
 
   socket.on('player1NameUpdated', (name: string) => {
-    sessionStore.setPlayer1Name(name)
+    if (!sessionStore.playerIsHost) sessionStore.setPlayer1Name(name)
   })
 
   socket.on('player2NameUpdated', (name: string) => {
-    sessionStore.setPlayer2Name(name)
-  })
-
-  socket.on('sessionCodeUpdated', (sessionCode: string) => {
-    sessionStore.setSessionCode(sessionCode)
+    if (sessionStore.playerIsHost) sessionStore.setPlayer2Name(name)
   })
 
   socket.on('roundsUpdated', (rounds: number) => {
-    sessionStore.setRounds(rounds)
+    if (!sessionStore.getPlayerIsHost) sessionStore.setRounds(rounds)
   })
 
   socket.on('spellCheckEnabledUpdated', (enabled: boolean) => {
-    sessionStore.setSpellCheckEnabled(enabled)
+    if (!sessionStore.getPlayerIsHost)
+      sessionStore.setSpellCheckEnabled(enabled)
   })
 
   socket.on('blockProfanityEnabledUpdated', (enabled: boolean) => {
-    sessionStore.setBlockProfanityEnabled(enabled)
+    if (!sessionStore.getPlayerIsHost)
+      sessionStore.setBlockProfanityEnabled(enabled)
   })
 
   socket.on('roundTimerEnabledUpdated', (enabled: boolean) => {
-    sessionStore.setRoundTimerEnabled(enabled)
+    if (!sessionStore.getPlayerIsHost)
+      sessionStore.setRoundTimerEnabled(enabled)
   })
 
   socket.on('roundTimerDurationUpdated', (duration: number) => {
-    sessionStore.setRoundTimerDuration(duration)
+    if (!sessionStore.getPlayerIsHost)
+      sessionStore.setRoundTimerDuration(duration)
   })
 }
 
-export const updatePlayer1Name = async (name: string) => {
-  return await emitAsync('updatePlayer1Name', [
-    name,
-    sessionStore.getSessionCode,
-  ])
+/* Client socket functions */
+export const updatePlayer1Name = (name: string) => {
+  sessionStore.setPlayer1Name(name)
+  return enqueue(() =>
+    emitAsync('updatePlayer1Name', [name, sessionStore.getSessionCode])
+  )
 }
 
-export const updatePlayer2Name = async (name: string) => {
-  return await emitAsync('updatePlayer2Name', [
-    name,
-    sessionStore.getSessionCode,
-  ])
+export const updatePlayer2Name = (name: string) => {
+  sessionStore.setPlayer2Name(name)
+  return enqueue(() =>
+    emitAsync('updatePlayer2Name', [name, sessionStore.getSessionCode])
+  )
 }
 
-export const updateRounds = async (rounds: number) => {
-  return await emitAsync('updateRounds', [rounds, sessionStore.getSessionCode])
+export const updateRounds = (rounds: number) => {
+  sessionStore.setRounds(rounds)
+  return enqueue(() =>
+    emitAsync('updateRounds', [rounds, sessionStore.getSessionCode])
+  )
 }
 
-// TODO: make a different caller system for functions like update spell check that shouldn't be async on slower connections.
-// We should be sure that functions that need to be async aren't called first tho... Like we need these non-async ones to still happen.
-export const updateSpellCheckEnabled = async (enabled: boolean) => {
-  return await emitAsync('updateSpellCheckEnabled', [
-    enabled,
-    sessionStore.getSessionCode,
-  ])
+export const updateSpellCheckEnabled = (enabled: boolean) => {
+  sessionStore.setSpellCheckEnabled(enabled)
+  return enqueue(() =>
+    emitAsync('updateSpellCheckEnabled', [enabled, sessionStore.getSessionCode])
+  )
 }
 
 export const updateBlockProfanityEnabled = (enabled: boolean) => {
-  return emitAsync('updateBlockProfanityEnabled', [
-    enabled,
-    sessionStore.getSessionCode,
-  ])
+  sessionStore.setBlockProfanityEnabled(enabled)
+  return enqueue(() =>
+    emitAsync('updateBlockProfanityEnabled', [
+      enabled,
+      sessionStore.getSessionCode,
+    ])
+  )
 }
 
 export const updateRoundTimerEnabled = (enabled: boolean) => {
-  return emitAsync('updateRoundTimerEnabled', [
-    enabled,
-    sessionStore.getSessionCode,
-  ])
+  sessionStore.setRoundTimerEnabled(enabled)
+  return enqueue(() =>
+    emitAsync('updateRoundTimerEnabled', [enabled, sessionStore.getSessionCode])
+  )
 }
 
 export const updateRoundTimerDuration = (duration: number) => {
-  return emitAsync('updateRoundTimerDuration', [
-    duration,
-    sessionStore.getSessionCode,
-  ])
+  sessionStore.setRoundTimerDuration(duration)
+  return enqueue(() =>
+    emitAsync('updateRoundTimerDuration', [
+      duration,
+      sessionStore.getSessionCode,
+    ])
+  )
 }
 
-export const exitSession = async (playerNumber: 1 | 2) => {
-  return await emitAsync('exitSession', [
-    playerNumber,
-    sessionStore.getSessionCode,
-  ])
-}
-
-export const kickPlayer2 = async () => {
-  return await emitAsync('kickPlayer2', sessionStore.getSessionCode)
-}
-
+/* Async client socket functions */
 export const createSession = async () => {
-  return await emitAsync('createSession')
+  return await enqueue(() => emitAsync('createSession'))
 }
 
 export const joinSession = async (sessionCode: string) => {
-  return await emitAsync('joinSession', sessionCode)
+  return await enqueue(() => emitAsync('joinSession', sessionCode))
+}
+
+export const exitSession = async (playerNumber: 1 | 2) => {
+  return await enqueue(() =>
+    emitAsync('exitSession', [playerNumber, sessionStore.getSessionCode])
+  )
+}
+
+export const kickPlayer2 = async () => {
+  return await enqueue(() =>
+    emitAsync('kickPlayer2', sessionStore.getSessionCode)
+  )
 }
