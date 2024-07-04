@@ -5,6 +5,7 @@ import InfoBox from '../components/InfoBox.vue'
 import HelpBoxContent from '../components/HelpBoxContent.vue'
 import InfoBoxContent from '../components/InfoBoxContent.vue'
 import MenuButton from '../components/MenuButton.vue'
+import ErrorBox from '../components/ErrorBox.vue'
 import { createSession, joinSession } from '../clients/SessionClient'
 
 const joinCode = ref('')
@@ -13,6 +14,7 @@ const showInfoContent = ref(false)
 const showHelpContent = ref(false)
 const hostButtonLoading = ref(false)
 const joinButtonLoading = ref(false)
+const errorMessage = ref('')
 
 // Convert join code to uppercase
 watch(joinCode, (newValue) => {
@@ -38,7 +40,7 @@ const handleHostButton = async () => {
     router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error creating session:', error)
-    // TODO: Show error message
+    errorMessage.value = 'Failed to create session.'
   } finally {
     hostButtonLoading.value = false
   }
@@ -46,7 +48,7 @@ const handleHostButton = async () => {
 
 const handleJoinButton = async () => {
   if (joinCode.value.length !== 4) {
-    // TODO: Show error message
+    errorMessage.value = 'Join code must be 4 characters.'
     return
   }
   joinButtonLoading.value = true
@@ -55,7 +57,8 @@ const handleJoinButton = async () => {
     router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error joining session:', error)
-    // TODO: Show error message
+    errorMessage.value =
+      'Failed to join session. Please check the code and try again.'
   } finally {
     joinButtonLoading.value = false
   }
@@ -132,6 +135,9 @@ const handleHelpButton = () => {
           tabindex="3"
         />
       </div>
+      <div class="error-box-container">
+        <error-box :message="errorMessage" />
+      </div>
     </div>
     <div class="info-section">
       <transition name="info-box">
@@ -199,6 +205,12 @@ h1 {
 
 .join-code-input-spacing {
   letter-spacing: 0.2rem;
+}
+
+.error-box-container {
+  height: 40px;
+  display: flex;
+  align-items: flex-start;
 }
 
 .info-section {
