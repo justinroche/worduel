@@ -63,7 +63,7 @@ const props = withDefaults(
   border-radius: 50%;
   width: 12px;
   height: 12px;
-  animation: spin 2s linear infinite;
+  animation: spin 1.5s linear infinite;
   display: inline-block;
   vertical-align: middle;
 }
