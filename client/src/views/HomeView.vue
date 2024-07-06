@@ -6,6 +6,7 @@ import HelpBoxContent from '../components/HelpBoxContent.vue'
 import InfoBoxContent from '../components/InfoBoxContent.vue'
 import MenuButton from '../components/MenuButton.vue'
 import ErrorBox from '../components/ErrorBox.vue'
+import ConnectionErrorBox from '../components/ConnectionErrorBox.vue'
 import { createSession, joinSession } from '../clients/SessionClient'
 
 const joinCode = ref('')
@@ -156,6 +157,9 @@ const handleHelpButton = () => {
       </div>
     </div>
   </div>
+  <div class="connection-error-box-container">
+    <connection-error-box />
+  </div>
 </template>
 
 <style scoped>
@@ -215,13 +219,19 @@ h1 {
 
 .info-section {
   position: absolute;
-  bottom: 10vh;
+  bottom: 5vh;
 }
 
 .info-button-container {
   display: flex;
   justify-content: center;
   gap: 30px;
+}
+
+.connection-error-box-container {
+  position: absolute;
+  bottom: 5vh;
+  right: 5vh;
 }
 
 .info-button,

@@ -4,6 +4,7 @@ import './style.css'
 import App from './App.vue'
 import router from './router'
 import { initializeSessionClient } from './clients/SessionClient'
+import { checkServerConnection } from './clients/checkServerConnection'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -20,6 +21,7 @@ app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(router)
 app.use(pinia)
 
+checkServerConnection()
 initializeSessionClient()
 
 app.mount('#app')

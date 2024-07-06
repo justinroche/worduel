@@ -30,6 +30,11 @@ io.on('connection', (socket) => {
   sessionSocket(socket, io);
 });
 
+// Health check route
+app.get('/health', (req, res) => {
+  res.status(200).send({ status: 'Server is running' });
+});
+
 server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
