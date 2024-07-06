@@ -2,7 +2,7 @@ import { useSessionStore } from '../stores/SessionStore'
 import { Session } from '../types/Session'
 
 import { emitAsync, enqueue } from '../utils/socketUtils'
-import { socket } from '../utils/socketInstance'
+import socket from '../socket'
 import router from '../router'
 
 let sessionStore: ReturnType<typeof useSessionStore>

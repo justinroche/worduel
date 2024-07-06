@@ -1,4 +1,4 @@
-import { socket } from './socketInstance'
+import socket from '../socket'
 
 let queue: Promise<void> = Promise.resolve()
 
