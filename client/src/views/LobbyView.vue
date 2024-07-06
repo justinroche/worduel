@@ -1,28 +1,41 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import router from '../router'
 import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
 import LobbyGameOptionsSection from '../components/LobbyGameOptionsSection.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { useSessionStore } from '../stores/SessionStore'
-import { exitSession } from '../clients/SessionClient'
+import { startGame, exitSession } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const sessionCode = computed(() => sessionStore.sessionCode)
 const playerIsHost = computed(() => sessionStore.playerIsHost)
 const player2Connected = computed(() => sessionStore.player2Connected)
+const startGameButtonLoading = ref(false)
+const exitGameButtonLoading = ref(false)
 
-const handleStartGameButtonClicked = () => {
-  console.log('Start game button clicked')
+const handleStartGameButtonClicked = async () => {
+  startGameButtonLoading.value = true
+  try {
+    await startGame()
+  } catch (error) {
+    console.error('Error starting game:', error)
+    // TODO: Show error message
+  } finally {
+    startGameButtonLoading.value = false
+  }
 }
 
 const handleExitLobbyButtonClicked = async () => {
+  exitGameButtonLoading.value = true
   try {
     await exitSession(playerIsHost.value ? 1 : 2)
     router.push({ name: 'home' })
   } catch (error) {
     console.error('Error exiting session:', error)
     // TODO: Show error message
+  } finally {
+    exitGameButtonLoading.value = false
   }
 }
 </script>
@@ -53,6 +66,7 @@ const handleExitLobbyButtonClicked = async () => {
           class="start-button"
           @click="handleStartGameButtonClicked"
           :disabled="!player2Connected"
+          :loading="startGameButtonLoading"
         />
         <div v-else>
           <p>Waiting for host to start the game...</p>
@@ -64,6 +78,7 @@ const handleExitLobbyButtonClicked = async () => {
           buttonHeight="40px"
           buttonStyle="taupe"
           @click="handleExitLobbyButtonClicked"
+          :loading="exitGameButtonLoading"
         />
       </div>
     </div>

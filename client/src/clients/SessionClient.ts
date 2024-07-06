@@ -11,6 +11,7 @@ export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
 
   /* Socket events */
+  // Session state events
   socket.on('sessionCreated', (session: Session) => {
     sessionStore.setSession(session)
     sessionStore.setPlayerIsHost(true)
@@ -23,6 +24,12 @@ export const initializeSessionClient = () => {
     sessionStore.setPlayer2Connected(true)
   })
 
+  socket.on('gameStarted', (session: Session) => {
+    sessionStore.setSession(session)
+    router.push({ name: 'play' })
+  })
+
+  // Session player management events
   socket.on('player1Disconnected', (session: Session) => {
     if (!sessionStore.getPlayerIsHost) {
       sessionStore.setSession(session)
@@ -49,6 +56,7 @@ export const initializeSessionClient = () => {
     }
   })
 
+  // Game option events
   socket.on('player1NameUpdated', (name: string) => {
     if (!sessionStore.playerIsHost) sessionStore.setPlayer1Name(name)
   })
@@ -83,6 +91,7 @@ export const initializeSessionClient = () => {
 }
 
 /* Client socket functions */
+// Game option functions
 export const updatePlayer1Name = (name: string) => {
   sessionStore.setPlayer1Name(name)
   return enqueue(() =>
@@ -150,6 +159,12 @@ export const joinSession = async (sessionCode: string) => {
 export const exitSession = async (playerNumber: 1 | 2) => {
   return await enqueue(() =>
     emitAsync('exitSession', [playerNumber, sessionStore.getSessionCode])
+  )
+}
+
+export const startGame = async () => {
+  return await enqueue(() =>
+    emitAsync('startGame', sessionStore.getSessionCode)
   )
 }
 
