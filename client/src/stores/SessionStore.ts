@@ -1,21 +1,24 @@
 import { defineStore } from 'pinia'
 import { Session } from '../types/Session'
+import { Game } from '../types/Game'
+import { Word } from '../types/Word'
 
 export const useSessionStore = defineStore('session', {
   state: () => ({
     sessionCode: '',
-
     player1Name: 'Player 1',
     player2Name: 'Player 2',
     player2Connected: false,
     playerIsHost: false,
-
     rounds: 3,
     MAX_ROUNDS: 5,
     spellCheckEnabled: true,
     blockProfanityEnabled: false,
     roundTimerEnabled: true,
     roundTimerDuration: 120,
+    state: 'in lobby' as 'in lobby' | 'in play' | 'complete',
+    currentRound: 0,
+    games: [] as Game[],
   }),
 
   getters: {
@@ -35,6 +38,9 @@ export const useSessionStore = defineStore('session', {
       const seconds = state.roundTimerDuration % 60
       return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
     },
+    getState: (state) => state.state,
+    getCurrentRound: (state) => state.currentRound,
+    getGames: (state) => state.games,
   },
 
   actions: {
@@ -68,6 +74,34 @@ export const useSessionStore = defineStore('session', {
     setRoundTimerDuration(roundTimerDuration: number) {
       this.roundTimerDuration = roundTimerDuration
     },
+    setState(state: 'in lobby' | 'in play' | 'complete') {
+      this.state = state
+    },
+    setCurrentRound(currentRound: number) {
+      this.currentRound = currentRound
+    },
+    updateGame(gameId: number, updatedGame: Partial<Game>) {
+      const index = this.games.findIndex((game) => game.id === gameId)
+      if (index !== -1) {
+        this.games[index] = { ...this.games[index], ...updatedGame }
+      }
+    },
+    addWordToGame(gameId: number, word: Word) {
+      const game = this.games.find((game) => game.id === gameId)
+      if (game) {
+        game.words.push(word)
+      }
+    },
+    updateWordInGame(
+      gameId: number,
+      wordIndex: number,
+      updatedWord: Partial<Word>
+    ) {
+      const game = this.games.find((game) => game.id === gameId)
+      if (game && game.words[wordIndex]) {
+        game.words[wordIndex] = { ...game.words[wordIndex], ...updatedWord }
+      }
+    },
     setSession(session: Session) {
       this.sessionCode = session.sessionCode
       this.player1Name = session.player1Name
@@ -78,6 +112,9 @@ export const useSessionStore = defineStore('session', {
       this.blockProfanityEnabled = session.blockProfanityEnabled
       this.roundTimerEnabled = session.roundTimerEnabled
       this.roundTimerDuration = session.roundTimerDuration
+      this.state = session.state
+      this.currentRound = session.currentRound
+      this.games = session.games
     },
   },
 })
