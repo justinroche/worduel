@@ -6,6 +6,7 @@ const connectionStore = useConnectionStore()
 <template>
   <transition name="fade">
     <div v-if="!connectionStore.isConnected" class="box">
+      <font-awesome-icon :icon="['fas', 'triangle-exclamation']" size="3x" />
       <p>
         Failed to connect to the server. Please check your internet connection
         and try again.
@@ -18,10 +19,14 @@ const connectionStore = useConnectionStore()
 .box {
   color: white;
   background-color: rgb(41, 41, 41);
-  padding: 1rem;
+  padding: 1.5rem 1rem;
   border-radius: 0.25rem;
   width: 250px;
   font-size: 1rem;
+}
+
+.box p {
+  margin: 1rem 0 0 0;
 }
 
 .fade-enter-active,
