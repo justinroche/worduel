@@ -80,10 +80,10 @@ export const useSessionStore = defineStore('session', {
     setCurrentRound(currentRound: number) {
       this.currentRound = currentRound
     },
-    updateGame(gameId: number, updatedGame: Partial<Game>) {
-      const index = this.games.findIndex((game) => game.id === gameId)
-      if (index !== -1) {
-        this.games[index] = { ...this.games[index], ...updatedGame }
+    setGameState(gameId: number, state: 'setting word' | 'in play' | 'complete') {
+      const game = this.games.find((game) => game.id === gameId)
+      if (game) {
+        game.state = state
       }
     },
     addWordToGame(gameId: number, word: Word) {
@@ -92,14 +92,17 @@ export const useSessionStore = defineStore('session', {
         game.words.push(word)
       }
     },
-    updateWordInGame(
-      gameId: number,
-      wordIndex: number,
-      updatedWord: Partial<Word>
-    ) {
+    addGuessToWord(gameId: number, wordIndex: number, guess: string) {
       const game = this.games.find((game) => game.id === gameId)
-      if (game && game.words[wordIndex]) {
-        game.words[wordIndex] = { ...game.words[wordIndex], ...updatedWord }
+      if (game) {
+        game.words[wordIndex].guesses.push(guess)
+      }
+    },
+    setWordGuessed(gameId: number, wordIndex: number, guessedIn: number) {
+      const game = this.games.find((game) => game.id === gameId)
+      if (game) {
+        game.words[wordIndex].guessedIn = guessedIn
+        game.words[wordIndex].successfullyGuessed = true
       }
     },
     setSession(session: Session) {
