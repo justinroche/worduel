@@ -130,6 +130,10 @@ function getResults(guess: string[], secretWord: string) {
 
   return results
 }
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyPress)
+})
 </script>
 
 <template>
