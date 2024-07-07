@@ -1,10 +1,12 @@
 <script setup lang="ts">
 /* Imports */
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import axios from 'axios'
 import GameTable from '../components/GameTable.vue'
 import Keyboard from '../components/Keyboard.vue'
-import dictionary from '../resources/dictionary.json'
+import { isWordInDictionary } from '../utils/dictionaryUtils'
+import { useSessionStore } from '../stores/SessionStore'
+import EnterWordBox from '../components/EnterWordBox.vue'
 
 /* State */
 const secretWord = 'MAKER'
@@ -16,13 +18,18 @@ const guesses = ref<string[][]>([])
 const results = ref<string[][]>([])
 const gameState = ref('playing')
 
+const sessionStore = useSessionStore()
+
+const currentRound = computed(() => sessionStore.getCurrentRound)
+const currentRoundState = computed(
+  () => sessionStore.getGames[currentRound.value].state
+)
+
 const letters: string[][] = [
   'QWERTYUIOP'.split(''),
   'ASDFGHJKL'.split(''),
   'ZXCVBNM'.split(''),
 ]
-
-const dictionarySet = new Set(Object.keys(dictionary))
 
 /* Keyboard label state */
 const letterLabels = ref<string[][]>(
@@ -64,7 +71,7 @@ const handleKeyEvent = (key: string) => {
     if (currentGuess.letters.join('').length !== 5) {
       return
     } else {
-      if (!dictionarySet.has(currentGuess.letters.join('').toLowerCase())) {
+      if (!isWordInDictionary(currentGuess.letters.join(''))) {
         return
       }
       if (currentGuess.letters.join('') === secretWord) {
@@ -94,6 +101,7 @@ const handleKeyEvent = (key: string) => {
 }
 
 const handleKeyPress = (event: KeyboardEvent) => {
+  if (currentRoundState.value != 'in play') return
   handleKeyEvent(event.key)
 }
 
@@ -137,7 +145,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1>Worduel</h1>
+  <div v-if="true">
+    <enter-word-box />
+  </div>
+  <h1>Round {{ currentRound }}</h1>
   <game-table :currentGuess="currentGuess" :results="results" />
   <div id="keyboardContainer">
     <keyboard
