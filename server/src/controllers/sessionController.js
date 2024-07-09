@@ -1,9 +1,9 @@
 const Session = require('../models/sessionModel');
 
 const generateSessionCode = () => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let code = '';
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     code += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return code;

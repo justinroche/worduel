@@ -50,8 +50,8 @@ const handleHostButton = async () => {
 }
 
 const handleJoinButton = async () => {
-  if (joinCode.value.length !== 4) {
-    homeErrorStore.setError('Join code must be 4 characters.')
+  if (joinCode.value.length !== 5) {
+    homeErrorStore.setError('Join code must be 5 characters.')
     return
   }
   joinButtonLoading.value = true
@@ -125,7 +125,7 @@ const handleHelpButton = () => {
           @input="handleJoinCodeInput"
           @keydown="handleJoinCodeInput"
           placeholder="Enter code..."
-          maxlength="4"
+          maxlength="5"
           tabindex="2"
         />
         <menu-button
