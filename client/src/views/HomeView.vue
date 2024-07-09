@@ -5,9 +5,10 @@ import InfoBox from '../components/InfoBox.vue'
 import HelpBoxContent from '../components/HelpBoxContent.vue'
 import InfoBoxContent from '../components/InfoBoxContent.vue'
 import MenuButton from '../components/MenuButton.vue'
-import ErrorBox from '../components/ErrorBox.vue'
 import ConnectionErrorBox from '../components/ConnectionErrorBox.vue'
+import HomeErrorBox from '../components/HomeErrorBox.vue'
 import { createSession, joinSession } from '../clients/SessionClient'
+import { useHomeErrorStore } from '../stores/HomeErrorStore'
 
 const joinCode = ref('')
 const showInfoBox = ref(false)
@@ -15,7 +16,8 @@ const showInfoContent = ref(false)
 const showHelpContent = ref(false)
 const hostButtonLoading = ref(false)
 const joinButtonLoading = ref(false)
-const errorMessage = ref('')
+
+const homeErrorStore = useHomeErrorStore()
 
 // Convert join code to uppercase
 watch(joinCode, (newValue) => {
@@ -41,7 +43,7 @@ const handleHostButton = async () => {
     router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error creating session:', error)
-    errorMessage.value = 'Failed to create session.'
+    homeErrorStore.setError('Failed to create session.')
   } finally {
     hostButtonLoading.value = false
   }
@@ -49,7 +51,7 @@ const handleHostButton = async () => {
 
 const handleJoinButton = async () => {
   if (joinCode.value.length !== 4) {
-    errorMessage.value = 'Join code must be 4 characters.'
+    homeErrorStore.setError('Join code must be 4 characters.')
     return
   }
   joinButtonLoading.value = true
@@ -58,8 +60,9 @@ const handleJoinButton = async () => {
     router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error joining session:', error)
-    errorMessage.value =
+    homeErrorStore.setError(
       'Failed to join session. Please check the code and try again.'
+    )
   } finally {
     joinButtonLoading.value = false
   }
@@ -137,7 +140,7 @@ const handleHelpButton = () => {
         />
       </div>
       <div class="error-box-container">
-        <error-box :message="errorMessage" />
+        <home-error-box />
       </div>
     </div>
     <div class="info-section">

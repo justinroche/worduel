@@ -1,4 +1,5 @@
 import { useSessionStore } from '../stores/SessionStore'
+import { useHomeErrorStore } from '../stores/HomeErrorStore'
 import { Session } from '../types/Session'
 
 import { emitAsync, enqueue } from '../utils/socketUtils'
@@ -6,9 +7,11 @@ import socket from '../socket'
 import router from '../router'
 
 let sessionStore: ReturnType<typeof useSessionStore>
+let homeErrorStore: ReturnType<typeof useHomeErrorStore>
 
 export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
+  homeErrorStore = useHomeErrorStore()
 
   /* Socket events */
   // Session state events
@@ -50,6 +53,7 @@ export const initializeSessionClient = () => {
     if (!sessionStore.getPlayerIsHost) {
       await enqueue(() => emitAsync('leaveRoom', sessionStore.getSessionCode))
       router.push({ name: 'home' })
+      homeErrorStore.setError('You have been kicked.')
     } else {
       sessionStore.setPlayer2Connected(false)
       sessionStore.setPlayer2Name('Player 2') // Is this necessary?
