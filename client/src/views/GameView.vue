@@ -1,7 +1,6 @@
 <script setup lang="ts">
 /* Imports */
 import { ref, reactive, onMounted, computed } from 'vue'
-import axios from 'axios'
 import GameTable from '../components/GameTable.vue'
 import Keyboard from '../components/Keyboard.vue'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
@@ -9,7 +8,6 @@ import { useSessionStore } from '../stores/SessionStore'
 import EnterWordBox from '../components/EnterWordBox.vue'
 
 /* State */
-const secretWord = 'MAKER'
 const currentGuess = reactive({
   row: 0,
   letters: ['', '', '', '', ''],
@@ -22,8 +20,17 @@ const sessionStore = useSessionStore()
 
 const currentRound = computed(() => sessionStore.getCurrentRound)
 const currentRoundState = computed(
-  () => sessionStore.getGames[currentRound.value].state
+  () => sessionStore.getGames[currentRound.value - 1].state
 )
+const playerNumber = computed(() => (useSessionStore().playerIsHost ? 1 : 2))
+const words = computed(
+  () => useSessionStore().getGames[currentRound.value - 1].words
+)
+
+const secretWord = computed(() => {
+  return words.value.filter((word) => word.wordSetter != playerNumber.value)[0]
+    ?.word
+})
 
 const letters: string[][] = [
   'QWERTYUIOP'.split(''),
@@ -74,12 +81,12 @@ const handleKeyEvent = (key: string) => {
       if (!isWordInDictionary(currentGuess.letters.join(''))) {
         return
       }
-      if (currentGuess.letters.join('') === secretWord) {
+      if (currentGuess.letters.join('') === secretWord.value) {
         gameState.value = 'solved'
       }
 
       guesses.value.push([...currentGuess.letters])
-      results.value.push(getResults(currentGuess.letters, secretWord))
+      results.value.push(getResults(currentGuess.letters, secretWord.value))
       currentGuess.row++
       currentGuess.letters = ['', '', '', '', '']
     }
@@ -145,7 +152,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="true">
+  <div v-if="currentRoundState === 'setting word'">
     <enter-word-box />
   </div>
   <h1>Round {{ currentRound }}</h1>

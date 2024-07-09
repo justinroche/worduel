@@ -92,6 +92,11 @@ export const initializeSessionClient = () => {
     if (!sessionStore.getPlayerIsHost)
       sessionStore.setRoundTimerDuration(duration)
   })
+
+  // Game events
+  socket.on('wordsSet', (session: Session) => {
+    sessionStore.setSession(session)
+  })
 }
 
 /* Client socket functions */
@@ -175,5 +180,13 @@ export const startGame = async () => {
 export const kickPlayer2 = async () => {
   return await enqueue(() =>
     emitAsync('kickPlayer2', sessionStore.getSessionCode)
+  )
+}
+
+// Game functions
+export const setWord = async (word: string) => {
+  const playerNumber = sessionStore.getPlayerIsHost ? 1 : 2
+  return await enqueue(() =>
+    emitAsync('setWord', [word, playerNumber, sessionStore.getSessionCode])
   )
 }

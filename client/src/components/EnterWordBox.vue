@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useSessionStore } from '../stores/SessionStore'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
 import MenuButton from './MenuButton.vue'
+import { setWord } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const currentRound = computed(() => sessionStore.getCurrentRound)
@@ -15,16 +16,28 @@ watch(word, (newValue) => {
   word.value = newValue.toUpperCase()
 })
 
-const handleConfirmButton = () => {
+const handleConfirmButton = async () => {
   if (word.value.length !== 5) {
+    // TODO: Show error message
     return
   }
   confirmButtonLoading.value = true
   if (!isWordInDictionary(word.value)) {
+    // TODO: Show error message
+    confirmButtonLoading.value = false
     return
   }
   // TODO: Process word
-  confirmButtonLoading.value = false
+  try {
+    await setWord(word.value)
+    console.log(sessionStore.getGames[currentRound.value - 1].state)
+    // TODO: Handle success (button switches to "Waiting for opponent" state and user can take back their word)
+  } catch (error) {
+    console.error('Error submitting word:', error)
+    // TODO: Handle error
+  } finally {
+    confirmButtonLoading.value = false
+  }
 }
 </script>
 
