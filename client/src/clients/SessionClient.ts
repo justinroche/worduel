@@ -53,7 +53,7 @@ export const initializeSessionClient = () => {
     if (!sessionStore.getPlayerIsHost) {
       await enqueue(() => emitAsync('leaveRoom', sessionStore.getSessionCode))
       router.push({ name: 'home' })
-      homeErrorStore.setError('You have been kicked.')
+      homeErrorStore.setError('You were kicked from the lobby.')
     } else {
       sessionStore.setPlayer2Connected(false)
       sessionStore.setPlayer2Name('Player 2') // Is this necessary?
