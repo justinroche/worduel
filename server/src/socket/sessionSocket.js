@@ -275,6 +275,39 @@ module.exports = (socket, io) => {
     }
   });
 
+  socket.on(
+    'madeGuess',
+    async ([guess, playerNumber, sessionCode], callback) => {
+      try {
+        let session = await sessionController.getSessionFromCode(sessionCode);
+        const currentGame = session.games[session.currentRound - 1];
+        const currentWord = currentGame.words.find(
+          (word) => word.wordSetter !== playerNumber
+        );
+
+        currentWord.guesses.push(guess);
+
+        if (currentWord.word === guess) {
+          currentWord.successfullyGuessed = true;
+          currentWord.guessedIn = playerNumber;
+
+          if (currentGame.words.every((word) => word.successfullyGuessed)) {
+            currentGame.state = 'complete';
+          }
+        }
+
+        session = await sessionController.updateSession(sessionCode, {
+          games: session.games,
+        });
+
+        io.to(sessionCode).emit('setSession', session);
+        callback();
+      } catch (error) {
+        callback(error.message);
+      }
+    }
+  );
+
   socket.on('disconnect', () => {
     console.log('A user disconnected');
   });

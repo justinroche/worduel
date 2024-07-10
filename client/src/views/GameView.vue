@@ -6,6 +6,7 @@ import Keyboard from '../components/Keyboard.vue'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
 import { useSessionStore } from '../stores/SessionStore'
 import EnterWordBox from '../components/EnterWordBox.vue'
+import { madeGuess } from '../clients/SessionClient'
 
 /* State */
 const currentGuess = reactive({
@@ -14,7 +15,6 @@ const currentGuess = reactive({
 })
 const guesses = ref<string[][]>([])
 const results = ref<string[][]>([])
-const gameState = ref('playing')
 
 const sessionStore = useSessionStore()
 
@@ -27,10 +27,12 @@ const words = computed(
   () => useSessionStore().getGames[currentRound.value - 1].words
 )
 
-const secretWord = computed(() => {
+const wordObject = computed(() => {
   return words.value.filter((word) => word.wordSetter != playerNumber.value)[0]
-    ?.word
 })
+
+const secretWord = computed(() => wordObject?.value.word)
+const wordGuessed = computed(() => wordObject?.value.successfullyGuessed)
 
 const letters: string[][] = [
   'QWERTYUIOP'.split(''),
@@ -70,9 +72,9 @@ function updateLabels(guessedLetters: string[], results: string[]) {
 }
 
 /* Keyboard event handler */
-const handleKeyEvent = (key: string) => {
+const handleKeyEvent = async (key: string) => {
   if (currentGuess.row >= 6) return
-  if (gameState.value === 'solved') return
+  if (wordGuessed.value) return
 
   if (key === 'Enter') {
     if (currentGuess.letters.join('').length !== 5) {
@@ -81,14 +83,15 @@ const handleKeyEvent = (key: string) => {
       if (!isWordInDictionary(currentGuess.letters.join(''))) {
         return
       }
-      if (currentGuess.letters.join('') === secretWord.value) {
-        gameState.value = 'solved'
-      }
 
       guesses.value.push([...currentGuess.letters])
       results.value.push(getResults(currentGuess.letters, secretWord.value))
-      currentGuess.row++
-      currentGuess.letters = ['', '', '', '', '']
+
+      if (currentGuess.letters.join('') !== secretWord.value) {
+        currentGuess.row++
+        currentGuess.letters = ['', '', '', '', '']
+      }
+      await madeGuess(currentGuess.letters.join(''))
     }
   } else if (key === 'Backspace') {
     let lastIndex = currentGuess.letters.findIndex((letter) => letter === '')
@@ -157,9 +160,8 @@ onMounted(() => {
   </div>
   <h1>Round {{ currentRound }}</h1>
   <game-table :currentGuess="currentGuess" :results="results" />
-  <div id="keyboardContainer">
+  <div class="keyboardContainer">
     <keyboard
-      id="keyboard"
       :letters="letters"
       :letterLabels="letterLabels"
       @key-event="handleKeyEvent"
@@ -168,7 +170,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-#keyboardContainer {
+.keyboardContainer {
   margin-top: 100px;
 }
 </style>
