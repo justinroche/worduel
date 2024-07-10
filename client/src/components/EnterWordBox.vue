@@ -3,13 +3,26 @@ import { ref, computed, watch } from 'vue'
 import { useSessionStore } from '../stores/SessionStore'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
 import MenuButton from './MenuButton.vue'
-import { setWord } from '../clients/SessionClient'
+import { setWord, changeWord } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const currentRound = computed(() => sessionStore.getCurrentRound)
 
 const word = ref('')
 const confirmButtonLoading = ref(false)
+const buttonState = ref('entering-word')
+const hoverText = ref('')
+
+const buttonText = computed(() => {
+  if (buttonState.value === 'entering-word') {
+    return 'Confirm'
+  } else if (buttonState.value === 'waiting') {
+    return hoverText.value === 'Change Word'
+      ? 'Change Word'
+      : 'Waiting for opponent...'
+  }
+  return ''
+})
 
 // Convert word to uppercase
 watch(word, (newValue) => {
@@ -17,26 +30,45 @@ watch(word, (newValue) => {
 })
 
 const handleConfirmButton = async () => {
+  if (buttonState.value === 'waiting') {
+    await changeWord()
+    buttonState.value = 'entering-word'
+    return
+  }
+
   if (word.value.length !== 5) {
     // TODO: Show error message
     return
   }
+
   confirmButtonLoading.value = true
+
   if (!isWordInDictionary(word.value)) {
     // TODO: Show error message
     confirmButtonLoading.value = false
     return
   }
-  // TODO: Process word
+
   try {
     await setWord(word.value)
-    console.log(sessionStore.getGames[currentRound.value - 1].state)
-    // TODO: Handle success (button switches to "Waiting for opponent" state and user can take back their word)
+    buttonState.value = 'waiting'
   } catch (error) {
     console.error('Error submitting word:', error)
     // TODO: Handle error
   } finally {
     confirmButtonLoading.value = false
+  }
+}
+
+const handleMouseEnter = () => {
+  if (buttonState.value === 'waiting') {
+    hoverText.value = 'Change Word'
+  }
+}
+
+const handleMouseLeave = () => {
+  if (buttonState.value === 'waiting') {
+    hoverText.value = ''
   }
 }
 </script>
@@ -45,17 +77,32 @@ const handleConfirmButton = async () => {
   <div class="overlay">
     <div class="enter-word-box">
       <h2>Round {{ currentRound }}</h2>
-      <input type="text" v-model="word" maxlength="5" class="word-input" />
+      <input
+        type="text"
+        v-model="word"
+        maxlength="5"
+        class="word-input"
+        :disabled="buttonState !== 'entering-word'"
+        @keydown.enter="handleConfirmButton"
+      />
       <p>Enter a word for your opponent to guess</p>
       <menu-button
-        buttonText="Confirm"
+        :buttonText="buttonText"
         fontSize="1rem"
         buttonWidth="250px"
         buttonHeight="40px"
         buttonStyle="atomic-tangerine"
         @click="handleConfirmButton"
+        @mouseenter="handleMouseEnter"
+        @mouseleave="handleMouseLeave"
         :loading="confirmButtonLoading"
-        class="confirm-button"
+        :disabled="
+          word.length !== 5 ||
+          (buttonState === 'waiting' && hoverText !== 'Change Word')
+        "
+        :class="{
+          waiting: buttonState === 'waiting',
+        }"
       />
     </div>
   </div>
@@ -89,5 +136,13 @@ const handleConfirmButton = async () => {
   font-size: 48px;
   text-align: center;
   width: 270px;
+  border: none;
+  border-bottom: 2px solid #000;
+  outline: none;
+  background: transparent;
+}
+
+.word-input:disabled {
+  opacity: 0.5;
 }
 </style>

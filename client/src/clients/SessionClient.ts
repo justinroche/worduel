@@ -15,8 +15,11 @@ export const initializeSessionClient = () => {
 
   /* Socket events */
   // Session state events
-  socket.on('sessionCreated', (session: Session) => {
+  socket.on('setSession', (session: Session) => {
     sessionStore.setSession(session)
+  })
+
+  socket.on('sessionCreated', () => {
     sessionStore.setPlayerIsHost(true)
   })
 
@@ -27,8 +30,7 @@ export const initializeSessionClient = () => {
     sessionStore.setPlayer2Connected(true)
   })
 
-  socket.on('gameStarted', (session: Session) => {
-    sessionStore.setSession(session)
+  socket.on('gameStarted', () => {
     router.push({ name: 'play' })
   })
 
@@ -91,11 +93,6 @@ export const initializeSessionClient = () => {
   socket.on('roundTimerDurationUpdated', (duration: number) => {
     if (!sessionStore.getPlayerIsHost)
       sessionStore.setRoundTimerDuration(duration)
-  })
-
-  // Game events
-  socket.on('wordsSet', (session: Session) => {
-    sessionStore.setSession(session)
   })
 }
 
@@ -188,5 +185,12 @@ export const setWord = async (word: string) => {
   const playerNumber = sessionStore.getPlayerIsHost ? 1 : 2
   return await enqueue(() =>
     emitAsync('setWord', [word, playerNumber, sessionStore.getSessionCode])
+  )
+}
+
+export const changeWord = async () => {
+  const playerNumber = sessionStore.getPlayerIsHost ? 1 : 2
+  return await enqueue(() =>
+    emitAsync('changeWord', [playerNumber, sessionStore.getSessionCode])
   )
 }

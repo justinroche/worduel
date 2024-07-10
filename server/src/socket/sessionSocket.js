@@ -9,7 +9,8 @@ module.exports = (socket, io) => {
       socket.join(session.sessionCode);
 
       // Notify the client that the session was created
-      socket.emit('sessionCreated', session);
+      socket.emit('setSession', session);
+      socket.emit('sessionCreated');
       console.log('Created new session:', session.sessionCode);
       callback();
     } catch (error) {
@@ -63,7 +64,8 @@ module.exports = (socket, io) => {
         games: games,
       });
 
-      io.to(sessionCode).emit('gameStarted', session);
+      io.to(sessionCode).emit('setSession', session);
+      io.to(sessionCode).emit('gameStarted');
       console.log(sessionCode, 'game started');
       callback();
     } catch (error) {
@@ -245,8 +247,28 @@ module.exports = (socket, io) => {
       });
 
       if (currentGame.state === 'in play') {
-        io.to(sessionCode).emit('wordsSet', session);
+        io.to(sessionCode).emit('setSession', session);
       }
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
+  socket.on('changeWord', async ([playerNumber, sessionCode], callback) => {
+    try {
+      let session = await sessionController.getSessionFromCode(sessionCode);
+      const currentGame = session.games[session.currentRound - 1];
+
+      currentGame.words = currentGame.words.filter(
+        (word) => word.wordSetter !== playerNumber
+      );
+
+      session = await sessionController.updateSession(sessionCode, {
+        games: session.games,
+      });
+
+      io.to(sessionCode).emit('setSession', session);
       callback();
     } catch (error) {
       callback(error.message);
