@@ -98,6 +98,7 @@ const handleMouseLeave = () => {
         :loading="confirmButtonLoading"
         :disabled="
           word.length !== 5 ||
+          !isWordInDictionary(word) ||
           (buttonState === 'waiting' && hoverText !== 'Change Word')
         "
         :class="{
@@ -143,6 +144,6 @@ const handleMouseLeave = () => {
 }
 
 .word-input:disabled {
-  opacity: 0.5;
+  opacity: 0.7;
 }
 </style>
