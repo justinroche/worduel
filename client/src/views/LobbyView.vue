@@ -113,7 +113,7 @@ const handleExitLobbyButtonClicked = async () => {
 }
 
 .session-code {
-  font-size: 4.5rem;
+  font-size: 4rem;
   margin: 0;
   line-height: 8rem;
   font-weight: 600;
