@@ -1,23 +1,26 @@
 <script setup lang="ts">
 import GameRow from './GameRow.vue'
 
-const props = defineProps<{
-  currentGuess: {
-    row: number
-    letters: string[]
+const props = withDefaults(
+  defineProps<{
+    guesses: string[][]
+    results: string[][]
+    scale: number
+  }>(),
+  {
+    scale: 3,
   }
-  results: string[][]
-}>()
+)
 </script>
 
 <template>
   <div>
     <game-row
-      v-for="row in 6"
-      :key="row - 1"
-      :currentGuess="props.currentGuess"
-      :guessNumber="row - 1"
-      :results="props.results[row - 1] ? props.results[row - 1] : []"
+      v-for="(guess, index) in props.guesses"
+      :key="index"
+      :guess="guess"
+      :results="props.results[index] ? props.results[index] : []"
+      :scale="props.scale"
     />
   </div>
 </template>

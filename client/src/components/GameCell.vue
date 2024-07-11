@@ -1,12 +1,23 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 const props = defineProps<{
   letter: string
   result: string
+  scale: number
 }>()
+
+const cardSize = computed(() => {
+  return `${props.scale * 20}px`
+})
 </script>
 
 <template>
-  <div class="card" :class="props.result">
+  <div
+    class="card"
+    :class="props.result"
+    :style="{ height: cardSize, width: cardSize }"
+  >
     {{ props.letter }}
   </div>
 </template>
@@ -20,8 +31,6 @@ const props = defineProps<{
   border-radius: 3px;
   box-sizing: border-box;
 
-  height: 60px;
-  width: 60px;
   margin: 5px;
 
   display: flex;
