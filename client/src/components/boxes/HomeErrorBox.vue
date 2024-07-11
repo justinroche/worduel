@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useHomeErrorStore } from '../stores/HomeErrorStore'
+import { useHomeErrorStore } from '../../stores/HomeErrorStore'
 import { computed } from 'vue'
 
 const homeErrorStore = useHomeErrorStore()

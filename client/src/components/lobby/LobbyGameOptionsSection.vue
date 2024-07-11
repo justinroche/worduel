@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useSessionStore } from '../stores/SessionStore'
+import { useSessionStore } from '../../stores/SessionStore'
 import {
   updateRounds,
   updateSpellCheckEnabled,
   updateBlockProfanityEnabled,
   updateRoundTimerEnabled,
   updateRoundTimerDuration,
-} from '../clients/SessionClient'
+} from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const playerIsHost = computed(() => sessionStore.playerIsHost)

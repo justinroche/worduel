@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /* Imports */
 import { ref, onMounted, computed } from 'vue'
-import GameTable from '../components/GameTable.vue'
-import Keyboard from '../components/Keyboard.vue'
+import GameTable from '../components/gameBoard/GameTable.vue'
+import Keyboard from '../components/gameBoard/Keyboard.vue'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
 import { useSessionStore } from '../stores/SessionStore'
-import EnterWordBox from '../components/EnterWordBox.vue'
-import PostRoundModal from '../components/PostRoundModal.vue'
+import EnterWordBox from '../components/modals/EnterWordModal.vue'
+import PostRoundModal from '../components/modals/PostRoundModal.vue'
 import { madeGuess } from '../clients/SessionClient'
 
 /* State */

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import router from '../router'
-import InfoBox from '../components/InfoBox.vue'
-import HelpBoxContent from '../components/HelpBoxContent.vue'
-import InfoBoxContent from '../components/InfoBoxContent.vue'
+import InfoBox from '../components/boxes/InfoBox.vue'
+import HelpBoxContent from '../components/boxes/HelpBoxContent.vue'
+import InfoBoxContent from '../components/boxes/InfoBoxContent.vue'
 import MenuButton from '../components/MenuButton.vue'
-import ConnectionErrorBox from '../components/ConnectionErrorBox.vue'
-import HomeErrorBox from '../components/HomeErrorBox.vue'
+import ConnectionErrorBox from '../components/boxes/ConnectionErrorBox.vue'
+import HomeErrorBox from '../components/boxes/HomeErrorBox.vue'
 import { createSession, joinSession } from '../clients/SessionClient'
 import { useHomeErrorStore } from '../stores/HomeErrorStore'
 

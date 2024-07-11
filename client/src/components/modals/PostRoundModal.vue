@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useSessionStore } from '../stores/SessionStore'
-import GameTable from './GameTable.vue'
+import { useSessionStore } from '../../stores/SessionStore'
 
 const sessionStore = useSessionStore()
 

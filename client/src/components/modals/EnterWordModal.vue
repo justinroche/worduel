@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useSessionStore } from '../stores/SessionStore'
-import { isWordInDictionary } from '../utils/dictionaryUtils'
-import MenuButton from './MenuButton.vue'
-import { setWord, changeWord } from '../clients/SessionClient'
+import { useSessionStore } from '../../stores/SessionStore'
+import { isWordInDictionary } from '../../utils/dictionaryUtils'
+import MenuButton from '../MenuButton.vue'
+import { setWord, changeWord } from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const currentRound = computed(() => sessionStore.getCurrentRound)
