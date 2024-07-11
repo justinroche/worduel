@@ -7,6 +7,8 @@ require('dotenv').config({ path: './config/.env' });
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+const HOST = '0.0.0.0'
+
 app.use(cors());
 app.use(express.json());
 
@@ -18,7 +20,7 @@ mongoose
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: '*',
     methods: ['GET', 'POST'],
   },
 });
@@ -35,6 +37,6 @@ app.get('/health', (req, res) => {
   res.status(200).send({ status: 'Server is running' });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
