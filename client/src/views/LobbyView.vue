@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import router from '../router'
-import LobbyPlayersSection from '../components/LobbyPlayersSection.vue'
-import LobbyGameOptionsSection from '../components/LobbyGameOptionsSection.vue'
+import LobbyPlayersSection from '../components/lobby/LobbyPlayersSection.vue'
+import LobbyGameOptionsSection from '../components/lobby/LobbyGameOptionsSection.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { useSessionStore } from '../stores/SessionStore'
 import { startGame, exitSession } from '../clients/SessionClient'

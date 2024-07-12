@@ -88,11 +88,12 @@ const handleKeyEvent = async (key: string) => {
 
       results.value.push(getResults(guess, secretWord.value))
 
+      await madeGuess(guess.join(''), results.value[currentRow.value])
+
       if (guess.join('') !== secretWord.value) {
         currentRow.value++
         currentLetter.value = 0
       }
-      await madeGuess(guess.join(''))
     }
   } else if (key === 'Backspace') {
     console.log(currentLetter.value)

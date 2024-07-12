@@ -18,7 +18,7 @@ const cardSize = computed(() => {
     :class="props.result"
     :style="{ height: cardSize, width: cardSize }"
   >
-    {{ props.letter }}
+    {{ props.letter !== '_' ? props.letter : '' }}
   </div>
 </template>
 

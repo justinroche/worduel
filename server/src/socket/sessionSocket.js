@@ -277,7 +277,7 @@ module.exports = (socket, io) => {
 
   socket.on(
     'madeGuess',
-    async ([guess, playerNumber, sessionCode], callback) => {
+    async ([guess, results, playerNumber, sessionCode], callback) => {
       try {
         let session = await sessionController.getSessionFromCode(sessionCode);
         const currentGame = session.games[session.currentRound - 1];
@@ -285,7 +285,8 @@ module.exports = (socket, io) => {
           (word) => word.wordSetter !== playerNumber
         );
 
-        currentWord.guesses.push(guess);
+        currentWord.guesses[currentWord.results.length] = guess;
+        currentWord.results.push(results);
 
         if (currentWord.word === guess) {
           currentWord.successfullyGuessed = true;

@@ -1,17 +1,43 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
+import GameTable from '../gameBoard/GameTable.vue'
 
 const sessionStore = useSessionStore()
 
 const currentRound = computed(() => sessionStore.getCurrentRound)
+const words = computed(
+  () => sessionStore.getGames[currentRound.value - 1].words
+)
+
+const wordThatPlayer1Guessed = computed(
+  () => words.value.filter((word) => word.wordSetter === 2)[0]
+)
+const wordThatPlayer2Guessed = computed(
+  () => words.value.filter((word) => word.wordSetter === 1)[0]
+)
 </script>
 
 <template>
   <div class="overlay">
     <div class="modal">
       <h2>Round {{ currentRound }} Complete</h2>
-      <div class="result-tables"></div>
+      <div class="result-tables">
+        <game-table
+          :guesses="
+            wordThatPlayer1Guessed.guesses.map((guess) => guess.split(''))
+          "
+          :results="wordThatPlayer1Guessed.results"
+          :scale="2"
+        />
+        <game-table
+          :guesses="
+            wordThatPlayer2Guessed.guesses.map((guess) => guess.split(''))
+          "
+          :results="wordThatPlayer2Guessed.results"
+          :scale="2"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -36,5 +62,11 @@ const currentRound = computed(() => sessionStore.getCurrentRound)
   background-color: #fff;
   border: 1px solid #000;
   border-radius: 0.25rem;
+}
+
+.result-tables {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
 }
 </style>

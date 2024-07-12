@@ -195,9 +195,14 @@ export const changeWord = async () => {
   )
 }
 
-export const madeGuess = async (guess: string) => {
+export const madeGuess = async (guess: string, results: string[]) => {
   const playerNumber = sessionStore.getPlayerIsHost ? 1 : 2
   return await enqueue(() =>
-    emitAsync('madeGuess', [guess, playerNumber, sessionStore.getSessionCode])
+    emitAsync('madeGuess', [
+      guess,
+      results,
+      playerNumber,
+      sessionStore.getSessionCode,
+    ])
   )
 }

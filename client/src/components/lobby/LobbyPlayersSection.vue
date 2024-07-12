@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useSessionStore } from '../stores/SessionStore'
-import MenuButton from './MenuButton.vue'
+import { useSessionStore } from '../../stores/SessionStore'
+import MenuButton from '../MenuButton.vue'
 import {
   updatePlayer1Name,
   updatePlayer2Name,
   kickPlayer2,
-} from '../clients/SessionClient'
+} from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const player1Name = computed(() => sessionStore.player1Name)

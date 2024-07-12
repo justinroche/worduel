@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const wordSchema = new mongoose.Schema({
   wordSetter: { type: Number, required: true, enum: [1, 2] },
   word: { type: String, required: true },
-  guesses: { type: [String], default: [] },
+  guesses: { type: [String], default: Array(6).fill('_____') },
+  results: { type: [[String]], default: [] },
   successfullyGuessed: { type: Boolean, default: false },
   guessedIn: { type: Number },
 });
