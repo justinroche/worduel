@@ -10,6 +10,9 @@ const words = computed(
   () => sessionStore.getGames[currentRound.value - 1].words
 )
 
+const player1Name = computed(() => sessionStore.getPlayer1Name)
+const player2Name = computed(() => sessionStore.getPlayer2Name)
+
 const wordThatPlayer1Guessed = computed(
   () => words.value.filter((word) => word.wordSetter === 2)[0]
 )
@@ -23,20 +26,26 @@ const wordThatPlayer2Guessed = computed(
     <div class="modal">
       <h2>Round {{ currentRound }} Complete</h2>
       <div class="result-tables">
-        <game-table
-          :guesses="
-            wordThatPlayer1Guessed.guesses.map((guess) => guess.split(''))
-          "
-          :results="wordThatPlayer1Guessed.results"
-          :scale="2"
-        />
-        <game-table
-          :guesses="
-            wordThatPlayer2Guessed.guesses.map((guess) => guess.split(''))
-          "
-          :results="wordThatPlayer2Guessed.results"
-          :scale="2"
-        />
+        <div>
+          <h3 class="player-name">{{ player1Name }}</h3>
+          <game-table
+            :guesses="
+              wordThatPlayer1Guessed.guesses.map((guess) => guess.split(''))
+            "
+            :results="wordThatPlayer1Guessed.results"
+            :scale="2"
+          />
+        </div>
+        <div>
+          <h3 class="player-name">{{ player2Name }}</h3>
+          <game-table
+            :guesses="
+              wordThatPlayer2Guessed.guesses.map((guess) => guess.split(''))
+            "
+            :results="wordThatPlayer2Guessed.results"
+            :scale="2"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -68,5 +77,10 @@ const wordThatPlayer2Guessed = computed(
   display: flex;
   justify-content: space-around;
   padding: 1rem;
+}
+
+.player-name {
+  margin: 0;
+  margin-bottom: 0.5rem;
 }
 </style>

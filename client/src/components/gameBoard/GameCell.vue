@@ -10,13 +10,15 @@ const props = defineProps<{
 const cardSize = computed(() => {
   return `${props.scale * 20}px`
 })
+
+const fontSize = computed(() => `${props.scale * 10 + 6}px`)
 </script>
 
 <template>
   <div
     class="card"
     :class="props.result"
-    :style="{ height: cardSize, width: cardSize }"
+    :style="{ height: cardSize, width: cardSize, fontSize }"
   >
     {{ props.letter !== '_' ? props.letter : '' }}
   </div>
