@@ -33,7 +33,7 @@ const wordObject = computed(() => {
 })
 
 const secretWord = computed(() => wordObject?.value.word)
-const wordGuessed = computed(() => wordObject?.value.successfullyGuessed)
+const wordGuessed = computed(() => wordObject?.value.guessingComplete)
 
 const letters: string[][] = [
   'QWERTYUIOP'.split(''),

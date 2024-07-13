@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
 import GameTable from '../gameBoard/GameTable.vue'
+import { getScoreFromGuessCount } from '../../utils/gameUtils'
 
 const sessionStore = useSessionStore()
 
@@ -35,6 +36,21 @@ const wordThatPlayer2Guessed = computed(
             :results="wordThatPlayer1Guessed.results"
             :scale="2"
           />
+          <div class="score-container">
+            <p class="word-score">
+              <b>
+                +{{ getScoreFromGuessCount(wordThatPlayer1Guessed.guessedIn!) }}
+                points
+              </b>
+            </p>
+            <p
+              v-if="wordThatPlayer1Guessed.guessedIn! === 7"
+              class="word-answer"
+            >
+              (Answer: <b>{{ wordThatPlayer1Guessed.word }}</b
+              >)
+            </p>
+          </div>
         </div>
         <div>
           <h3 class="player-name">{{ player2Name }}</h3>
@@ -45,6 +61,21 @@ const wordThatPlayer2Guessed = computed(
             :results="wordThatPlayer2Guessed.results"
             :scale="2"
           />
+          <div class="score-container">
+            <p class="word-score">
+              <b>
+                +{{ getScoreFromGuessCount(wordThatPlayer2Guessed.guessedIn!) }}
+                points
+              </b>
+            </p>
+            <p
+              v-if="wordThatPlayer2Guessed.guessedIn! === 7"
+              class="word-answer"
+            >
+              (Answer: <b>{{ wordThatPlayer2Guessed.word }}</b
+              >)
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -82,5 +113,15 @@ const wordThatPlayer2Guessed = computed(
 .player-name {
   margin: 0;
   margin-bottom: 0.5rem;
+}
+
+.word-score {
+  margin: 0.5rem 0 0 0;
+}
+
+.word-answer {
+  margin: 0.25rem 0 0 0;
+  font-style: italic;
+  font-size: 0.8rem;
 }
 </style>

@@ -288,11 +288,14 @@ module.exports = (socket, io) => {
         currentWord.guesses[currentWord.results.length] = guess;
         currentWord.results.push(results);
 
-        if (currentWord.word === guess) {
-          currentWord.successfullyGuessed = true;
-          currentWord.guessedIn = playerNumber;
+        if (currentWord.word === guess || currentWord.results.length === 6) {
+          currentWord.guessingComplete = true;
 
-          if (currentGame.words.every((word) => word.successfullyGuessed)) {
+          if (currentWord.word === guess) {
+            currentWord.guessedIn = currentWord.results.length;
+          } else currentWord.guessedIn = 7;
+
+          if (currentGame.words.every((word) => word.guessingComplete)) {
             currentGame.state = 'complete';
           }
         }

@@ -3,6 +3,6 @@ export type Word = {
   word: string
   guesses: string[]
   results: string[][]
-  successfullyGuessed: boolean
+  guessingComplete: boolean
   guessedIn?: number
 }

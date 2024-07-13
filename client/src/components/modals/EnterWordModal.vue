@@ -76,7 +76,7 @@ const handleMouseLeave = () => {
 <template>
   <div class="overlay">
     <div class="enter-word-box">
-      <h2>Round {{ currentRound }}</h2>
+      <h2> Entering Round {{ currentRound }}</h2>
       <input
         type="text"
         v-model="word"

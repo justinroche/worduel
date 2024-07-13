@@ -5,7 +5,7 @@ const wordSchema = new mongoose.Schema({
   word: { type: String, required: true },
   guesses: { type: [String], default: Array(6).fill('_____') },
   results: { type: [[String]], default: [] },
-  successfullyGuessed: { type: Boolean, default: false },
+  guessingComplete: { type: Boolean, default: false },
   guessedIn: { type: Number },
 });
 

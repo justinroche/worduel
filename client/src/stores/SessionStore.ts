@@ -92,19 +92,6 @@ export const useSessionStore = defineStore('session', {
         game.words.push(word)
       }
     },
-    addGuessToWord(gameId: number, wordIndex: number, guess: string) {
-      const game = this.games.find((game) => game.id === gameId)
-      if (game) {
-        game.words[wordIndex].guesses.push(guess)
-      }
-    },
-    setWordGuessed(gameId: number, wordIndex: number, guessedIn: number) {
-      const game = this.games.find((game) => game.id === gameId)
-      if (game) {
-        game.words[wordIndex].guessedIn = guessedIn
-        game.words[wordIndex].successfullyGuessed = true
-      }
-    },
     setSession(session: Session) {
       this.sessionCode = session.sessionCode
       this.player1Name = session.player1Name
