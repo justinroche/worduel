@@ -1,20 +1,26 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import {
+  client_host,
+  server_host,
+  client_port,
+  server_port,
+} from './src/config.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
   server: {
-    host: '192.168.7.33',
-    port: 3000,
+    host: client_host,
+    port: client_port,
     proxy: {
       '/api': {
-        target: 'http://192.168.7.33:8080',
+        target: 'http://' + server_host + ':' + server_port,
         changeOrigin: true,
         secure: false,
       },
       '/socket.io': {
-        target: 'http://192.168.7.33:8080',
+        target: 'http://' + server_host + ':' + server_port,
         ws: true,
       },
     },
