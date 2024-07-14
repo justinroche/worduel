@@ -12,13 +12,14 @@ const cardSize = computed(() => {
 })
 
 const fontSize = computed(() => `${props.scale * 10 + 6}px`)
+const cellMargin = computed(() => `${props.scale * 2 - 1}px`)
 </script>
 
 <template>
   <div
     class="card"
     :class="props.result"
-    :style="{ height: cardSize, width: cardSize, fontSize }"
+    :style="{ height: cardSize, width: cardSize, fontSize, margin: cellMargin }"
   >
     {{ props.letter !== '_' ? props.letter : '' }}
   </div>
@@ -27,13 +28,10 @@ const fontSize = computed(() => `${props.scale * 10 + 6}px`)
 <style scoped>
 .card {
   font-weight: 600;
-  font-size: 32px;
   color: #fff;
 
   border-radius: 3px;
   box-sizing: border-box;
-
-  margin: 5px;
 
   display: flex;
   align-items: center;
