@@ -96,7 +96,6 @@ const handleKeyEvent = async (key: string) => {
       }
     }
   } else if (key === 'Backspace') {
-    console.log(currentLetter.value)
     if (currentLetter.value === 0) {
       return
     } else {
@@ -161,7 +160,7 @@ onMounted(() => {
     <post-round-modal />
   </div>
   <h1>Round {{ currentRound }}</h1>
-  <game-table :guesses="guesses" :results="results" />
+  <game-table :guesses="guesses" :results="results" :scale="3" />
   <div class="keyboardContainer">
     <keyboard
       :letters="letters"
