@@ -123,7 +123,7 @@ module.exports = (socket, io) => {
       }
 
       // Leave the room for the session
-      socket.leave(sessionCode);
+      socket.leaveAll();
       callback();
     } catch (error) {
       callback(error.message);
@@ -131,7 +131,7 @@ module.exports = (socket, io) => {
   });
 
   socket.on('leaveRoom', (sessionCode, callback) => {
-    socket.leave(sessionCode);
+    socket.leaveAll();
     callback();
   });
 
@@ -255,26 +255,6 @@ module.exports = (socket, io) => {
     }
   });
 
-  socket.on('changeWord', async ([playerNumber, sessionCode], callback) => {
-    try {
-      let session = await sessionController.getSessionFromCode(sessionCode);
-      const currentGame = session.games[session.currentRound - 1];
-
-      currentGame.words = currentGame.words.filter(
-        (word) => word.wordSetter !== playerNumber
-      );
-
-      session = await sessionController.updateSession(sessionCode, {
-        games: session.games,
-      });
-
-      io.to(sessionCode).emit('setSession', session);
-      callback();
-    } catch (error) {
-      callback(error.message);
-    }
-  });
-
   socket.on(
     'madeGuess',
     async ([guess, results, playerNumber, sessionCode], callback) => {
@@ -313,6 +293,7 @@ module.exports = (socket, io) => {
   );
 
   socket.on('disconnect', () => {
+    socket.leaveAll();
     console.log('A user disconnected');
   });
 };

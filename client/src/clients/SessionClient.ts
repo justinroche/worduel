@@ -188,13 +188,6 @@ export const setWord = async (word: string) => {
   )
 }
 
-export const changeWord = async () => {
-  const playerNumber = sessionStore.getPlayerIsHost ? 1 : 2
-  return await enqueue(() =>
-    emitAsync('changeWord', [playerNumber, sessionStore.getSessionCode])
-  )
-}
-
 export const madeGuess = async (guess: string, results: string[]) => {
   const playerNumber = sessionStore.getPlayerIsHost ? 1 : 2
   return await enqueue(() =>

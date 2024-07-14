@@ -3,7 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
 import { isWordInDictionary } from '../../utils/dictionaryUtils'
 import MenuButton from '../MenuButton.vue'
-import { setWord, changeWord } from '../../clients/SessionClient'
+import { setWord } from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const currentRound = computed(() => sessionStore.getCurrentRound)
@@ -11,17 +11,11 @@ const currentRound = computed(() => sessionStore.getCurrentRound)
 const word = ref('')
 const confirmButtonLoading = ref(false)
 const buttonState = ref('entering-word')
-const hoverText = ref('')
 
 const buttonText = computed(() => {
-  if (buttonState.value === 'entering-word') {
-    return 'Confirm'
-  } else if (buttonState.value === 'waiting') {
-    return hoverText.value === 'Change Word'
-      ? 'Change Word'
-      : 'Waiting for opponent...'
-  }
-  return ''
+  return buttonState.value === 'entering-word'
+    ? 'Confirm'
+    : 'Waiting for opponent...'
 })
 
 // Convert word to uppercase
@@ -31,8 +25,6 @@ watch(word, (newValue) => {
 
 const handleConfirmButton = async () => {
   if (buttonState.value === 'waiting') {
-    await changeWord()
-    buttonState.value = 'entering-word'
     return
   }
 
@@ -59,24 +51,12 @@ const handleConfirmButton = async () => {
     confirmButtonLoading.value = false
   }
 }
-
-const handleMouseEnter = () => {
-  if (buttonState.value === 'waiting') {
-    hoverText.value = 'Change Word'
-  }
-}
-
-const handleMouseLeave = () => {
-  if (buttonState.value === 'waiting') {
-    hoverText.value = ''
-  }
-}
 </script>
 
 <template>
   <div class="overlay">
     <div class="enter-word-box">
-      <h2> Entering Round {{ currentRound }}</h2>
+      <h2>Entering Round {{ currentRound }}</h2>
       <input
         type="text"
         v-model="word"
@@ -93,13 +73,11 @@ const handleMouseLeave = () => {
         buttonHeight="40px"
         buttonStyle="atomic-tangerine"
         @click="handleConfirmButton"
-        @mouseenter="handleMouseEnter"
-        @mouseleave="handleMouseLeave"
         :loading="confirmButtonLoading"
         :disabled="
           word.length !== 5 ||
           !isWordInDictionary(word) ||
-          (buttonState === 'waiting' && hoverText !== 'Change Word')
+          buttonState === 'waiting'
         "
         :class="{
           waiting: buttonState === 'waiting',
