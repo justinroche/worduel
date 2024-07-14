@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
 import GameTable from '../gameBoard/GameTable.vue'
+import Scoreboard from '../Scoreboard.vue'
 import { getScoreFromGuessCount } from '../../utils/gameUtils'
 
 const sessionStore = useSessionStore()
@@ -27,7 +28,7 @@ const wordThatPlayer2Guessed = computed(
     <div class="modal">
       <h2>Round {{ currentRound }} Complete</h2>
       <div class="result-tables">
-        <div>
+        <div class="result-table">
           <h3 class="player-name">{{ player1Name }}</h3>
           <game-table
             :guesses="
@@ -52,7 +53,7 @@ const wordThatPlayer2Guessed = computed(
             </p>
           </div>
         </div>
-        <div>
+        <div class="result-table">
           <h3 class="player-name">{{ player2Name }}</h3>
           <game-table
             :guesses="
@@ -78,6 +79,10 @@ const wordThatPlayer2Guessed = computed(
           </div>
         </div>
       </div>
+      <div class="scoreboard">
+        <h3>Scoreboard</h3>
+        <scoreboard />
+      </div>
     </div>
   </div>
 </template>
@@ -102,17 +107,36 @@ const wordThatPlayer2Guessed = computed(
   background-color: #fff;
   border: 1px solid #000;
   border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .result-tables {
+  width: 100%;
   display: flex;
   justify-content: space-around;
   padding: 1rem;
 }
 
+.result-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .player-name {
+  line-height: 1rem;
+  width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 0 0.75rem 0;
   margin: 0;
-  margin-bottom: 0.5rem;
+}
+
+.score-container {
+  height: 55px;
 }
 
 .word-score {
@@ -123,5 +147,9 @@ const wordThatPlayer2Guessed = computed(
   margin: 0.25rem 0 0 0;
   font-style: italic;
   font-size: 0.8rem;
+}
+
+.scoreboard h3 {
+  margin: 0 0 0.5rem 0;
 }
 </style>
