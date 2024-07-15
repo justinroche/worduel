@@ -89,6 +89,7 @@ const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
   border-collapse: collapse;
   min-width: 300px;
   width: 300px;
+  height: 280px;
 }
 
 .scoreboard th,

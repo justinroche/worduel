@@ -1,49 +1,32 @@
 <script setup lang="ts">
 /* Imports */
-import { ref, onMounted, computed } from 'vue'
+import { onMounted, computed } from 'vue'
 import GameTable from '../components/gameBoard/GameTable.vue'
 import Keyboard from '../components/gameBoard/Keyboard.vue'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
 import { useSessionStore } from '../stores/SessionStore'
+import { useLocalRoundStore } from '../stores/LocalRoundStore'
 import EnterWordBox from '../components/modals/EnterWordModal.vue'
 import PostRoundModal from '../components/modals/PostRoundModal.vue'
 import { madeGuess } from '../clients/SessionClient'
 
-/* State */
-const guesses = ref<string[][]>(
-  Array.from({ length: 6 }, () => Array(5).fill(''))
-)
-const currentRow = ref(0)
-const currentLetter = ref(0)
-const results = ref<string[][]>([])
-
 const sessionStore = useSessionStore()
+const localRoundStore = useLocalRoundStore()
 
+/* Computed state */
+const playerNumber = computed(() => (sessionStore.playerIsHost ? 1 : 2))
 const currentRound = computed(() => sessionStore.getCurrentRound)
-const currentRoundState = computed(
-  () => sessionStore.getGames[currentRound.value - 1].state
-)
-const playerNumber = computed(() => (useSessionStore().playerIsHost ? 1 : 2))
-const words = computed(
-  () => useSessionStore().getGames[currentRound.value - 1].words
+const currentGame = computed(
+  () => sessionStore.getGames[currentRound.value - 1]
 )
 
-const wordObject = computed(() => {
-  return words.value.filter((word) => word.wordSetter != playerNumber.value)[0]
-})
+const currentWords = computed(() => currentGame.value.words)
 
-const secretWord = computed(() => wordObject?.value.word)
-const wordGuessed = computed(() => wordObject?.value.guessingComplete)
-
-const letters: string[][] = [
-  'QWERTYUIOP'.split(''),
-  'ASDFGHJKL'.split(''),
-  'ZXCVBNM'.split(''),
-]
-
-/* Keyboard label state */
-const letterLabels = ref<string[][]>(
-  letters.map((row) => row.map(() => 'unused'))
+const wordBeingGuessed = computed(
+  () =>
+    currentWords.value.filter(
+      (word) => word.wordSetter !== playerNumber.value
+    )[0]
 )
 
 /* Update keyboard labels */
@@ -51,9 +34,9 @@ function updateLabels(guessedLetters: string[], results: string[]) {
   guessedLetters.forEach((letter, index) => {
     const result = results[index]
 
-    for (let i = 0; i < letters.length; i++) {
-      const row = letters[i]
-      const labelRow = letterLabels.value[i]
+    for (let i = 0; i < localRoundStore.letters.length; i++) {
+      const row = localRoundStore.letters[i]
+      const labelRow = localRoundStore.letterLabels[i]
       const letterIndex = row.indexOf(letter)
 
       if (letterIndex !== -1) {
@@ -74,42 +57,49 @@ function updateLabels(guessedLetters: string[], results: string[]) {
 
 /* Keyboard event handler */
 const handleKeyEvent = async (key: string) => {
-  if (currentRow.value >= 6) return
-  if (wordGuessed.value) return
+  if (localRoundStore.currentRow >= 6) return
+  if (wordBeingGuessed.value.guessingComplete) return
 
   if (key === 'Enter') {
-    if (currentLetter.value !== 5) {
+    if (localRoundStore.currentLetter !== 5) {
       return
     } else {
-      const guess = guesses.value[currentRow.value]
+      const guess = localRoundStore.guesses[localRoundStore.currentRow]
       if (!isWordInDictionary(guess.join(''))) {
         return
       }
 
-      results.value.push(getResults(guess, secretWord.value))
+      localRoundStore.results.push(
+        getResults(guess, wordBeingGuessed.value.word)
+      )
 
-      await madeGuess(guess.join(''), results.value[currentRow.value])
+      await madeGuess(
+        guess.join(''),
+        localRoundStore.results[localRoundStore.currentRow]
+      )
 
-      if (guess.join('') !== secretWord.value) {
-        currentRow.value++
-        currentLetter.value = 0
+      if (guess.join('') !== wordBeingGuessed.value.word) {
+        localRoundStore.currentRow++
+        localRoundStore.currentLetter = 0
       }
     }
   } else if (key === 'Backspace') {
-    if (currentLetter.value === 0) {
+    if (localRoundStore.currentLetter === 0) {
       return
     } else {
-      currentLetter.value--
-      guesses.value[currentRow.value][currentLetter.value] = ''
+      localRoundStore.currentLetter--
+      localRoundStore.guesses[localRoundStore.currentRow][
+        localRoundStore.currentLetter
+      ] = ''
     }
-  } else if (/^[a-zA-Z]$/.test(key) && currentLetter.value < 5) {
-    guesses.value[currentRow.value][currentLetter.value] = key.toUpperCase()
-    currentLetter.value++
+  } else if (/^[a-zA-Z]$/.test(key) && localRoundStore.currentLetter < 5) {
+    localRoundStore.guesses[localRoundStore.currentRow][localRoundStore.currentLetter] = key.toUpperCase()
+    localRoundStore.currentLetter++
   }
 }
 
 const handleKeyPress = (event: KeyboardEvent) => {
-  if (currentRoundState.value != 'in play') return
+  if (currentGame.value.state != 'in play') return
   handleKeyEvent(event.key)
 }
 
@@ -153,18 +143,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="currentRoundState === 'setting word'">
+  <div v-if="currentGame.state === 'setting word'">
     <enter-word-box />
   </div>
-  <div v-if="currentRoundState === 'complete'">
+  <div v-if="currentGame.state === 'complete'">
     <post-round-modal />
   </div>
   <h1>Round {{ currentRound }}</h1>
-  <game-table :guesses="guesses" :results="results" :scale="3" />
+  <game-table :guesses="localRoundStore.guesses" :results="localRoundStore.results" :scale="3" />
   <div class="keyboardContainer">
     <keyboard
-      :letters="letters"
-      :letterLabels="letterLabels"
+      :letters="localRoundStore.letters"
+      :letterLabels="localRoundStore.letterLabels"
       @key-event="handleKeyEvent"
     />
   </div>

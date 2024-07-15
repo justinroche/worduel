@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
 import GameTable from '../gameBoard/GameTable.vue'
 import Scoreboard from '../Scoreboard.vue'
 import { getScoreFromGuessCount } from '../../utils/gameUtils'
+import MenuButton from '../MenuButton.vue'
+import { nextRound } from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 
@@ -21,6 +23,14 @@ const wordThatPlayer1Guessed = computed(
 const wordThatPlayer2Guessed = computed(
   () => words.value.filter((word) => word.wordSetter === 1)[0]
 )
+
+const nextRoundButtonLoading = ref(false)
+
+const handleNextRoundButton = async () => {
+  nextRoundButtonLoading.value = true
+  await nextRound()
+  nextRoundButtonLoading.value = false
+}
 </script>
 
 <template>
@@ -83,6 +93,16 @@ const wordThatPlayer2Guessed = computed(
         <h3>Scoreboard</h3>
         <scoreboard />
       </div>
+      <menu-button
+        v-if="sessionStore.getPlayerIsHost"
+        buttonText="Next Round"
+        fontSize="1rem"
+        buttonWidth="250px"
+        buttonHeight="40px"
+        buttonStyle="atomic-tangerine"
+        @click="handleNextRoundButton"
+        :loading="nextRoundButtonLoading"
+      />
     </div>
   </div>
 </template>
@@ -147,6 +167,10 @@ const wordThatPlayer2Guessed = computed(
   margin: 0.25rem 0 0 0;
   font-style: italic;
   font-size: 0.8rem;
+}
+
+.scoreboard {
+  margin-bottom: 1.25rem;
 }
 
 .scoreboard h3 {

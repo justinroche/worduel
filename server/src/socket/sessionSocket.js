@@ -292,8 +292,24 @@ module.exports = (socket, io) => {
     }
   );
 
+  socket.on('nextRound', async (sessionCode, callback) => {
+    try {
+      let session = await sessionController.getSessionFromCode(sessionCode);
+      session.currentRound += 1;
+
+      session = await sessionController.updateSession(sessionCode, {
+        currentRound: session.currentRound,
+      });
+
+      io.to(sessionCode).emit('resetLocalRoundState');
+      io.to(sessionCode).emit('setSession', session);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
   socket.on('disconnect', () => {
-    socket.leaveAll();
     console.log('A user disconnected');
   });
 };

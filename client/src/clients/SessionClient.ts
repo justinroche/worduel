@@ -1,4 +1,5 @@
 import { useSessionStore } from '../stores/SessionStore'
+import { useLocalRoundStore } from '../stores/LocalRoundStore'
 import { useHomeErrorStore } from '../stores/HomeErrorStore'
 import { Session } from '../types/Session'
 
@@ -7,10 +8,12 @@ import socket from '../socket'
 import router from '../router'
 
 let sessionStore: ReturnType<typeof useSessionStore>
+let localRoundStore: ReturnType<typeof useLocalRoundStore>
 let homeErrorStore: ReturnType<typeof useHomeErrorStore>
 
 export const initializeSessionClient = () => {
   sessionStore = useSessionStore()
+  localRoundStore = useLocalRoundStore()
   homeErrorStore = useHomeErrorStore()
 
   /* Socket events */
@@ -93,6 +96,11 @@ export const initializeSessionClient = () => {
   socket.on('roundTimerDurationUpdated', (duration: number) => {
     if (!sessionStore.getPlayerIsHost)
       sessionStore.setRoundTimerDuration(duration)
+  })
+
+  // Game events
+  socket.on('resetLocalRoundState', () => {
+    localRoundStore.reset()
   })
 }
 
@@ -197,5 +205,11 @@ export const madeGuess = async (guess: string, results: string[]) => {
       playerNumber,
       sessionStore.getSessionCode,
     ])
+  )
+}
+
+export const nextRound = async () => {
+  return await enqueue(() =>
+    emitAsync('nextRound', sessionStore.getSessionCode)
   )
 }
