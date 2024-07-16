@@ -50,8 +50,12 @@ const handleHostButton = async () => {
 }
 
 const handleJoinButton = async () => {
+  if (joinCode.value.length === 0) {
+    homeErrorStore.setError('Please enter a lobby code.')
+    return
+  }
   if (joinCode.value.length !== 5) {
-    homeErrorStore.setError('Join code must be 5 characters.')
+    homeErrorStore.setError('Lobby code must be 5 characters.')
     return
   }
   joinButtonLoading.value = true
