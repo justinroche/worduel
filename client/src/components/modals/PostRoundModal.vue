@@ -56,6 +56,7 @@ const handleViewGameSummaryButton = async () => {
         @click="handleViewGameSummaryButton"
         :loading="viewGameSummaryButtonLoading"
       />
+      <p v-else>Waiting for host to continue...</p>
     </div>
   </div>
 </template>
