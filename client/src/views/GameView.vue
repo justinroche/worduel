@@ -7,6 +7,7 @@ import { isWordInDictionary } from '../utils/dictionaryUtils'
 import { useSessionStore } from '../stores/SessionStore'
 import { useLocalRoundStore } from '../stores/LocalRoundStore'
 import EnterWordBox from '../components/modals/EnterWordModal.vue'
+import WaitingForOpponentModal from '../components/modals/WaitingForOpponentModal.vue'
 import PostRoundModal from '../components/modals/PostRoundModal.vue'
 import { madeGuess } from '../clients/SessionClient'
 
@@ -93,7 +94,9 @@ const handleKeyEvent = async (key: string) => {
       ] = ''
     }
   } else if (/^[a-zA-Z]$/.test(key) && localRoundStore.currentLetter < 5) {
-    localRoundStore.guesses[localRoundStore.currentRow][localRoundStore.currentLetter] = key.toUpperCase()
+    localRoundStore.guesses[localRoundStore.currentRow][
+      localRoundStore.currentLetter
+    ] = key.toUpperCase()
     localRoundStore.currentLetter++
   }
 }
@@ -146,11 +149,18 @@ onMounted(() => {
   <div v-if="currentGame.state === 'setting word'">
     <enter-word-box />
   </div>
+  <div v-if="wordBeingGuessed ? wordBeingGuessed.guessingComplete : false">
+    <waiting-for-opponent-modal />
+  </div>
   <div v-if="currentGame.state === 'complete'">
     <post-round-modal />
   </div>
   <h1>Round {{ currentRound }}</h1>
-  <game-table :guesses="localRoundStore.guesses" :results="localRoundStore.results" :scale="3" />
+  <game-table
+    :guesses="localRoundStore.guesses"
+    :results="localRoundStore.results"
+    :scale="3"
+  />
   <div class="keyboardContainer">
     <keyboard
       :letters="localRoundStore.letters"
