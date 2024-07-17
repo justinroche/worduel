@@ -28,6 +28,7 @@ const toggleOpen = () => {
         <font-awesome-icon
           :icon="['fas', 'caret-right']"
           size="lg"
+          style="color: black"
           :class="{ rotate: isOpen }"
           class="fa-icon"
         />

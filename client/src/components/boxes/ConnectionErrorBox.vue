@@ -6,7 +6,11 @@ const connectionStore = useConnectionStore()
 <template>
   <transition name="fade">
     <div v-if="!connectionStore.isConnected" class="box">
-      <font-awesome-icon :icon="['fas', 'triangle-exclamation']" size="3x" />
+      <font-awesome-icon
+        :icon="['fas', 'triangle-exclamation']"
+        style="color: black"
+        size="3x"
+      />
       <div class="box-text">
         <h4>Failed to connect to the server.</h4>
         <p>Please check your internet connection and try again.</p>

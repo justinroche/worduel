@@ -156,10 +156,18 @@ const handleHelpButton = () => {
       </transition>
       <div class="info-button-container">
         <button @click="handleInfoButton" class="info-button" tabindex="4">
-          <font-awesome-icon :icon="['fas', 'circle-info']" size="2x" />
+          <font-awesome-icon
+            :icon="['fas', 'circle-info']"
+            style="color: black"
+            size="2x"
+          />
         </button>
         <button @click="handleHelpButton" class="help-button" tab-index="5">
-          <font-awesome-icon :icon="['fas', 'circle-question']" size="2x" />
+          <font-awesome-icon
+            :icon="['fas', 'circle-question']"
+            style="color: black"
+            size="2x"
+          />
         </button>
       </div>
     </div>

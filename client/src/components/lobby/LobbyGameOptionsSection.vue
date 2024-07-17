@@ -76,12 +76,17 @@ const handleSubtractTimeButton = () => {
       <p>Rounds</p>
       <div class="game-option-number-picker">
         <button class="game-option-button" @click="handleSubtractRoundButton">
-          <font-awesome-icon :icon="['fas', 'circle-chevron-left']" size="2x" />
+          <font-awesome-icon
+            :icon="['fas', 'circle-chevron-left']"
+            style="color: black"
+            size="2x"
+          />
         </button>
         <p class="rounds-counter">{{ rounds }}</p>
         <button class="game-option-button" @click="handleAddRoundButton">
           <font-awesome-icon
             :icon="['fas', 'circle-chevron-right']"
+            style="color: black"
             size="2x"
           />
         </button>
@@ -93,9 +98,15 @@ const handleSubtractTimeButton = () => {
         <font-awesome-icon
           v-if="!spellCheckEnabled"
           :icon="['far', 'square']"
+          style="color: black"
           size="2x"
         />
-        <font-awesome-icon v-else :icon="['fas', 'square-check']" size="2x" />
+        <font-awesome-icon
+          v-else
+          :icon="['fas', 'square-check']"
+          style="color: black"
+          size="2x"
+        />
       </button>
     </div>
     <div class="game-option">
@@ -104,9 +115,15 @@ const handleSubtractTimeButton = () => {
         <font-awesome-icon
           v-if="!blockProfanityEnabled"
           :icon="['far', 'square']"
+          style="color: black"
           size="2x"
         />
-        <font-awesome-icon v-else :icon="['fas', 'square-check']" size="2x" />
+        <font-awesome-icon
+          v-else
+          :icon="['fas', 'square-check']"
+          style="color: black"
+          size="2x"
+        />
       </button>
     </div>
     <div class="game-option">
@@ -115,20 +132,34 @@ const handleSubtractTimeButton = () => {
         <font-awesome-icon
           v-if="!roundTimerEnabled"
           :icon="['far', 'square']"
+          style="color: black"
           size="2x"
         />
-        <font-awesome-icon v-else :icon="['fas', 'square-check']" size="2x" />
+        <font-awesome-icon
+          v-else
+          :icon="['fas', 'square-check']"
+          style="color: black"
+          size="2x"
+        />
       </button>
     </div>
     <div v-if="roundTimerEnabled" class="game-option">
       <p></p>
       <div class="game-option-number-picker">
         <button class="game-option-button" @click="handleSubtractTimeButton">
-          <font-awesome-icon :icon="['fas', 'circle-minus']" size="2x" />
+          <font-awesome-icon
+            :icon="['fas', 'circle-minus']"
+            style="color: black"
+            size="2x"
+          />
         </button>
         <p class="round-timer">{{ roundTimerDurationFormatted }}</p>
         <button class="game-option-button" @click="handleAddTimeButton">
-          <font-awesome-icon :icon="['fas', 'circle-plus']" size="2x" />
+          <font-awesome-icon
+            :icon="['fas', 'circle-plus']"
+            style="color: black"
+            size="2x"
+          />
         </button>
       </div>
     </div>
