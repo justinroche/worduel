@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useSessionStore } from '../stores/SessionStore'
-import { getScoreFromGuessCount } from '../utils/gameUtils'
+import { getScoreFromGuessCount, getTotalScore } from '../utils/gameUtils'
 
 const sessionStore = useSessionStore()
 
@@ -9,30 +9,6 @@ const player1Name = computed(() => sessionStore.getPlayer1Name)
 const player2Name = computed(() => sessionStore.getPlayer2Name)
 const numberOfRounds = computed(() => sessionStore.getRounds)
 const games = computed(() => sessionStore.getGames)
-
-const getRoundScore = (round: number, playerNumber: 1 | 2): number => {
-  if (
-    games.value[round - 1].words.filter(
-      (word) => word.wordSetter !== playerNumber
-    ).length !== 0
-  ) {
-    return getScoreFromGuessCount(
-      games.value[round - 1].words.filter(
-        (word) => word.wordSetter !== playerNumber
-      )[0].guessedIn!
-    )
-  } else {
-    return 0
-  }
-}
-
-const getTotalScore = (playerNumber: 1 | 2) => {
-  let total = 0
-  for (let i = 0; i < numberOfRounds.value; i++) {
-    total += getRoundScore(i + 1, playerNumber)
-  }
-  return total
-}
 
 const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
   if (
@@ -52,36 +28,38 @@ const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
 </script>
 
 <template>
-  <table class="scoreboard">
-    <tr>
-      <th class="first-col"></th>
-      <th class="player-col">
-        <p class="player-name">{{ player1Name }}</p>
-      </th>
-      <th class="player-col">
-        <p class="player-name">{{ player2Name }}</p>
-      </th>
-    </tr>
-    <tr v-for="round in numberOfRounds" :key="round" class="score-row">
-      <td class="round-number">{{ round }}</td>
-      <template v-if="games[round - 1].state === 'in play'">
-        <td colspan="2" class="in-progress">in progress...</td>
-      </template>
-      <template v-else>
-        <td class="score">
-          {{ getRoundScoreDisplay(round, 1) }}
-        </td>
-        <td class="score">
-          {{ getRoundScoreDisplay(round, 2) }}
-        </td>
-      </template>
-    </tr>
-    <tr class="total-row">
-      <td class="total-text">TOTAL</td>
-      <td class="score">{{ getTotalScore(1) }}</td>
-      <td class="score">{{ getTotalScore(2) }}</td>
-    </tr>
-  </table>
+  <div>
+    <table class="scoreboard">
+      <tr>
+        <th class="first-col"></th>
+        <th class="player-col">
+          <p class="player-name">{{ player1Name }}</p>
+        </th>
+        <th class="player-col">
+          <p class="player-name">{{ player2Name }}</p>
+        </th>
+      </tr>
+      <tr v-for="round in numberOfRounds" :key="round" class="score-row">
+        <td class="round-number">{{ round }}</td>
+        <template v-if="games[round - 1].state === 'in play'">
+          <td colspan="2" class="in-progress">in progress...</td>
+        </template>
+        <template v-else>
+          <td class="score">
+            {{ getRoundScoreDisplay(round, 1) }}
+          </td>
+          <td class="score">
+            {{ getRoundScoreDisplay(round, 2) }}
+          </td>
+        </template>
+      </tr>
+      <tr class="total-row">
+        <td class="total-text">TOTAL</td>
+        <td class="score">{{ getTotalScore(1) }}</td>
+        <td class="score">{{ getTotalScore(2) }}</td>
+      </tr>
+    </table>
+  </div>
 </template>
 
 <style scoped>
@@ -89,7 +67,7 @@ const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
   border-collapse: collapse;
   min-width: 300px;
   width: 300px;
-  height: 280px;
+  height: auto;
 }
 
 .scoreboard th,

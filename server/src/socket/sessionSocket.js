@@ -130,7 +130,7 @@ module.exports = (socket, io) => {
     }
   });
 
-  socket.on('leaveRoom', (sessionCode, callback) => {
+  socket.on('leaveRoom', (callback) => {
     socket.leaveAll();
     callback();
   });
@@ -303,6 +303,24 @@ module.exports = (socket, io) => {
 
       io.to(sessionCode).emit('resetLocalRoundState');
       io.to(sessionCode).emit('setSession', session);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
+  socket.on('endGame', async (sessionCode, callback) => {
+    try {
+      let session = await sessionController.getSessionFromCode(sessionCode);
+      session.state = 'complete';
+
+      session = await sessionController.updateSession(sessionCode, {
+        state: session.state,
+      });
+
+      io.to(sessionCode).emit('resetLocalRoundState');
+      io.to(sessionCode).emit('setSession', session);
+      io.to(sessionCode).emit('goToSummary');
       callback();
     } catch (error) {
       callback(error.message);

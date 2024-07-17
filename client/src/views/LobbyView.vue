@@ -53,7 +53,7 @@ const handleExitLobbyButtonClicked = async () => {
     </div>
     <div class="bottom-row">
       <div class="game-options-section">
-        <lobby-game-options-section />
+        <lobby-game-options-section :isLobby="true" />
       </div>
       <div class="host-buttons-section">
         <menu-button

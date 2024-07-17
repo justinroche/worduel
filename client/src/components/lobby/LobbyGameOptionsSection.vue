@@ -9,6 +9,10 @@ import {
   updateRoundTimerDuration,
 } from '../../clients/SessionClient'
 
+const props = defineProps<{
+  isLobby: boolean
+}>()
+
 const sessionStore = useSessionStore()
 const playerIsHost = computed(() => sessionStore.playerIsHost)
 const rounds = computed(() => sessionStore.rounds)
@@ -23,50 +27,50 @@ const roundTimerDurationFormatted = computed(
 )
 
 const handleAddRoundButton = () => {
-  if (playerIsHost.value && rounds.value < MAX_ROUNDS) {
+  if (playerIsHost.value && props.isLobby && rounds.value < MAX_ROUNDS) {
     updateRounds(rounds.value + 1)
   }
 }
 
 const handleSubtractRoundButton = () => {
-  if (playerIsHost.value && rounds.value > 1) {
+  if (playerIsHost.value && props.isLobby && rounds.value > 1) {
     updateRounds(rounds.value - 1)
   }
 }
 
 const toggleSpellCheckEnabled = () => {
-  if (playerIsHost.value) {
+  if (playerIsHost.value && props.isLobby) {
     updateSpellCheckEnabled(!spellCheckEnabled.value)
   }
 }
 
 const toggleBlockProfanity = () => {
-  if (playerIsHost.value) {
+  if (playerIsHost.value && props.isLobby) {
     updateBlockProfanityEnabled(!blockProfanityEnabled.value)
   }
 }
 
 const toggleRoundTimer = () => {
-  if (playerIsHost.value) {
+  if (playerIsHost.value && props.isLobby) {
     updateRoundTimerEnabled(!roundTimerEnabled.value)
   }
 }
 
 const handleAddTimeButton = () => {
-  if (playerIsHost.value && roundTimerDuration.value < 300) {
+  if (playerIsHost.value && props.isLobby && roundTimerDuration.value < 300) {
     updateRoundTimerDuration(roundTimerDuration.value + 15)
   }
 }
 
 const handleSubtractTimeButton = () => {
-  if (playerIsHost.value && roundTimerDuration.value > 15) {
+  if (playerIsHost.value && props.isLobby && roundTimerDuration.value > 15) {
     updateRoundTimerDuration(roundTimerDuration.value - 15)
   }
 }
 </script>
 
 <template>
-  <div v-if="playerIsHost">
+  <div v-if="playerIsHost && props.isLobby">
     <h2>Game Options</h2>
     <div class="game-option">
       <p>Rounds</p>
@@ -130,7 +134,7 @@ const handleSubtractTimeButton = () => {
     </div>
   </div>
   <div v-else>
-    <h2>Game Options</h2>
+    <h2 v-if="props.isLobby">Game Options</h2>
     <div class="game-option">
       <p>Rounds</p>
       <p class="rounds-counter-not-host">{{ rounds }}</p>

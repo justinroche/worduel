@@ -56,7 +56,7 @@ export const initializeSessionClient = () => {
 
   socket.on('removePlayer2', async () => {
     if (!sessionStore.getPlayerIsHost) {
-      await enqueue(() => emitAsync('leaveRoom', sessionStore.getSessionCode))
+      await enqueue(() => emitAsync('leaveRoom'))
       router.push({ name: 'home' })
       homeErrorStore.setError('You were kicked from the lobby.')
     } else {
@@ -101,6 +101,10 @@ export const initializeSessionClient = () => {
   // Game events
   socket.on('resetLocalRoundState', () => {
     localRoundStore.reset()
+  })
+
+  socket.on('goToSummary', () => {
+    router.push({ name: 'summary' })
   })
 }
 
@@ -212,4 +216,13 @@ export const nextRound = async () => {
   return await enqueue(() =>
     emitAsync('nextRound', sessionStore.getSessionCode)
   )
+}
+
+export const endGame = async () => {
+  return await enqueue(() => emitAsync('endGame', sessionStore.getSessionCode))
+}
+
+export const leaveRoom = async () => {
+  sessionStore.setPlayerIsHost(false)
+  return await enqueue(() => emitAsync('leaveRoom'))
 }
