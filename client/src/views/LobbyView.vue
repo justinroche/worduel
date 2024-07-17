@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import router from '../router'
 import LobbyPlayersSection from '../components/lobby/LobbyPlayersSection.vue'
 import LobbyGameOptionsSection from '../components/lobby/LobbyGameOptionsSection.vue'
+import HeaderBanner from '../components/HeaderBanner.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { useSessionStore } from '../stores/SessionStore'
 import { startGame, exitSession } from '../clients/SessionClient'
@@ -42,6 +43,7 @@ const handleExitLobbyButtonClicked = async () => {
 
 <template>
   <div class="lobby-view">
+    <header-banner title="Lobby" />
     <div class="top-row">
       <div class="lobby-section">
         <h2>Lobby Code</h2>

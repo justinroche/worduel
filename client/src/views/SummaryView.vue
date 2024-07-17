@@ -7,6 +7,7 @@ import { computed, ref } from 'vue'
 import Scoreboard from '../components/Scoreboard.vue'
 import LobbyGameOptionsSection from '../components/lobby/LobbyGameOptionsSection.vue'
 import RoundSummary from '../components/RoundSummary.vue'
+import HeaderBanner from '../components/HeaderBanner.vue'
 import router from '../router'
 
 const sessionStore = useSessionStore()
@@ -36,53 +37,71 @@ const winningPlayerName = computed(() => {
 </script>
 
 <template>
-  <h1>Game Summary</h1>
-  <h2 v-if="winningPlayerName !== 'tie'">{{ winningPlayerName }} wins!</h2>
-  <h2 v-else>It's a tie!</h2>
-  <div class="summaryBody">
-    <div class="leftContainer">
-      <div class="scoreboard">
-        <h2>Scoreboard</h2>
-        <scoreboard />
+  <header-banner title="Game Summary" />
+  <div class="pageBody">
+    <h1 v-if="winningPlayerName !== 'tie'">{{ winningPlayerName }} wins!</h1>
+    <h1 v-else>It's a tie!</h1>
+    <div class="summaryBody">
+      <div class="leftContainer">
+        <div class="leftBody">
+          <div class="scoreboard">
+            <h2 class="scoreboard-title">Scoreboard</h2>
+            <scoreboard />
+          </div>
+          <div class="gameOptions">
+            <lobby-game-options-section :isLobby="false" />
+          </div>
+        </div>
       </div>
-      <div class="gameOptions">
-        <lobby-game-options-section :isLobby="false" />
+      <div class="rightContainer">
+        <div
+          v-for="(round, index) in sessionStore.rounds"
+          :key="index"
+          class="roundSummary"
+        >
+          <round-summary
+            :round="round"
+            :roundIndex="index"
+            :openRound="openRound"
+            @update:openRound="openRound = $event"
+          />
+        </div>
       </div>
     </div>
-    <div class="rightContainer">
-      <div
-        v-for="(round, index) in sessionStore.rounds"
-        :key="index"
-        class="roundSummary"
-      >
-        <round-summary
-          :round="round"
-          :roundIndex="index"
-          :openRound="openRound"
-          @update:openRound="openRound = $event"
-        />
-      </div>
+    <div class="exit-session-section">
+      <menu-button
+        buttonText="Exit"
+        fontSize="1rem"
+        buttonWidth="250px"
+        buttonHeight="40px"
+        buttonStyle="atomic-tangerine"
+        @click="handleExitButton"
+        :loading="exitButtonLoading"
+      />
     </div>
-  </div>
-  <div class="exit-session-section">
-    <menu-button
-      buttonText="Exit"
-      fontSize="1rem"
-      buttonWidth="250px"
-      buttonHeight="40px"
-      buttonStyle="atomic-tangerine"
-      @click="handleExitButton"
-      :loading="exitButtonLoading"
-    />
   </div>
 </template>
 
 <style scoped>
+.pageBody {
+  margin-top: 60px;
+}
+
 .summaryBody {
   display: flex;
   justify-content: space-between;
-  width: 1000px;
-  transform: translateX(150px);
+  width: 1050px;
+  margin-top: 50px;
+}
+
+.leftBody {
+  padding: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid black;
+}
+
+.scoreboard-title {
+  margin-top: 0;
 }
 
 .gameOptions {

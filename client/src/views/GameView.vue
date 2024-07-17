@@ -9,6 +9,7 @@ import { useLocalRoundStore } from '../stores/LocalRoundStore'
 import EnterWordBox from '../components/modals/EnterWordModal.vue'
 import WaitingForOpponentModal from '../components/modals/WaitingForOpponentModal.vue'
 import PostRoundModal from '../components/modals/PostRoundModal.vue'
+import HeaderBanner from '../components/HeaderBanner.vue'
 import { madeGuess } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
@@ -146,6 +147,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <header-banner :title="'Round ' + currentRound" />
   <div v-if="currentGame.state === 'setting word'">
     <enter-word-box />
   </div>
@@ -155,23 +157,39 @@ onMounted(() => {
   <div v-if="currentGame.state === 'complete'">
     <post-round-modal />
   </div>
-  <h1>Round {{ currentRound }}</h1>
-  <game-table
-    :guesses="localRoundStore.guesses"
-    :results="localRoundStore.results"
-    :scale="3"
-  />
-  <div class="keyboardContainer">
-    <keyboard
-      :letters="localRoundStore.letters"
-      :letterLabels="localRoundStore.letterLabels"
-      @key-event="handleKeyEvent"
+  <div class="pageBody">
+    <game-table
+      :guesses="localRoundStore.guesses"
+      :results="localRoundStore.results"
+      :scale="3"
+      class="gameTable"
     />
+    <div class="keyboardContainer">
+      <keyboard
+        :letters="localRoundStore.letters"
+        :letterLabels="localRoundStore.letterLabels"
+        @key-event="handleKeyEvent"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
+.pageBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;
+}
+
+.gameTable {
+  margin: 100px 0 275px 0;
+}
+
 .keyboardContainer {
-  margin-top: 100px;
+  position: absolute;
+  bottom: 75px;
 }
 </style>
