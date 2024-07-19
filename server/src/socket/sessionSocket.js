@@ -138,8 +138,10 @@ module.exports = (socket, io) => {
   /* Game option events */
   socket.on('updatePlayer1Name', async ([name, sessionCode], callback) => {
     try {
-      await sessionController.updateSession(sessionCode, { player1Name: name });
-      io.to(sessionCode).emit('player1NameUpdated', name);
+      let session = await sessionController.updateSession(sessionCode, {
+        player1Name: name,
+      });
+      io.to(sessionCode).emit('setSession', session);
       callback();
     } catch (error) {
       callback(error.message);
@@ -148,8 +150,10 @@ module.exports = (socket, io) => {
 
   socket.on('updatePlayer2Name', async ([name, sessionCode], callback) => {
     try {
-      await sessionController.updateSession(sessionCode, { player2Name: name });
-      io.to(sessionCode).emit('player2NameUpdated', name);
+      let session = await sessionController.updateSession(sessionCode, {
+        player2Name: name,
+      });
+      io.to(sessionCode).emit('setSession', session);
       callback();
     } catch (error) {
       callback(error.message);
@@ -158,8 +162,10 @@ module.exports = (socket, io) => {
 
   socket.on('updateRounds', async ([rounds, sessionCode], callback) => {
     try {
-      await sessionController.updateSession(sessionCode, { rounds });
-      io.to(sessionCode).emit('roundsUpdated', rounds);
+      let session = await sessionController.updateSession(sessionCode, {
+        rounds,
+      });
+      io.to(sessionCode).emit('setSession', session);
       callback();
     } catch (error) {
       callback(error.message);
@@ -170,10 +176,10 @@ module.exports = (socket, io) => {
     'updateSpellCheckEnabled',
     async ([enabled, sessionCode], callback) => {
       try {
-        await sessionController.updateSession(sessionCode, {
+        let session = await sessionController.updateSession(sessionCode, {
           spellCheckEnabled: enabled,
         });
-        io.to(sessionCode).emit('spellCheckEnabledUpdated', enabled);
+        io.to(sessionCode).emit('setSession', session);
         callback();
       } catch (error) {
         callback(error.message);
@@ -185,10 +191,10 @@ module.exports = (socket, io) => {
     'updateBlockProfanityEnabled',
     async ([enabled, sessionCode], callback) => {
       try {
-        await sessionController.updateSession(sessionCode, {
+        let session = await sessionController.updateSession(sessionCode, {
           blockProfanityEnabled: enabled,
         });
-        io.to(sessionCode).emit('blockProfanityEnabledUpdated', enabled);
+        io.to(sessionCode).emit('setSession', session);
         callback();
       } catch (error) {
         callback(error.message);
@@ -200,10 +206,10 @@ module.exports = (socket, io) => {
     'updateRoundTimerEnabled',
     async ([enabled, sessionCode], callback) => {
       try {
-        await sessionController.updateSession(sessionCode, {
+        let session = await sessionController.updateSession(sessionCode, {
           roundTimerEnabled: enabled,
         });
-        io.to(sessionCode).emit('roundTimerEnabledUpdated', enabled);
+        io.to(sessionCode).emit('setSession', session);
         callback();
       } catch (error) {
         callback(error.message);
@@ -215,10 +221,10 @@ module.exports = (socket, io) => {
     'updateRoundTimerDuration',
     async ([duration, sessionCode], callback) => {
       try {
-        await sessionController.updateSession(sessionCode, {
+        let session = await sessionController.updateSession(sessionCode, {
           roundTimerDuration: duration,
         });
-        io.to(sessionCode).emit('roundTimerDurationUpdated', duration);
+        io.to(sessionCode).emit('setSession', session);
         callback();
       } catch (error) {
         callback(error.message);
@@ -246,9 +252,7 @@ module.exports = (socket, io) => {
         games: session.games,
       });
 
-      if (currentGame.state === 'in play') {
-        io.to(sessionCode).emit('setSession', session);
-      }
+      io.to(sessionCode).emit('setSession', session);
       callback();
     } catch (error) {
       callback(error.message);

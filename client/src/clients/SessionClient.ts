@@ -65,39 +65,6 @@ export const initializeSessionClient = () => {
     }
   })
 
-  // Game option events
-  socket.on('player1NameUpdated', (name: string) => {
-    if (!sessionStore.playerIsHost) sessionStore.setPlayer1Name(name)
-  })
-
-  socket.on('player2NameUpdated', (name: string) => {
-    if (sessionStore.playerIsHost) sessionStore.setPlayer2Name(name)
-  })
-
-  socket.on('roundsUpdated', (rounds: number) => {
-    if (!sessionStore.getPlayerIsHost) sessionStore.setRounds(rounds)
-  })
-
-  socket.on('spellCheckEnabledUpdated', (enabled: boolean) => {
-    if (!sessionStore.getPlayerIsHost)
-      sessionStore.setSpellCheckEnabled(enabled)
-  })
-
-  socket.on('blockProfanityEnabledUpdated', (enabled: boolean) => {
-    if (!sessionStore.getPlayerIsHost)
-      sessionStore.setBlockProfanityEnabled(enabled)
-  })
-
-  socket.on('roundTimerEnabledUpdated', (enabled: boolean) => {
-    if (!sessionStore.getPlayerIsHost)
-      sessionStore.setRoundTimerEnabled(enabled)
-  })
-
-  socket.on('roundTimerDurationUpdated', (duration: number) => {
-    if (!sessionStore.getPlayerIsHost)
-      sessionStore.setRoundTimerDuration(duration)
-  })
-
   // Game events
   socket.on('resetLocalRoundState', () => {
     localRoundStore.reset()
