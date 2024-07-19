@@ -59,13 +59,24 @@ const props = withDefaults(
 
 .menu-button.loading .loading-spinner {
   border: 3px solid #f3f3f3;
-  border-top: 3px solid var(--atomic-tangerine-default);
   border-radius: 50%;
   width: 12px;
   height: 12px;
   animation: spin 1.5s linear infinite;
   display: inline-block;
   vertical-align: middle;
+}
+
+.primary.loading .loading-spinner {
+  border-top: 3px solid var(--green-default);
+}
+
+.taupe.loading .loading-spinner {
+  border-top: 3px solid var(--taupe-default);
+}
+
+.auburn.loading .loading-spinner {
+  border-top: 3px solid var(--auburn-default);
 }
 
 @keyframes spin {
@@ -78,32 +89,32 @@ const props = withDefaults(
 }
 
 /* Existing styles for different button styles */
-.atomic-tangerine:not(:disabled) {
-  background-color: var(--atomic-tangerine-default);
-  border: 1px solid var(--atomic-tangerine-light);
+.primary:not(:disabled) {
+  background-color: var(--green-default);
+  border: 1px solid var(--green-light);
 }
 
-.atomic-tangerine:not(:disabled):hover {
-  background-color: var(--atomic-tangerine-light);
-  border: 2px solid var(--atomic-tangerine-hover-border);
+.primary:not(:disabled):hover {
+  background-color: var(--green-light);
+  border: 2px solid var(--green-hover-border);
 }
 
-.atomic-tangerine:not(:disabled):active {
-  background-color: var(--atomic-tangerine-active);
+.primary:not(:disabled):active {
+  background-color: var(--green-active);
   border: 1px solid white;
 }
 
-.taupe:not(:disabled) {
+.secondary:not(:disabled) {
   background-color: var(--taupe-default);
   border: 1px solid var(--taupe-light);
 }
 
-.taupe:not(:disabled):hover {
+.secondary:not(:disabled):hover {
   background-color: var(--taupe-light);
   border: 2px solid var(--taupe-hover-border);
 }
 
-.taupe:not(:disabled):active {
+.secondary:not(:disabled):active {
   background-color: var(--taupe-active);
   border: 1px solid white;
 }

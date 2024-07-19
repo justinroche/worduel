@@ -39,19 +39,19 @@ const cellMargin = computed(() => `${props.scale * 2 - 1}px`)
 }
 
 .empty {
-  border: 3px solid #b6b6b6;
+  border: 3px solid var(--empty-cell-border);
   color: #1d1c1c;
 }
 
 .correct {
-  background-color: #55be4c;
+  background-color: var(--correct-cell);
 }
 
 .misplaced {
-  background-color: #f0d354;
+  background-color: var(--misplaced-cell);
 }
 
 .incorrect {
-  background-color: #787c7e;
+  background-color: var(--incorrect-cell);
 }
 </style>

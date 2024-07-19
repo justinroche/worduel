@@ -43,10 +43,10 @@ const handleExitLobbyButtonClicked = async () => {
 
 <template>
   <div class="lobby-view">
-    <header-banner title="Lobby" />
+    <header-banner title="Game Setup" />
     <div class="top-row">
       <div class="lobby-section">
-        <h2>Lobby Code</h2>
+        <h2>Game Code</h2>
         <p class="session-code">{{ sessionCode }}</p>
       </div>
       <div class="players-section">
@@ -64,7 +64,7 @@ const handleExitLobbyButtonClicked = async () => {
           fontSize="1rem"
           buttonWidth="250px"
           buttonHeight="40px"
-          buttonStyle="atomic-tangerine"
+          buttonStyle="primary"
           class="start-button"
           @click="handleStartGameButtonClicked"
           :disabled="!player2Connected"
@@ -78,7 +78,7 @@ const handleExitLobbyButtonClicked = async () => {
           fontSize="1rem"
           buttonWidth="250px"
           buttonHeight="40px"
-          buttonStyle="taupe"
+          buttonStyle="secondary"
           @click="handleExitLobbyButtonClicked"
           :loading="exitGameButtonLoading"
         />

@@ -19,13 +19,13 @@ const joinButtonLoading = ref(false)
 
 const homeErrorStore = useHomeErrorStore()
 
-// Convert join code to uppercase
+// Convert game code to uppercase
 watch(joinCode, (newValue) => {
   joinCode.value = newValue.toUpperCase()
 })
 
 const handleJoinCodeInput = (event: Event) => {
-  // Only allow alphanumeric characters in the join code input
+  // Only allow alphanumeric characters in the game code input
   const input = event.target as HTMLInputElement
   const filteredValue = input.value.replace(/[^a-zA-Z0-9]/g, '')
   joinCode.value = filteredValue
@@ -51,11 +51,11 @@ const handleHostButton = async () => {
 
 const handleJoinButton = async () => {
   if (joinCode.value.length === 0) {
-    homeErrorStore.setError('Please enter a lobby code.')
+    homeErrorStore.setError('Please enter a game code.')
     return
   }
   if (joinCode.value.length !== 5) {
-    homeErrorStore.setError('Lobby code must be 5 characters.')
+    homeErrorStore.setError('Game code must be 5 characters.')
     return
   }
   joinButtonLoading.value = true
@@ -114,7 +114,7 @@ const handleHelpButton = () => {
         fontSize="1rem"
         buttonWidth="250px"
         buttonHeight="40px"
-        buttonStyle="atomic-tangerine"
+        buttonStyle="primary"
         @click="handleHostButton"
         :loading="hostButtonLoading"
         class="host-button"
@@ -137,7 +137,7 @@ const handleHelpButton = () => {
           fontSize="1rem"
           buttonWidth="120px"
           buttonHeight="40px"
-          buttonStyle="atomic-tangerine"
+          buttonStyle="primary"
           @click="handleJoinButton"
           :loading="joinButtonLoading"
           tabindex="3"

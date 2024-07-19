@@ -1,7 +1,7 @@
 :root {
-  --floral-white: #fffaf0;
-  --blue-munsell: #3b9aab;
-  --avocado: #6f843e;
+  --floral-white: rgb(255, 250, 240);
+  --blue-munsell: rgb(59, 154, 171);
+  --avocado: rgb(111, 132, 62);
 
   --taupe-default: rgb(74, 62, 53);
   --taupe-light: rgb(85, 72, 62);
@@ -13,10 +13,21 @@
   --atomic-tangerine-active: rgb(255, 152, 130);
   --atomic-tangerine-hover-border: rgb(255, 162, 140);
 
+  --green-default: rgb(75, 180, 66);
+  --green-light: rgb(85, 190, 76);
+  --green-active: rgb(95, 200, 86);
+  --green-hover-border: rgb(110, 215, 101);
+
   --auburn-default: rgb(170, 27, 39);
   --auburn-light: rgb(190, 42, 54);
   --auburn-active: rgb(215, 57, 69);
   --auburn-hover-border: rgb(245, 87, 99);
+
+  /* Game cell colors */
+  --empty-cell-border: rgb(182, 182, 182);
+  --correct-cell: rgb(85, 190, 76);
+  --misplaced-cell: rgb(240, 211, 84);
+  --incorrect-cell: rgb(120, 124, 126);
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

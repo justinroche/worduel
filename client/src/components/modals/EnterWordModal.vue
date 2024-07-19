@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
 import { isWordInDictionary } from '../../utils/dictionaryUtils'
 import MenuButton from '../MenuButton.vue'
+import Modal from './Modal.vue'
 import { setWord } from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
@@ -22,6 +23,13 @@ const buttonText = computed(() => {
 watch(word, (newValue) => {
   word.value = newValue.toUpperCase()
 })
+
+const handleWordInput = (event: Event) => {
+  // Only allow alphanumeric characters in the word input
+  const input = event.target as HTMLInputElement
+  const filteredValue = input.value.replace(/[^a-zA-Z]/g, '')
+  word.value = filteredValue
+}
 
 const handleConfirmButton = async () => {
   if (buttonState.value === 'waiting') {
@@ -54,59 +62,41 @@ const handleConfirmButton = async () => {
 </script>
 
 <template>
-  <div class="overlay">
-    <div class="enter-word-box">
-      <h2>Entering Round {{ currentRound }}</h2>
-      <input
-        type="text"
-        v-model="word"
-        maxlength="5"
-        class="word-input"
-        :disabled="buttonState !== 'entering-word'"
-        @keydown.enter="handleConfirmButton"
-      />
-      <p>Enter a word for your opponent to guess</p>
-      <menu-button
-        :buttonText="buttonText"
-        fontSize="1rem"
-        buttonWidth="250px"
-        buttonHeight="40px"
-        buttonStyle="atomic-tangerine"
-        @click="handleConfirmButton"
-        :loading="confirmButtonLoading"
-        :disabled="
-          word.length !== 5 ||
-          !isWordInDictionary(word) ||
-          buttonState === 'waiting'
-        "
-        :class="{
-          waiting: buttonState === 'waiting',
-        }"
-      />
-    </div>
-  </div>
+  <modal width="420px" height="265px">
+    <h2 class="header">Entering Round {{ currentRound }}</h2>
+    <input
+      type="text"
+      v-model="word"
+      maxlength="5"
+      class="word-input"
+      :disabled="buttonState !== 'entering-word'"
+      @keydown.enter="handleConfirmButton"
+      @input="handleWordInput"
+    />
+    <p>Enter a word for your opponent to guess</p>
+    <menu-button
+      :buttonText="buttonText"
+      fontSize="1rem"
+      buttonWidth="250px"
+      buttonHeight="40px"
+      buttonStyle="primary"
+      @click="handleConfirmButton"
+      :loading="confirmButtonLoading"
+      :disabled="
+        word.length !== 5 ||
+        !isWordInDictionary(word) ||
+        buttonState === 'waiting'
+      "
+      :class="{
+        waiting: buttonState === 'waiting',
+      }"
+    />
+  </modal>
 </template>
 
 <style scoped>
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-}
-
-.enter-word-box {
-  width: 420px;
-  height: 265px;
-  background-color: #fff;
-  border: 1px solid #000;
-  border-radius: 0.25rem;
+.header {
+  margin-top: 0;
 }
 
 .word-input {

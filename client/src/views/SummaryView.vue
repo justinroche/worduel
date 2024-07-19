@@ -74,7 +74,7 @@ const winningPlayerName = computed(() => {
         fontSize="1rem"
         buttonWidth="250px"
         buttonHeight="40px"
-        buttonStyle="atomic-tangerine"
+        buttonStyle="primary"
         @click="handleExitButton"
         :loading="exitButtonLoading"
       />
