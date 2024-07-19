@@ -12,6 +12,7 @@ function emitKeyEvent(key: string, event: Event) {
 }
 </script>
 
+<!-- TODO: use touchstart (rather than click) for mobile interface -->
 <template>
   <div v-for="(row, rowIndex) in props.letters" class="row">
     <button
