@@ -2,17 +2,13 @@
 import { computed, ref } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
 import MenuButton from '../MenuButton.vue'
-import {
-  updatePlayer1Name,
-  updatePlayer2Name,
-  kickPlayer2,
-} from '../../clients/SessionClient'
+import { updateGameOption, kickPlayer2 } from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
-const player1Name = computed(() => sessionStore.player1Name)
-const player2Name = computed(() => sessionStore.player2Name)
+const player1Name = computed(() => sessionStore.session.player1Name)
+const player2Name = computed(() => sessionStore.session.player2Name)
 const playerIsHost = computed(() => sessionStore.playerIsHost)
-const player2Connected = computed(() => sessionStore.player2Connected)
+const player2Connected = computed(() => sessionStore.session.player2Connected)
 
 const player1Editing = ref(false)
 const player2Editing = ref(false)
@@ -32,7 +28,7 @@ const togglePlayer2Editing = () => {
 const handleUpdatePlayer1Name = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.value.length > 0) {
-    updatePlayer1Name(input.value)
+    updateGameOption('player1Name', input.value)
     player1Editing.value = false
   }
 }
@@ -40,7 +36,7 @@ const handleUpdatePlayer1Name = (event: Event) => {
 const handleUpdatePlayer2Name = (event: Event) => {
   const input = event.target as HTMLInputElement
   if (input.value.length > 0) {
-    updatePlayer2Name(input.value)
+    updateGameOption('player2Name', input.value)
     player2Editing.value = false
   }
 }

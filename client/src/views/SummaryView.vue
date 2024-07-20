@@ -27,9 +27,9 @@ const winningPlayerName = computed(() => {
   const player1Score = getTotalScore(1)
   const player2Score = getTotalScore(2)
   if (player1Score > player2Score) {
-    return sessionStore.player1Name
+    return sessionStore.session.player1Name
   } else if (player2Score > player1Score) {
-    return sessionStore.player2Name
+    return sessionStore.session.player2Name
   } else {
     return 'tie'
   }
@@ -55,7 +55,7 @@ const winningPlayerName = computed(() => {
       </div>
       <div class="rightContainer">
         <div
-          v-for="(round, index) in sessionStore.rounds"
+          v-for="(round, index) in sessionStore.getRounds"
           :key="index"
           class="roundSummary"
         >

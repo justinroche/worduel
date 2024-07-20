@@ -6,9 +6,10 @@ const connectionStore = useConnectionStore()
 <template>
   <transition name="fade">
     <div v-if="!connectionStore.isConnected" class="box">
+      <!-- TODO: update colors for all icons on hover -->
       <font-awesome-icon
         :icon="['fas', 'triangle-exclamation']"
-        style="color: black"
+        style="color: white"
         size="3x"
       />
       <div class="box-text">

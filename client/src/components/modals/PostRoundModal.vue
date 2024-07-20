@@ -10,7 +10,7 @@ import ResultTables from '../ResultTables.vue'
 const sessionStore = useSessionStore()
 
 const currentRound = computed(() => sessionStore.getCurrentRound)
-const numberOfRounds = computed(() => sessionStore.rounds)
+const numberOfRounds = computed(() => sessionStore.session.rounds)
 
 const nextRoundButtonLoading = ref(false)
 const viewGameSummaryButtonLoading = ref(false)

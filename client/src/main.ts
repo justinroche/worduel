@@ -1,10 +1,11 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import './style.css'
 import App from './App.vue'
 import router from './router'
-import { initializeSessionClient } from './clients/SessionClient'
+import './style.css'
 import { checkServerConnection } from './clients/checkServerConnection'
+import { initializeSessionClient } from './clients/SessionClient'
+import { initializePlayerState } from './utils/playerStateUtils'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -22,6 +23,7 @@ app.use(router)
 app.use(pinia)
 
 checkServerConnection()
+initializePlayerState()
 initializeSessionClient()
 
 app.mount('#app')

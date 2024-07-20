@@ -1,110 +1,34 @@
 import { defineStore } from 'pinia'
 import { Session } from '../types/Session'
-import { Game } from '../types/Game'
-import { Word } from '../types/Word'
 
 export const useSessionStore = defineStore('session', {
   state: () => ({
-    sessionCode: '',
-    player1Name: 'Player 1',
-    player2Name: 'Player 2',
-    player2Connected: false,
+    session: {} as Session,
     playerIsHost: false,
-    rounds: 3,
     MAX_ROUNDS: 5,
-    spellCheckEnabled: true,
-    blockProfanityEnabled: false,
-    roundTimerEnabled: true,
-    roundTimerDuration: 120,
-    state: 'in lobby' as 'in lobby' | 'in play' | 'complete',
-    currentRound: 0,
-    games: [] as Game[],
   }),
 
   getters: {
-    getSessionCode: (state) => state.sessionCode,
-    getPlayer1Name: (state) => state.player1Name,
-    getPlayer2Name: (state) => state.player2Name,
-    getPlayer2Connected: (state) => state.player2Connected,
+    getSessionCode: (state) => state.session.sessionCode,
+    getPlayer1Name: (state) => state.session.player1Name,
+    getPlayer2Name: (state) => state.session.player2Name,
+    getPlayer1UUID: (state) => state.session.player1UUID,
+    getPlayer2UUID: (state) => state.session.player2UUID,
+    getPlayer2Connected: (state) => state.session.player2Connected,
     getPlayerIsHost: (state) => state.playerIsHost,
-    getRounds: (state) => state.rounds,
+    getRounds: (state) => state.session.rounds,
     getMaxRounds: (state) => state.MAX_ROUNDS,
-    getSpellCheckEnabled: (state) => state.spellCheckEnabled,
-    getBlockProfanityEnabled: (state) => state.blockProfanityEnabled,
-    getRoundTimerEnabled: (state) => state.roundTimerEnabled,
-    getRoundTimerDuration: (state) => state.roundTimerDuration,
+    getSpellCheckEnabled: (state) => state.session.spellCheckEnabled,
+    getBlockProfanityEnabled: (state) => state.session.blockProfanityEnabled,
+    getRoundTimerEnabled: (state) => state.session.roundTimerEnabled,
+    getRoundTimerDuration: (state) => state.session.roundTimerDuration,
     getRoundTimerDurationFormatted: (state) => {
-      const minutes = Math.floor(state.roundTimerDuration / 60)
-      const seconds = state.roundTimerDuration % 60
+      const minutes = Math.floor(state.session.roundTimerDuration / 60)
+      const seconds = state.session.roundTimerDuration % 60
       return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
     },
-    getState: (state) => state.state,
-    getCurrentRound: (state) => state.currentRound,
-    getGames: (state) => state.games,
-  },
-
-  actions: {
-    setSessionCode(sessionCode: string) {
-      this.sessionCode = sessionCode
-    },
-    setPlayer1Name(player1Name: string) {
-      this.player1Name = player1Name
-    },
-    setPlayer2Name(player2Name: string) {
-      this.player2Name = player2Name
-    },
-    setPlayer2Connected(player2Connected: boolean) {
-      this.player2Connected = player2Connected
-    },
-    setPlayerIsHost(playerIsHost: boolean) {
-      this.playerIsHost = playerIsHost
-    },
-    setRounds(rounds: number) {
-      this.rounds = rounds
-    },
-    setSpellCheckEnabled(spellCheckEnabled: boolean) {
-      this.spellCheckEnabled = spellCheckEnabled
-    },
-    setBlockProfanityEnabled(blockProfanityEnabled: boolean) {
-      this.blockProfanityEnabled = blockProfanityEnabled
-    },
-    setRoundTimerEnabled(roundTimerEnabled: boolean) {
-      this.roundTimerEnabled = roundTimerEnabled
-    },
-    setRoundTimerDuration(roundTimerDuration: number) {
-      this.roundTimerDuration = roundTimerDuration
-    },
-    setState(state: 'in lobby' | 'in play' | 'complete') {
-      this.state = state
-    },
-    setCurrentRound(currentRound: number) {
-      this.currentRound = currentRound
-    },
-    setGameState(gameId: number, state: 'setting word' | 'in play' | 'complete') {
-      const game = this.games.find((game) => game.id === gameId)
-      if (game) {
-        game.state = state
-      }
-    },
-    addWordToGame(gameId: number, word: Word) {
-      const game = this.games.find((game) => game.id === gameId)
-      if (game) {
-        game.words.push(word)
-      }
-    },
-    setSession(session: Session) {
-      this.sessionCode = session.sessionCode
-      this.player1Name = session.player1Name
-      this.player2Name = session.player2Name
-      this.player2Connected = session.player2Connected
-      this.rounds = session.rounds
-      this.spellCheckEnabled = session.spellCheckEnabled
-      this.blockProfanityEnabled = session.blockProfanityEnabled
-      this.roundTimerEnabled = session.roundTimerEnabled
-      this.roundTimerDuration = session.roundTimerDuration
-      this.state = session.state
-      this.currentRound = session.currentRound
-      this.games = session.games
-    },
+    getState: (state) => state.session.state,
+    getCurrentRound: (state) => state.session.currentRound,
+    getGames: (state) => state.session.games,
   },
 })

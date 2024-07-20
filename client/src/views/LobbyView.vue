@@ -9,9 +9,9 @@ import { useSessionStore } from '../stores/SessionStore'
 import { startGame, exitSession } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
-const sessionCode = computed(() => sessionStore.sessionCode)
+const sessionCode = computed(() => sessionStore.session.sessionCode)
 const playerIsHost = computed(() => sessionStore.playerIsHost)
-const player2Connected = computed(() => sessionStore.player2Connected)
+const player2Connected = computed(() => sessionStore.session.player2Connected)
 const startGameButtonLoading = ref(false)
 const exitGameButtonLoading = ref(false)
 

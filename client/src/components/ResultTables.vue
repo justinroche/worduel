@@ -15,8 +15,8 @@ const props = withDefaults(
 
 const sessionStore = useSessionStore()
 
-const player1Name = computed(() => sessionStore.player1Name)
-const player2Name = computed(() => sessionStore.player2Name)
+const player1Name = computed(() => sessionStore.session.player1Name)
+const player2Name = computed(() => sessionStore.session.player2Name)
 
 const words = computed(() => sessionStore.getGames[props.round - 1].words)
 

@@ -1,24 +1,28 @@
 const sessionController = require('../controllers/sessionController');
 
 module.exports = (socket, io) => {
-  socket.on('createSession', async (callback) => {
+  socket.on('createSession', async (uuid, callback) => {
     try {
-      const session = await sessionController.createSession();
+      let session = await sessionController.createSession();
+      session = await sessionController.updateSession(session.sessionCode, {
+        player1UUID: uuid,
+      });
 
       // Join the room for the session
       socket.join(session.sessionCode);
 
       // Notify the client that the session was created
       socket.emit('setSession', session);
-      socket.emit('sessionCreated');
+      socket.emit('setPlayerIsHost', true);
       console.log('Created new session:', session.sessionCode);
       callback();
     } catch (error) {
+      console.log(error);
       callback(error.message);
     }
   });
 
-  socket.on('joinSession', async (sessionCode, callback) => {
+  socket.on('joinSession', async ([uuid, sessionCode], callback) => {
     try {
       // Check if the session exists and is joinable
       let session = await sessionController.getSessionFromCode(sessionCode);
@@ -32,14 +36,39 @@ module.exports = (socket, io) => {
       // Update the session to indicate that player 2 has connected
       session = await sessionController.updateSession(sessionCode, {
         player2Connected: true,
+        player2UUID: uuid,
       });
 
       // Join the room for the session
       socket.join(session.sessionCode);
 
       // Notify all clients in the room that the user joined the session
-      io.to(session.sessionCode).emit('sessionJoined', session);
+      io.to(session.sessionCode).emit('setPlayer2Connected', true);
+      socket.emit('setPlayerIsHost', false);
+      socket.emit('setSession', session);
       console.log('User joined session', sessionCode);
+      callback();
+    } catch (error) {
+      callback(error.message);
+    }
+  });
+
+  socket.on('rejoinSession', async ([uuid, sessionCode], callback) => {
+    try {
+      // Check if uuid matches either player
+      let session = await sessionController.getSessionFromCode(sessionCode);
+      if (session.player1UUID === uuid) {
+        // rejoin as host
+        socket.join(sessionCode);
+        socket.emit('setPlayerIsHost', true);
+        socket.emit('setSession', session);
+      } else if (session.player2UUID === uuid) {
+        // rejoin as player 2
+        socket.join(sessionCode);
+        socket.emit('setSession', session);
+      } else {
+        throw new Error('UUID does not match either player');
+      }
       callback();
     } catch (error) {
       callback(error.message);
@@ -65,7 +94,7 @@ module.exports = (socket, io) => {
       });
 
       io.to(sessionCode).emit('setSession', session);
-      io.to(sessionCode).emit('gameStarted');
+      io.to(sessionCode).emit('goToGameView');
       console.log(sessionCode, 'game started');
       callback();
     } catch (error) {
@@ -135,94 +164,12 @@ module.exports = (socket, io) => {
     callback();
   });
 
-  /* Game option events */
-  socket.on('updatePlayer1Name', async ([name, sessionCode], callback) => {
-    try {
-      let session = await sessionController.updateSession(sessionCode, {
-        player1Name: name,
-      });
-      io.to(sessionCode).emit('setSession', session);
-      callback();
-    } catch (error) {
-      callback(error.message);
-    }
-  });
-
-  socket.on('updatePlayer2Name', async ([name, sessionCode], callback) => {
-    try {
-      let session = await sessionController.updateSession(sessionCode, {
-        player2Name: name,
-      });
-      io.to(sessionCode).emit('setSession', session);
-      callback();
-    } catch (error) {
-      callback(error.message);
-    }
-  });
-
-  socket.on('updateRounds', async ([rounds, sessionCode], callback) => {
-    try {
-      let session = await sessionController.updateSession(sessionCode, {
-        rounds,
-      });
-      io.to(sessionCode).emit('setSession', session);
-      callback();
-    } catch (error) {
-      callback(error.message);
-    }
-  });
-
   socket.on(
-    'updateSpellCheckEnabled',
-    async ([enabled, sessionCode], callback) => {
+    'updateGameOption',
+    async ([option, value, sessionCode], callback) => {
       try {
         let session = await sessionController.updateSession(sessionCode, {
-          spellCheckEnabled: enabled,
-        });
-        io.to(sessionCode).emit('setSession', session);
-        callback();
-      } catch (error) {
-        callback(error.message);
-      }
-    }
-  );
-
-  socket.on(
-    'updateBlockProfanityEnabled',
-    async ([enabled, sessionCode], callback) => {
-      try {
-        let session = await sessionController.updateSession(sessionCode, {
-          blockProfanityEnabled: enabled,
-        });
-        io.to(sessionCode).emit('setSession', session);
-        callback();
-      } catch (error) {
-        callback(error.message);
-      }
-    }
-  );
-
-  socket.on(
-    'updateRoundTimerEnabled',
-    async ([enabled, sessionCode], callback) => {
-      try {
-        let session = await sessionController.updateSession(sessionCode, {
-          roundTimerEnabled: enabled,
-        });
-        io.to(sessionCode).emit('setSession', session);
-        callback();
-      } catch (error) {
-        callback(error.message);
-      }
-    }
-  );
-
-  socket.on(
-    'updateRoundTimerDuration',
-    async ([duration, sessionCode], callback) => {
-      try {
-        let session = await sessionController.updateSession(sessionCode, {
-          roundTimerDuration: duration,
+          [option]: value,
         });
         io.to(sessionCode).emit('setSession', session);
         callback();
@@ -324,7 +271,7 @@ module.exports = (socket, io) => {
 
       io.to(sessionCode).emit('resetLocalRoundState');
       io.to(sessionCode).emit('setSession', session);
-      io.to(sessionCode).emit('goToSummary');
+      io.to(sessionCode).emit('goToSummaryView');
       callback();
     } catch (error) {
       callback(error.message);
