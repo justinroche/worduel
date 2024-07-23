@@ -6,6 +6,8 @@ export type Session = {
   player2Name: string
   player1UUID: string
   player2UUID: string
+  player1SocketId: string
+  player2SocketId: string
   player2Connected: boolean
   rounds: number
   spellCheckEnabled: boolean

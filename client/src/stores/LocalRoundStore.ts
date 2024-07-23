@@ -48,6 +48,31 @@ export const useLocalRoundStore = defineStore('localRound', () => {
     letterLabels.value = letters.map((row) => row.map(() => 'unused'))
   }
 
+  const updateLetterLabels = (guessedLetters: string[], results: string[]) => {
+    guessedLetters.forEach((letter, index) => {
+      const result = results[index]
+
+      for (let i = 0; i < letters.length; i++) {
+        const row = letters[i]
+        const labelRow = letterLabels.value[i]
+        const letterIndex = row.indexOf(letter)
+
+        if (letterIndex !== -1) {
+          const currentLabel = labelRow[letterIndex]
+
+          // Update only if the new label has higher priority
+          if (
+            result === 'correct' ||
+            (result === 'misplaced' && currentLabel !== 'correct') ||
+            (result === 'incorrect' && currentLabel === 'unused')
+          ) {
+            labelRow[letterIndex] = result
+          }
+        }
+      }
+    })
+  }
+
   return {
     // State
     guesses,
@@ -62,6 +87,7 @@ export const useLocalRoundStore = defineStore('localRound', () => {
     setCurrentLetter,
     setCurrentRow,
     setLetterLabels,
+    updateLetterLabels,
     // Actions
     reset,
   }

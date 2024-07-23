@@ -30,27 +30,7 @@ export const initializeSessionClient = () => {
     sessionStore.playerIsHost = value
   })
 
-  socket.on('setPlayer2Connected', (value: boolean) => {
-    sessionStore.session.player2Connected = value
-  })
-
   // Session player management events
-  socket.on('player1Disconnected', (session: Session) => {
-    if (!sessionStore.getPlayerIsHost) {
-      sessionStore.session = session
-      sessionStore.playerIsHost = true
-    } else {
-      sessionStore.playerIsHost = false
-    }
-  })
-
-  socket.on('player2Disconnected', () => {
-    if (sessionStore.getPlayerIsHost) {
-      sessionStore.session.player2Connected = false
-      sessionStore.session.player2Name = 'Player 2'
-    }
-  })
-
   socket.on('removePlayer2', async () => {
     if (!sessionStore.getPlayerIsHost) {
       await enqueue(() => emitAsync('leaveRoom'))
@@ -59,12 +39,30 @@ export const initializeSessionClient = () => {
     } else {
       sessionStore.session.player2Connected = false
       sessionStore.session.player2Name = 'Player 2'
+      sessionStore.session.player2UUID = ''
+      sessionStore.session.player2SocketId = ''
     }
   })
 
   // Game events
   socket.on('resetLocalRoundState', () => {
     localRoundStore.reset()
+  })
+
+  socket.on(
+    'rejoinSetLocalRoundState',
+    (guesses: string[], results: string[][]) => {
+      localRoundStore.setGuesses(guesses.map((guess) => guess.split('')))
+      localRoundStore.setResults(results)
+      localRoundStore.setCurrentRow(results.length)
+      guesses.forEach((guess, index) => {
+        localRoundStore.updateLetterLabels(guess.split(''), results[index])
+      })
+    }
+  )
+
+  socket.on('goToLobbyView', () => {
+    router.push({ name: 'lobby' })
   })
 
   socket.on('goToGameView', () => {

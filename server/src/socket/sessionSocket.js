@@ -1,197 +1,274 @@
 const sessionController = require('../controllers/sessionController');
+const {
+  logEvent,
+  logInfo,
+  logAction,
+  logError,
+} = require('../logging/loggingUtils');
 
 module.exports = (socket, io) => {
+  /* Session and lobby events */
+  // Create session -> called when player hosts a game
   socket.on('createSession', async (uuid, callback) => {
     try {
+      logEvent('User hosted a session');
+      // Create session and set host uuid
       let session = await sessionController.createSession();
       session = await sessionController.updateSession(session.sessionCode, {
         player1UUID: uuid,
+        player1SocketId: socket.id,
       });
 
       // Join the room for the session
       socket.join(session.sessionCode);
 
-      // Notify the client that the session was created
+      // Set the client's session and host status
       socket.emit('setSession', session);
       socket.emit('setPlayerIsHost', true);
-      console.log('Created new session:', session.sessionCode);
+
+      logAction('Created session: ' + session.sessionCode);
       callback();
     } catch (error) {
-      console.log(error);
+      logError(error);
       callback(error.message);
     }
   });
 
+  // Join session -> called when player joins game or opens a link
+  // Handle joining and rejoining sessions
   socket.on('joinSession', async ([uuid, sessionCode], callback) => {
     try {
+      logEvent('User requested to join session ' + sessionCode);
       // Check if the session exists and is joinable
       let session = await sessionController.getSessionFromCode(sessionCode);
-      if (session.state !== 'in lobby') {
-        throw new Error('Session is not in lobby');
+      if (!session) {
+        throw new Error('Session does not exist');
       }
-      if (session.player2Connected) {
-        throw new Error('Session is full');
+      if (session.state === 'complete') {
+        throw new Error('Session is complete');
       }
+      if (session.state === 'in lobby') {
+        if (session.player2Connected) {
+          throw new Error('Session is full');
+        }
+        if (session.player1UUID === uuid) {
+          throw new Error('User may not connect to their own session');
+        }
 
-      // Update the session to indicate that player 2 has connected
-      session = await sessionController.updateSession(sessionCode, {
-        player2Connected: true,
-        player2UUID: uuid,
-      });
+        // Update the session to indicate that player 2 has connected
+        session = await sessionController.updateSession(sessionCode, {
+          player2Connected: true,
+          player2UUID: uuid,
+          player2SocketId: socket.id,
+        });
 
-      // Join the room for the session
-      socket.join(session.sessionCode);
+        // Join the room for the session
+        socket.join(session.sessionCode);
 
-      // Notify all clients in the room that the user joined the session
-      io.to(session.sessionCode).emit('setPlayer2Connected', true);
-      socket.emit('setPlayerIsHost', false);
-      socket.emit('setSession', session);
-      console.log('User joined session', sessionCode);
-      callback();
-    } catch (error) {
-      callback(error.message);
-    }
-  });
+        // Emit the session and player 2 status
+        io.to(session.sessionCode).emit('setSession', session);
+        socket.emit('setPlayerIsHost', false);
+        socket.emit('goToLobbyView');
 
-  socket.on('rejoinSession', async ([uuid, sessionCode], callback) => {
-    try {
-      // Check if uuid matches either player
-      let session = await sessionController.getSessionFromCode(sessionCode);
-      if (session.player1UUID === uuid) {
-        // rejoin as host
-        socket.join(sessionCode);
-        socket.emit('setPlayerIsHost', true);
-        socket.emit('setSession', session);
-      } else if (session.player2UUID === uuid) {
-        // rejoin as player 2
-        socket.join(sessionCode);
-        socket.emit('setSession', session);
+        logAction('User successfully joined session ' + session.sessionCode);
+        callback();
       } else {
-        throw new Error('UUID does not match either player');
+        // Ensure the session can be rejoined
+        const room = io.sockets.adapter.rooms.get(sessionCode);
+        if (!room) {
+          throw new Error('Room does not exist');
+        }
+        if (room.size > 1) {
+          throw new Error('Room is full');
+        }
+
+        // Attempt to rejoin the session
+        if (session.player1UUID === uuid) {
+          // Rejoin as host
+          session = await sessionController.updateSession(sessionCode, {
+            player1SocketId: socket.id,
+          });
+
+          // Join the room for the session
+          socket.join(sessionCode);
+
+          // Get the current word
+          const currentGame = session.games[session.currentRound - 1];
+          const currentWord = currentGame.words.filter(
+            (word) => word.wordSetter !== 1
+          )[0];
+
+          // Emit the session, host status, and rejoin event
+          socket.emit('setSession', session);
+          socket.emit(
+            'rejoinSetLocalRoundState',
+            currentWord.guesses,
+            currentWord.results
+          );
+          socket.emit('setPlayerIsHost', true);
+          socket.emit('goToGameView');
+          io.to(sessionCode).emit('opponentRejoined');
+
+          logAction('Host successfully rejoined session ' + sessionCode);
+          callback();
+        } else if (session.player2UUID === uuid) {
+          // Rejoin as player 2
+          session = await sessionController.updateSession(sessionCode, {
+            player2SocketId: socket.id,
+          });
+
+          // Join the room for the session
+          socket.join(sessionCode);
+
+          // Get the current word
+          const currentGame = session.games[session.currentRound - 1];
+          const currentWord = currentGame.words.filter(
+            (word) => word.wordSetter !== 2
+          )[0];
+
+          // Emit the session, player 2 status, and rejoin event
+          socket.emit('setSession', session);
+          socket.emit(
+            'rejoinSetLocalRoundState',
+            currentWord.guesses,
+            currentWord.results
+          );
+          socket.emit('setPlayerIsHost', false);
+          socket.emit('goToGameView');
+          io.to(sessionCode).emit('opponentRejoined');
+
+          logAction('Player 2 successfully rejoined session ' + sessionCode);
+          callback();
+        } else {
+          throw new Error('UUID does not match either player');
+        }
       }
-      callback();
     } catch (error) {
+      logError(error);
       callback(error.message);
     }
   });
 
+  // Exit session -> called when player exits a session from the lobby
+  socket.on('exitSession', async ([playerNumber, sessionCode], callback) => {
+    try {
+      logEvent('User exited session ' + sessionCode);
+
+      // Leave all rooms
+      socket.leaveAll();
+
+      let session = await sessionController.getSessionFromCode(sessionCode);
+
+      // Delete the session if no other player is present
+      if (!session.player2Connected) {
+        sessionController.deleteSession(sessionCode);
+        logAction('Deleted session ' + sessionCode);
+        callback();
+        return;
+      }
+
+      if (playerNumber === 1) {
+        // Remove player 1 and promote player 2
+        session = await sessionController.removePlayer1AndPromotePlayer2(
+          sessionCode
+        );
+        io.to(sessionCode).emit('setSession', session);
+        io.to(sessionCode).emit('setPlayerIsHost', true);
+        logAction(
+          'Removed player 1 and promoted player 2 in session ' + sessionCode
+        );
+      } else if (playerNumber === 2) {
+        // Remove player 2 from the session
+        session = await sessionController.removePlayer2(sessionCode);
+        io.to(sessionCode).emit('setSession', session);
+        logAction('Removed player 2 from session ' + sessionCode);
+      }
+
+      callback();
+    } catch (error) {
+      logError(error);
+      callback(error.message);
+    }
+  });
+
+  // Start game -> called when host starts the game from the lobby
   socket.on('startGame', async (sessionCode, callback) => {
     try {
+      logEvent('Host started game ' + sessionCode);
       let session = await sessionController.getSessionFromCode(sessionCode);
 
-      // Create the initial game objects
-      const games = Array.from({ length: session.rounds }, (_, index) => ({
-        id: index,
-        state: 'setting word',
-        words: [],
-      }));
-
-      // Update the session
-      session = await sessionController.updateSession(sessionCode, {
-        state: 'in play',
-        currentRound: 1,
-        games: games,
-      });
+      session = await sessionController.startGame(sessionCode);
 
       io.to(sessionCode).emit('setSession', session);
       io.to(sessionCode).emit('goToGameView');
-      console.log(sessionCode, 'game started');
+      logAction('Started game ' + sessionCode);
       callback();
     } catch (error) {
+      logError(error);
       callback(error.message);
     }
   });
 
+  // Kick player 2 -> called when host kicks player 2 from the lobby
   socket.on('kickPlayer2', async (sessionCode, callback) => {
     try {
-      await sessionController.updateSession(sessionCode, {
-        player2Connected: false,
-        player2Name: 'Player 2',
-      });
+      logEvent('Host kicked player 2 from ' + sessionCode);
+      let session = await sessionController.removePlayer2(sessionCode);
       io.to(sessionCode).emit('removePlayer2');
-      console.log('Player 2 kicked from', sessionCode);
+      logAction('Kicked player 2 from ' + sessionCode);
       callback();
     } catch (error) {
+      logError(error);
       callback(error.message);
     }
   });
 
-  socket.on('exitSession', async ([playerNumber, sessionCode], callback) => {
-    try {
-      let session = await sessionController.getSessionFromCode(sessionCode);
-
-      if (playerNumber === 1) {
-        if (!session.player2Connected) {
-          // Close the session if no other player is present
-          sessionController.closeSession(sessionCode);
-          console.log('Closed session', sessionCode);
-        } else {
-          // Otherwise promote player 2 to player 1
-          session = await sessionController.updateSession(sessionCode, {
-            player2Connected: false,
-            player1Name:
-              session.player2Name === 'Player 2'
-                ? 'Player 1'
-                : session.player2Name,
-            player2Name: 'Player 2',
-          });
-        }
-        // Emit player 1 disconnected
-        io.to(sessionCode).emit('player1Disconnected', session);
-        console.log('Host left', sessionCode);
-      } else if (playerNumber === 2) {
-        // Disconnect player 2 from the session
-        await sessionController.updateSession(sessionCode, {
-          player2Connected: false,
-          player2Name: 'Player 2',
-        });
-
-        // Emit player 2 disconnected
-        io.to(sessionCode).emit('player2Disconnected');
-        console.log('Player 2 left', sessionCode);
-      }
-
-      // Leave the room for the session
-      socket.leaveAll();
-      callback();
-    } catch (error) {
-      callback(error.message);
-    }
-  });
-
+  // Leave room -> called when player exits the lobby
   socket.on('leaveRoom', (callback) => {
     socket.leaveAll();
     callback();
   });
 
+  // Update game option -> called when host updates a game option
   socket.on(
     'updateGameOption',
     async ([option, value, sessionCode], callback) => {
       try {
+        logEvent('Host updated game option ' + option + ' to ' + value);
         let session = await sessionController.updateSession(sessionCode, {
           [option]: value,
         });
         io.to(sessionCode).emit('setSession', session);
         callback();
       } catch (error) {
+        logError(error);
         callback(error.message);
       }
     }
   );
 
   /* Game events */
+  // Set word -> called when player sets a word
   socket.on('setWord', async ([word, playerNumber, sessionCode], callback) => {
     try {
+      logEvent(
+        'Player ' + playerNumber + ' set word ' + word + ' in ' + sessionCode
+      );
       let session = await sessionController.getSessionFromCode(sessionCode);
       const currentGame = session.games[session.currentRound - 1];
 
+      // Set the word for the player
       if (playerNumber === 1) {
         currentGame.words.push({ wordSetter: 1, word });
       } else if (playerNumber === 2) {
         currentGame.words.push({ wordSetter: 2, word });
       }
 
+      // If both players have set words, start the round
       if (currentGame.words.length === 2) {
+        logAction(
+          'Starting round ' + session.currentRound + ' in ' + sessionCode
+        );
         currentGame.state = 'in play';
       }
 
@@ -202,23 +279,36 @@ module.exports = (socket, io) => {
       io.to(sessionCode).emit('setSession', session);
       callback();
     } catch (error) {
+      logError(error);
       callback(error.message);
     }
   });
 
+  // Made guess -> called when player makes a guess
   socket.on(
     'madeGuess',
     async ([guess, results, playerNumber, sessionCode], callback) => {
       try {
+        logEvent(
+          'Player ' +
+            playerNumber +
+            ' guessed ' +
+            guess +
+            ' in game ' +
+            sessionCode
+        );
+
         let session = await sessionController.getSessionFromCode(sessionCode);
         const currentGame = session.games[session.currentRound - 1];
         const currentWord = currentGame.words.find(
           (word) => word.wordSetter !== playerNumber
         );
 
+        // Push the guess and results
         currentWord.guesses[currentWord.results.length] = guess;
         currentWord.results.push(results);
 
+        // Conditions for completing the round
         if (currentWord.word === guess || currentWord.results.length === 6) {
           currentWord.guessingComplete = true;
 
@@ -236,15 +326,19 @@ module.exports = (socket, io) => {
         });
 
         io.to(sessionCode).emit('setSession', session);
+
         callback();
       } catch (error) {
+        logError(error);
         callback(error.message);
       }
     }
   );
 
+  // Next round -> called when host moves to the next round
   socket.on('nextRound', async (sessionCode, callback) => {
     try {
+      logEvent('Moving to next round in game ' + sessionCode);
       let session = await sessionController.getSessionFromCode(sessionCode);
       session.currentRound += 1;
 
@@ -254,31 +348,100 @@ module.exports = (socket, io) => {
 
       io.to(sessionCode).emit('resetLocalRoundState');
       io.to(sessionCode).emit('setSession', session);
+
       callback();
     } catch (error) {
+      logError(error);
       callback(error.message);
     }
   });
 
+  // End game -> called when host moves to game summary
   socket.on('endGame', async (sessionCode, callback) => {
     try {
-      let session = await sessionController.getSessionFromCode(sessionCode);
-      session.state = 'complete';
+      logEvent('Game ' + sessionCode + ' completed');
 
       session = await sessionController.updateSession(sessionCode, {
-        state: session.state,
+        state: 'complete',
       });
 
       io.to(sessionCode).emit('resetLocalRoundState');
       io.to(sessionCode).emit('setSession', session);
       io.to(sessionCode).emit('goToSummaryView');
+
       callback();
     } catch (error) {
+      logError(error);
       callback(error.message);
     }
   });
 
-  socket.on('disconnect', () => {
-    console.log('A user disconnected');
+  // Disconnect event
+  // Process disconnects from lobby, game, and empty sessions
+  socket.on('disconnect', async () => {
+    try {
+      logEvent('User disconnected');
+      const sessions = await sessionController.getSessionsFromSocketId(
+        socket.id
+      );
+      if (sessions.length === 0) {
+        logInfo('User was connected to no sessions');
+        return;
+      }
+      logInfo(
+        'User sessions: ' +
+          Array.from(sessions, (session) => session.sessionCode)
+      );
+
+      sessions.forEach(async (session) => {
+        const room = io.sockets.adapter.rooms.get(session.sessionCode);
+        const numberOfClients = room ? room.size : 0;
+        logInfo(
+          'Number of clients in ' + session.sessionCode + ': ' + numberOfClients
+        );
+
+        // Delete empty sessions
+        if (numberOfClients === 0) {
+          sessionController.deleteSession(session.sessionCode);
+          logAction('Deleted empty session ' + session.sessionCode);
+          return;
+        } else if (numberOfClients > 1) {
+          throw new Error('Session has more than one client');
+        }
+
+        if (session.state === 'in lobby') {
+          if (session.player2SocketId === socket.id) {
+            // Remove player 2 from the session
+            session = await sessionController.removePlayer2(
+              session.sessionCode
+            );
+            io.to(session.sessionCode).emit('setSession', session);
+            logAction('Removed player 2 from session ' + session.sessionCode);
+          } else {
+            // Otherwise remove player 1 and promote player 2
+            session = await sessionController.removePlayer1AndPromotePlayer2(
+              session.sessionCode
+            );
+            io.to(session.sessionCode).emit('setSession', session);
+            io.to(session.sessionCode).emit('setPlayerIsHost', true);
+            logAction(
+              'Removed player 1 and promoted player 2 in session ' +
+                session.sessionCode
+            );
+          }
+        } else if (session.state === 'in play') {
+          // Emit opponent left event if the session is in play
+          io.to(session.sessionCode).emit('opponentLeftMidGame');
+          logAction(
+            'Session ' +
+              session.sessionCode +
+              ' is in play with a remaining player. Emitted opponent left event...'
+          );
+        }
+      });
+    } catch (error) {
+      logError(error);
+      // No callback for disconnect events
+    }
   });
 };

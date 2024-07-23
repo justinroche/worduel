@@ -25,6 +25,8 @@ const sessionSchema = new mongoose.Schema({
   player2Name: { type: String, default: 'Player 2' },
   player1UUID: { type: String, default: '' },
   player2UUID: { type: String, default: '' },
+  player1SocketId: { type: String, default: '' },
+  player2SocketId: { type: String, default: '' },
   player2Connected: { type: Boolean, default: false },
   rounds: { type: Number, default: 3 },
   spellCheckEnabled: { type: Boolean, default: true },

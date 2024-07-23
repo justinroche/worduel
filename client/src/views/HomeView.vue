@@ -61,7 +61,6 @@ const handleJoinButton = async () => {
   joinButtonLoading.value = true
   try {
     await joinSession(joinCode.value)
-    router.push({ name: 'lobby' })
   } catch (error) {
     console.error('Error joining session:', error)
     homeErrorStore.setError(

@@ -7,7 +7,7 @@ require('dotenv').config({ path: './config/.env' });
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const HOST = '0.0.0.0'
+const HOST = '0.0.0.0';
 
 app.use(cors());
 app.use(express.json());
@@ -27,7 +27,7 @@ const io = new Server(server, {
 
 const sessionSocket = require('./socket/sessionSocket');
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('User connected');
 
   sessionSocket(socket, io);
 });

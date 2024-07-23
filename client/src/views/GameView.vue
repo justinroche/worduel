@@ -31,32 +31,6 @@ const wordBeingGuessed = computed(
     )[0]
 )
 
-/* Update keyboard labels */
-function updateLabels(guessedLetters: string[], results: string[]) {
-  guessedLetters.forEach((letter, index) => {
-    const result = results[index]
-
-    for (let i = 0; i < localRoundStore.letters.length; i++) {
-      const row = localRoundStore.letters[i]
-      const labelRow = localRoundStore.letterLabels[i]
-      const letterIndex = row.indexOf(letter)
-
-      if (letterIndex !== -1) {
-        const currentLabel = labelRow[letterIndex]
-
-        // Update only if the new label has higher priority
-        if (
-          result === 'correct' ||
-          (result === 'misplaced' && currentLabel !== 'correct') ||
-          (result === 'incorrect' && currentLabel === 'unused')
-        ) {
-          labelRow[letterIndex] = result
-        }
-      }
-    }
-  })
-}
-
 /* Keyboard event handler */
 const handleKeyEvent = async (key: string) => {
   if (localRoundStore.currentRow >= 6) return
@@ -136,7 +110,7 @@ function getResults(guess: string[], secretWord: string) {
     }
   }
 
-  updateLabels(guess, results)
+  localRoundStore.updateLetterLabels(guess, results)
 
   return results
 }
