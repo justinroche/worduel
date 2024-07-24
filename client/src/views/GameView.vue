@@ -28,7 +28,7 @@ onMounted(async () => {
     router.push({ name: 'home' })
     return
   }
-  await joinSession(gameCode)
+  await joinSession(gameCode.toUpperCase())
 })
 
 /* Computed state */

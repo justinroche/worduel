@@ -51,7 +51,7 @@ onMounted(async () => {
   if (!gameCode) {
     router.push({ name: 'home' })
   }
-  await joinSession(gameCode)
+  await joinSession(gameCode.toUpperCase())
 })
 </script>
 
@@ -60,8 +60,9 @@ onMounted(async () => {
     <header-banner title="Game Setup" />
     <div class="top-row">
       <div class="lobby-section">
-        <h2>Game Code</h2>
+        <h2 class="game-code-header">Game Code</h2>
         <p class="session-code">{{ sessionCode }}</p>
+        <p class="session-link">playworduel.com/join/{{ sessionCode }}</p>
       </div>
       <div class="players-section">
         <lobby-players-section />
@@ -128,11 +129,19 @@ onMounted(async () => {
   height: 250px;
 }
 
+.game-code-header {
+  margin-bottom: 0;
+}
+
 .session-code {
   font-size: 4rem;
   margin: 0;
   line-height: 8rem;
   font-weight: 600;
+}
+
+.session-link {
+  margin: 0;
 }
 
 .host-buttons-section {
