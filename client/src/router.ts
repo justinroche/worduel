@@ -1,4 +1,9 @@
-import { createWebHistory, createRouter, RouteRecordRaw, RouteLocation } from 'vue-router'
+import {
+  createWebHistory,
+  createRouter,
+  RouteRecordRaw,
+  RouteLocation,
+} from 'vue-router'
 
 import GameView from './views/GameView.vue'
 import HomeView from './views/HomeView.vue'
@@ -14,13 +19,15 @@ const routes: Array<RouteRecordRaw> = [
   },
   { path: '/play/:gameCode', name: 'play', component: GameView },
   { path: '/summary/:gameCode', name: 'summary', component: SummaryView },
-  { 
-    path: '/join/:gameCode', 
+  {
+    path: '/join/:gameCode',
     redirect: (to: RouteLocation) => {
       const { gameCode } = to.params as { gameCode: string }
       return { name: 'lobby', params: { gameCode } }
-    }
-  }
+    },
+  },
+  // Catch-all route to redirect to home
+  { path: '/:catchAll(.*)', redirect: { name: 'home' } },
 ]
 
 const router = createRouter({
@@ -29,4 +36,3 @@ const router = createRouter({
 })
 
 export default router
-
