@@ -17,7 +17,7 @@ const exitButtonLoading = ref(false)
 const handleExitButton = async () => {
   exitButtonLoading.value = true
   await leaveRoom()
-  await router.push({ name: 'home' })
+  router.push({ name: 'home' })
   exitButtonLoading.value = false
 }
 

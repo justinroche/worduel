@@ -9,6 +9,7 @@ import ConnectionErrorBox from '../components/boxes/ConnectionErrorBox.vue'
 import HomeErrorBox from '../components/boxes/HomeErrorBox.vue'
 import { createSession, joinSession } from '../clients/SessionClient'
 import { useHomeErrorStore } from '../stores/HomeErrorStore'
+import { useSessionStore } from '../stores/SessionStore'
 
 const joinCode = ref('')
 const showInfoBox = ref(false)
@@ -18,6 +19,7 @@ const hostButtonLoading = ref(false)
 const joinButtonLoading = ref(false)
 
 const homeErrorStore = useHomeErrorStore()
+const sessionStore = useSessionStore()
 
 // Convert game code to uppercase
 watch(joinCode, (newValue) => {
@@ -40,7 +42,10 @@ const handleHostButton = async () => {
   hostButtonLoading.value = true
   try {
     await createSession()
-    router.push({ name: 'lobby' })
+    router.push({
+      name: 'lobby',
+      params: { gameCode: sessionStore.getSessionCode },
+    })
   } catch (error) {
     console.error('Error creating session:', error)
     homeErrorStore.setError('Failed to create session.')

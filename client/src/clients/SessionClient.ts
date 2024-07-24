@@ -66,16 +66,29 @@ export const initializeSessionClient = () => {
     localRoundStore.setEnterWordModalWaiting(true)
   })
 
+  socket.on('goToHomeView', () => {
+    router.push({ name: 'home' })
+  })
+
   socket.on('goToLobbyView', () => {
-    router.push({ name: 'lobby' })
+    router.push({
+      name: 'lobby',
+      params: { gameCode: sessionStore.getSessionCode },
+    })
   })
 
   socket.on('goToGameView', () => {
-    router.push({ name: 'play' })
+    router.push({
+      name: 'play',
+      params: { gameCode: sessionStore.getSessionCode },
+    })
   })
 
   socket.on('goToSummaryView', () => {
-    router.push({ name: 'summary' })
+    router.push({
+      name: 'summary',
+      params: { gameCode: sessionStore.getSessionCode },
+    })
   })
 }
 
@@ -95,6 +108,16 @@ export const createSession = async () => {
 }
 
 export const joinSession = async (sessionCode: string) => {
+  if (sessionCode.length === 0) {
+    homeErrorStore.setError('Please enter a game code.')
+    router.push({ name: 'home' })
+    return
+  }
+  if (sessionCode.length !== 5) {
+    homeErrorStore.setError('Game code must be 5 characters long.')
+    router.push({ name: 'home' })
+    return
+  }
   return await enqueue(() =>
     emitAsync('joinSession', [playerStateStore.playerID, sessionCode])
   )

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /* Imports */
 import { onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import GameTable from '../components/gameBoard/GameTable.vue'
 import Keyboard from '../components/gameBoard/Keyboard.vue'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
@@ -10,23 +11,38 @@ import EnterWordBox from '../components/modals/EnterWordModal.vue'
 import WaitingForOpponentModal from '../components/modals/WaitingForOpponentModal.vue'
 import PostRoundModal from '../components/modals/PostRoundModal.vue'
 import HeaderBanner from '../components/HeaderBanner.vue'
-import { madeGuess } from '../clients/SessionClient'
+import { joinSession, madeGuess } from '../clients/SessionClient'
+import router from '../router'
 
 const sessionStore = useSessionStore()
 const localRoundStore = useLocalRoundStore()
+const route = useRoute()
+
+onMounted(async () => {
+  window.addEventListener('keydown', handleKeyPress)
+  if (sessionStore.getSessionCode) {
+    return
+  }
+  const gameCode = route.params.gameCode as string
+  if (!gameCode) {
+    router.push({ name: 'home' })
+    return
+  }
+  await joinSession(gameCode)
+})
 
 /* Computed state */
 const playerNumber = computed(() => (sessionStore.playerIsHost ? 1 : 2))
 const currentRound = computed(() => sessionStore.getCurrentRound)
-const currentGame = computed(
-  () => sessionStore.getGames[currentRound.value - 1]
+const currentGame = computed(() =>
+  sessionStore.getGames ? sessionStore.getGames[currentRound.value - 1] : null
 )
 
-const currentWords = computed(() => currentGame.value.words)
+const currentWords = computed(() => currentGame.value?.words)
 
 const wordBeingGuessed = computed(
   () =>
-    currentWords.value.filter(
+    currentWords.value?.filter(
       (word) => word.wordSetter !== playerNumber.value
     )[0]
 )
@@ -34,7 +50,7 @@ const wordBeingGuessed = computed(
 /* Keyboard event handler */
 const handleKeyEvent = async (key: string) => {
   if (localRoundStore.currentRow >= 6) return
-  if (wordBeingGuessed.value.guessingComplete) return
+  if (wordBeingGuessed.value?.guessingComplete) return
 
   if (key === 'Enter') {
     if (localRoundStore.currentLetter !== 5) {
@@ -45,16 +61,18 @@ const handleKeyEvent = async (key: string) => {
         return
       }
 
-      localRoundStore.results.push(
-        getResults(guess, wordBeingGuessed.value.word)
-      )
+      if (wordBeingGuessed.value) {
+        localRoundStore.results.push(
+          getResults(guess, wordBeingGuessed.value.word)
+        )
+      }
 
       await madeGuess(
         guess.join(''),
         localRoundStore.results[localRoundStore.currentRow]
       )
 
-      if (guess.join('') !== wordBeingGuessed.value.word) {
+      if (guess.join('') !== wordBeingGuessed.value?.word) {
         localRoundStore.currentRow++
         localRoundStore.currentLetter = 0
       }
@@ -77,7 +95,7 @@ const handleKeyEvent = async (key: string) => {
 }
 
 const handleKeyPress = (event: KeyboardEvent) => {
-  if (currentGame.value.state != 'in play') return
+  if (currentGame.value?.state != 'in play') return
   handleKeyEvent(event.key)
 }
 
@@ -114,21 +132,17 @@ function getResults(guess: string[], secretWord: string) {
 
   return results
 }
-
-onMounted(() => {
-  window.addEventListener('keydown', handleKeyPress)
-})
 </script>
 
 <template>
   <header-banner :title="'Round ' + currentRound" />
-  <div v-if="currentGame.state === 'setting word'">
+  <div v-if="currentGame?.state === 'setting word'">
     <enter-word-box />
   </div>
   <div v-if="wordBeingGuessed ? wordBeingGuessed.guessingComplete : false">
     <waiting-for-opponent-modal />
   </div>
-  <div v-if="currentGame.state === 'complete'">
+  <div v-if="currentGame?.state === 'complete'">
     <post-round-modal />
   </div>
   <div class="pageBody">

@@ -172,6 +172,7 @@ export default (socket: IOSocket, io: IOServer) => {
       }
     } catch (error: any) {
       logError(error.message);
+      socket.emit('goToHomeView')
       callback(error.message);
     }
   });

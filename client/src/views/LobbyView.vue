@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import router from '../router'
 import LobbyPlayersSection from '../components/lobby/LobbyPlayersSection.vue'
 import LobbyGameOptionsSection from '../components/lobby/LobbyGameOptionsSection.vue'
 import HeaderBanner from '../components/HeaderBanner.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { useSessionStore } from '../stores/SessionStore'
-import { startGame, exitSession } from '../clients/SessionClient'
+import { startGame, exitSession, joinSession } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
+const route = useRoute()
+
 const sessionCode = computed(() => sessionStore.session.sessionCode)
 const playerIsHost = computed(() => sessionStore.playerIsHost)
 const player2Connected = computed(() => sessionStore.session.player2Connected)
@@ -39,6 +42,17 @@ const handleExitLobbyButtonClicked = async () => {
     exitGameButtonLoading.value = false
   }
 }
+
+onMounted(async () => {
+  if (sessionStore.getSessionCode) {
+    return
+  }
+  const gameCode = route.params.gameCode as string
+  if (!gameCode) {
+    router.push({ name: 'home' })
+  }
+  await joinSession(gameCode)
+})
 </script>
 
 <template>

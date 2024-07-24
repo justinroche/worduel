@@ -1,19 +1,26 @@
-import { createWebHistory, createRouter } from 'vue-router'
+import { createWebHistory, createRouter, RouteRecordRaw, RouteLocation } from 'vue-router'
 
 import GameView from './views/GameView.vue'
 import HomeView from './views/HomeView.vue'
 import LobbyView from './views/LobbyView.vue'
 import SummaryView from './views/SummaryView.vue'
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
   { path: '/', name: 'home', component: HomeView },
   {
-    path: '/lobby',
+    path: '/lobby/:gameCode',
     name: 'lobby',
     component: LobbyView,
   },
-  { path: '/play', name: 'play', component: GameView },
-  { path: '/summary', name: 'summary', component: SummaryView },
+  { path: '/play/:gameCode', name: 'play', component: GameView },
+  { path: '/summary/:gameCode', name: 'summary', component: SummaryView },
+  { 
+    path: '/join/:gameCode', 
+    redirect: (to: RouteLocation) => {
+      const { gameCode } = to.params as { gameCode: string }
+      return { name: 'lobby', params: { gameCode } }
+    }
+  }
 ]
 
 const router = createRouter({
@@ -22,3 +29,4 @@ const router = createRouter({
 })
 
 export default router
+
