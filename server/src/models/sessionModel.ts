@@ -1,6 +1,40 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const wordSchema = new mongoose.Schema({
+export interface Word {
+  wordSetter: number;
+  word: string;
+  guesses?: string[];
+  results?: string[][];
+  guessingComplete?: boolean;
+  guessedIn?: number;
+}
+
+export interface Game {
+  id: number;
+  state: 'setting word' | 'in play' | 'complete';
+  words: Word[];
+}
+
+export interface Session extends mongoose.Document {
+  sessionCode: string;
+  player1Name: string;
+  player2Name: string;
+  player1UUID: string;
+  player2UUID: string;
+  player1SocketId: string;
+  player2SocketId: string;
+  player2Connected: boolean;
+  rounds: number;
+  spellCheckEnabled: boolean;
+  blockProfanityEnabled: boolean;
+  roundTimerEnabled: boolean;
+  roundTimerDuration: number;
+  state: 'in lobby' | 'in play' | 'complete';
+  currentRound: number;
+  games: Game[];
+}
+
+const wordSchema = new mongoose.Schema<Word>({
   wordSetter: { type: Number, required: true, enum: [1, 2] },
   word: { type: String, required: true },
   guesses: { type: [String], default: Array(6).fill('_____') },
@@ -9,7 +43,7 @@ const wordSchema = new mongoose.Schema({
   guessedIn: { type: Number },
 });
 
-const gameSchema = new mongoose.Schema({
+const gameSchema = new mongoose.Schema<Game>({
   id: { type: Number, required: true, min: 0, max: 9 },
   state: {
     type: String,
@@ -19,7 +53,7 @@ const gameSchema = new mongoose.Schema({
   words: { type: [wordSchema], default: [] },
 });
 
-const sessionSchema = new mongoose.Schema({
+const sessionSchema = new mongoose.Schema<Session>({
   sessionCode: { type: String, required: true, length: 5, unique: true },
   player1Name: { type: String, default: 'Player 1' },
   player2Name: { type: String, default: 'Player 2' },
@@ -42,4 +76,6 @@ const sessionSchema = new mongoose.Schema({
   games: { type: [gameSchema], default: [] },
 });
 
-module.exports = mongoose.model('Session', sessionSchema);
+const SessionModel = mongoose.model<Session>('Session', sessionSchema);
+
+export default SessionModel;

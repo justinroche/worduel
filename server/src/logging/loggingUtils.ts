@@ -3,18 +3,18 @@ const INFO_PREFIX = '[INFO]';
 const ACTION_PREFIX = '[ACTION]';
 const ERROR_PREFIX = '[ERROR]';
 
-exports.logEvent = (message) => {
+export const logEvent = (message: string) => {
   console.log(EVENT_PREFIX, message);
 };
 
-exports.logInfo = (message) => {
+export const logInfo = (message: string) => {
   console.log(INFO_PREFIX, message);
 };
 
-exports.logAction = (message) => {
+export const logAction = (message: string) => {
   console.log(ACTION_PREFIX, message);
 };
 
-exports.logError = (message) => {
+export const logError = (message: string) => {
   console.log(ERROR_PREFIX, message);
 };

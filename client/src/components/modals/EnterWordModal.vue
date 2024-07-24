@@ -1,27 +1,29 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
+import { useLocalRoundStore } from '../../stores/LocalRoundStore'
 import { isWordInDictionary } from '../../utils/dictionaryUtils'
 import MenuButton from '../MenuButton.vue'
 import Modal from './Modal.vue'
 import { setWord } from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
+const localRoundStore = useLocalRoundStore()
 const currentRound = computed(() => sessionStore.getCurrentRound)
 
-const word = ref('')
 const confirmButtonLoading = ref(false)
-const buttonState = ref('entering-word')
 
-const buttonText = computed(() => {
-  return buttonState.value === 'entering-word'
-    ? 'Confirm'
-    : 'Waiting for opponent...'
+const word = computed({
+  get: () => localRoundStore.enterWordModalWord,
+  set: (value) => {
+    localRoundStore.enterWordModalWord = value.toUpperCase()
+  },
 })
 
-// Convert word to uppercase
-watch(word, (newValue) => {
-  word.value = newValue.toUpperCase()
+const buttonText = computed(() => {
+  return !localRoundStore.enterWordModalWaiting
+    ? 'Confirm'
+    : 'Waiting for opponent...'
 })
 
 const handleWordInput = (event: Event) => {
@@ -32,7 +34,7 @@ const handleWordInput = (event: Event) => {
 }
 
 const handleConfirmButton = async () => {
-  if (buttonState.value === 'waiting') {
+  if (localRoundStore.enterWordModalWaiting) {
     return
   }
 
@@ -51,7 +53,7 @@ const handleConfirmButton = async () => {
 
   try {
     await setWord(word.value)
-    buttonState.value = 'waiting'
+    localRoundStore.enterWordModalWaiting = true
   } catch (error) {
     console.error('Error submitting word:', error)
     // TODO: Handle error
@@ -69,7 +71,7 @@ const handleConfirmButton = async () => {
       v-model="word"
       maxlength="5"
       class="word-input"
-      :disabled="buttonState !== 'entering-word'"
+      :disabled="localRoundStore.enterWordModalWaiting"
       @keydown.enter="handleConfirmButton"
       @input="handleWordInput"
     />
@@ -85,10 +87,10 @@ const handleConfirmButton = async () => {
       :disabled="
         word.length !== 5 ||
         !isWordInDictionary(word) ||
-        buttonState === 'waiting'
+        localRoundStore.enterWordModalWaiting
       "
       :class="{
-        waiting: buttonState === 'waiting',
+        waiting: localRoundStore.enterWordModalWaiting,
       }"
     />
   </modal>

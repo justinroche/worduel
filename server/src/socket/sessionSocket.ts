@@ -1,12 +1,14 @@
-const sessionController = require('../controllers/sessionController');
-const {
+import sessionController from '../controllers/sessionController.js';
+import { Server as IOServer, Socket as IOSocket } from 'socket.io';
+import { Word, Session } from '../models/sessionModel.js';
+import {
   logEvent,
   logInfo,
   logAction,
   logError,
-} = require('../logging/loggingUtils');
+} from '../logging/loggingUtils.js';
 
-module.exports = (socket, io) => {
+export default (socket: IOSocket, io: IOServer) => {
   /* Session and lobby events */
   // Create session -> called when player hosts a game
   socket.on('createSession', async (uuid, callback) => {
@@ -28,8 +30,8 @@ module.exports = (socket, io) => {
 
       logAction('Created session: ' + session.sessionCode);
       callback();
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       callback(error.message);
     }
   });
@@ -92,19 +94,34 @@ module.exports = (socket, io) => {
           // Join the room for the session
           socket.join(sessionCode);
 
-          // Get the current word
+          // Get words
           const currentGame = session.games[session.currentRound - 1];
-          const currentWord = currentGame.words.filter(
-            (word) => word.wordSetter !== 1
+          const wordThisPlayerIsGuessing = currentGame.words.filter(
+            (word: Word) => word.wordSetter === 2
           )[0];
+          const wordThisPlayerSet = currentGame.words.filter(
+            (word: Word) => word.wordSetter === 1
+          )[0];
+
+          console.log(currentGame.words);
+
+          // Emit local round state if words have been set
+          if (wordThisPlayerIsGuessing) {
+            socket.emit(
+              'rejoinSetWordThisPlayerIsGuessingLocalRoundState',
+              wordThisPlayerIsGuessing.guesses,
+              wordThisPlayerIsGuessing.results
+            );
+          }
+          if (wordThisPlayerSet) {
+            socket.emit(
+              'rejoinSetWordThisPlayerSetLocalRoundState',
+              wordThisPlayerSet.word
+            );
+          }
 
           // Emit the session, host status, and rejoin event
           socket.emit('setSession', session);
-          socket.emit(
-            'rejoinSetLocalRoundState',
-            currentWord.guesses,
-            currentWord.results
-          );
           socket.emit('setPlayerIsHost', true);
           socket.emit('goToGameView');
           io.to(sessionCode).emit('opponentRejoined');
@@ -120,19 +137,35 @@ module.exports = (socket, io) => {
           // Join the room for the session
           socket.join(sessionCode);
 
-          // Get the current word
+          // Get words
           const currentGame = session.games[session.currentRound - 1];
-          const currentWord = currentGame.words.filter(
-            (word) => word.wordSetter !== 2
+          const wordThisPlayerIsGuessing = currentGame.words.filter(
+            (word: Word) => word.wordSetter === 1
+          )[0];
+          const wordThisPlayerSet = currentGame.words.filter(
+            (word: Word) => word.wordSetter === 2
           )[0];
 
+          console.log(currentGame.words);
+
+          // Emit local round state if words have been set
+          if (wordThisPlayerIsGuessing) {
+            socket.emit(
+              'rejoinSetWordThisPlayerIsGuessingLocalRoundState',
+              wordThisPlayerIsGuessing.guesses,
+              wordThisPlayerIsGuessing.results
+            );
+          }
+          if (wordThisPlayerSet) {
+            console.log('setting word this player set');
+
+            socket.emit(
+              'rejoinSetWordThisPlayerSetLocalRoundState',
+              wordThisPlayerSet.word
+            );
+          }
           // Emit the session, player 2 status, and rejoin event
           socket.emit('setSession', session);
-          socket.emit(
-            'rejoinSetLocalRoundState',
-            currentWord.guesses,
-            currentWord.results
-          );
           socket.emit('setPlayerIsHost', false);
           socket.emit('goToGameView');
           io.to(sessionCode).emit('opponentRejoined');
@@ -143,8 +176,8 @@ module.exports = (socket, io) => {
           throw new Error('UUID does not match either player');
         }
       }
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       callback(error.message);
     }
   });
@@ -154,8 +187,8 @@ module.exports = (socket, io) => {
     try {
       logEvent('User exited session ' + sessionCode);
 
-      // Leave all rooms
-      socket.leaveAll();
+      // Leave room
+      socket.leave(sessionCode);
 
       let session = await sessionController.getSessionFromCode(sessionCode);
 
@@ -185,8 +218,8 @@ module.exports = (socket, io) => {
       }
 
       callback();
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       callback(error.message);
     }
   });
@@ -203,8 +236,8 @@ module.exports = (socket, io) => {
       io.to(sessionCode).emit('goToGameView');
       logAction('Started game ' + sessionCode);
       callback();
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       callback(error.message);
     }
   });
@@ -217,15 +250,15 @@ module.exports = (socket, io) => {
       io.to(sessionCode).emit('removePlayer2');
       logAction('Kicked player 2 from ' + sessionCode);
       callback();
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       callback(error.message);
     }
   });
 
   // Leave room -> called when player exits the lobby
-  socket.on('leaveRoom', (callback) => {
-    socket.leaveAll();
+  socket.on('leaveRoom', (sessionCode, callback) => {
+    socket.leave(sessionCode);
     callback();
   });
 
@@ -234,14 +267,13 @@ module.exports = (socket, io) => {
     'updateGameOption',
     async ([option, value, sessionCode], callback) => {
       try {
-        logEvent('Host updated game option ' + option + ' to ' + value);
         let session = await sessionController.updateSession(sessionCode, {
           [option]: value,
         });
         io.to(sessionCode).emit('setSession', session);
         callback();
-      } catch (error) {
-        logError(error);
+      } catch (error: any) {
+        logError(error.message);
         callback(error.message);
       }
     }
@@ -251,9 +283,6 @@ module.exports = (socket, io) => {
   // Set word -> called when player sets a word
   socket.on('setWord', async ([word, playerNumber, sessionCode], callback) => {
     try {
-      logEvent(
-        'Player ' + playerNumber + ' set word ' + word + ' in ' + sessionCode
-      );
       let session = await sessionController.getSessionFromCode(sessionCode);
       const currentGame = session.games[session.currentRound - 1];
 
@@ -278,8 +307,8 @@ module.exports = (socket, io) => {
 
       io.to(sessionCode).emit('setSession', session);
       callback();
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       callback(error.message);
     }
   });
@@ -289,20 +318,15 @@ module.exports = (socket, io) => {
     'madeGuess',
     async ([guess, results, playerNumber, sessionCode], callback) => {
       try {
-        logEvent(
-          'Player ' +
-            playerNumber +
-            ' guessed ' +
-            guess +
-            ' in game ' +
-            sessionCode
-        );
-
         let session = await sessionController.getSessionFromCode(sessionCode);
         const currentGame = session.games[session.currentRound - 1];
         const currentWord = currentGame.words.find(
-          (word) => word.wordSetter !== playerNumber
+          (word: Word) => word.wordSetter !== playerNumber
         );
+
+        if (!currentWord || !currentWord.guesses || !currentWord.results) {
+          throw new Error("Player's word not found");
+        }
 
         // Push the guess and results
         currentWord.guesses[currentWord.results.length] = guess;
@@ -316,7 +340,7 @@ module.exports = (socket, io) => {
             currentWord.guessedIn = currentWord.results.length;
           } else currentWord.guessedIn = 7;
 
-          if (currentGame.words.every((word) => word.guessingComplete)) {
+          if (currentGame.words.every((word: Word) => word.guessingComplete)) {
             currentGame.state = 'complete';
           }
         }
@@ -328,8 +352,8 @@ module.exports = (socket, io) => {
         io.to(sessionCode).emit('setSession', session);
 
         callback();
-      } catch (error) {
-        logError(error);
+      } catch (error: any) {
+        logError(error.message);
         callback(error.message);
       }
     }
@@ -338,7 +362,6 @@ module.exports = (socket, io) => {
   // Next round -> called when host moves to the next round
   socket.on('nextRound', async (sessionCode, callback) => {
     try {
-      logEvent('Moving to next round in game ' + sessionCode);
       let session = await sessionController.getSessionFromCode(sessionCode);
       session.currentRound += 1;
 
@@ -350,8 +373,8 @@ module.exports = (socket, io) => {
       io.to(sessionCode).emit('setSession', session);
 
       callback();
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       callback(error.message);
     }
   });
@@ -361,7 +384,7 @@ module.exports = (socket, io) => {
     try {
       logEvent('Game ' + sessionCode + ' completed');
 
-      session = await sessionController.updateSession(sessionCode, {
+      let session = await sessionController.updateSession(sessionCode, {
         state: 'complete',
       });
 
@@ -370,8 +393,8 @@ module.exports = (socket, io) => {
       io.to(sessionCode).emit('goToSummaryView');
 
       callback();
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       callback(error.message);
     }
   });
@@ -390,10 +413,13 @@ module.exports = (socket, io) => {
       }
       logInfo(
         'User sessions: ' +
-          Array.from(sessions, (session) => session.sessionCode)
+          Array.from(
+            sessions,
+            (session: { sessionCode: string }) => session.sessionCode
+          )
       );
 
-      sessions.forEach(async (session) => {
+      sessions.forEach(async (session: Session) => {
         const room = io.sockets.adapter.rooms.get(session.sessionCode);
         const numberOfClients = room ? room.size : 0;
         logInfo(
@@ -439,8 +465,8 @@ module.exports = (socket, io) => {
           );
         }
       });
-    } catch (error) {
-      logError(error);
+    } catch (error: any) {
+      logError(error.message);
       // No callback for disconnect events
     }
   });

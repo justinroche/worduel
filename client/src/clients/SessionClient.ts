@@ -33,7 +33,7 @@ export const initializeSessionClient = () => {
   // Session player management events
   socket.on('removePlayer2', async () => {
     if (!sessionStore.getPlayerIsHost) {
-      await enqueue(() => emitAsync('leaveRoom'))
+      await enqueue(() => emitAsync('leaveRoom', sessionStore.getSessionCode))
       router.push({ name: 'home' })
       homeErrorStore.setError('You were kicked from the lobby.')
     } else {
@@ -50,7 +50,7 @@ export const initializeSessionClient = () => {
   })
 
   socket.on(
-    'rejoinSetLocalRoundState',
+    'rejoinSetWordThisPlayerIsGuessingLocalRoundState',
     (guesses: string[], results: string[][]) => {
       localRoundStore.setGuesses(guesses.map((guess) => guess.split('')))
       localRoundStore.setResults(results)
@@ -60,6 +60,11 @@ export const initializeSessionClient = () => {
       })
     }
   )
+
+  socket.on('rejoinSetWordThisPlayerSetLocalRoundState', (word: string) => {
+    localRoundStore.setEnterWordModalWord(word)
+    localRoundStore.setEnterWordModalWaiting(true)
+  })
 
   socket.on('goToLobbyView', () => {
     router.push({ name: 'lobby' })
@@ -145,5 +150,7 @@ export const endGame = async () => {
 
 export const leaveRoom = async () => {
   sessionStore.playerIsHost = false
-  return await enqueue(() => emitAsync('leaveRoom'))
+  return await enqueue(() =>
+    emitAsync('leaveRoom', sessionStore.getSessionCode)
+  )
 }

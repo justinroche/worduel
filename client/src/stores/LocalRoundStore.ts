@@ -19,6 +19,8 @@ export const useLocalRoundStore = defineStore('localRound', () => {
   const letterLabels = ref<string[][]>(
     letters.map((row) => row.map(() => 'unused'))
   )
+  const enterWordModalWord = ref('')
+  const enterWordModalWaiting = ref(false)
 
   // Setters
   const setGuesses = (newGuesses: string[][]) => {
@@ -36,6 +38,12 @@ export const useLocalRoundStore = defineStore('localRound', () => {
   const setLetterLabels = (newLetterLabels: string[][]) => {
     letterLabels.value = newLetterLabels
   }
+  const setEnterWordModalWord = (word: string) => {
+    enterWordModalWord.value = word
+  }
+  const setEnterWordModalWaiting = (value: boolean) => {
+    enterWordModalWaiting.value = value
+  }
 
   // Actions
   const reset = () => {
@@ -46,6 +54,8 @@ export const useLocalRoundStore = defineStore('localRound', () => {
     currentLetter.value = 0
     currentRow.value = 0
     letterLabels.value = letters.map((row) => row.map(() => 'unused'))
+    enterWordModalWord.value = ''
+    enterWordModalWaiting.value = false
   }
 
   const updateLetterLabels = (guessedLetters: string[], results: string[]) => {
@@ -81,6 +91,8 @@ export const useLocalRoundStore = defineStore('localRound', () => {
     currentRow,
     letters,
     letterLabels,
+    enterWordModalWord,
+    enterWordModalWaiting,
     // Setters
     setGuesses,
     setResults,
@@ -88,6 +100,8 @@ export const useLocalRoundStore = defineStore('localRound', () => {
     setCurrentRow,
     setLetterLabels,
     updateLetterLabels,
+    setEnterWordModalWord,
+    setEnterWordModalWaiting,
     // Actions
     reset,
   }
