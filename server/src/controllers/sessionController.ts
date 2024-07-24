@@ -3,7 +3,7 @@ import SessionModel, { Session } from '../models/sessionModel.js';
 const generateSessionCode = (): string => {
   const characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
   let code = '';
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     code += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return code;

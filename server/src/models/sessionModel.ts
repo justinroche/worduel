@@ -54,7 +54,7 @@ const gameSchema = new mongoose.Schema<Game>({
 });
 
 const sessionSchema = new mongoose.Schema<Session>({
-  sessionCode: { type: String, required: true, length: 5, unique: true },
+  sessionCode: { type: String, required: true, length: 4, unique: true },
   player1Name: { type: String, default: 'Player 1' },
   player2Name: { type: String, default: 'Player 2' },
   player1UUID: { type: String, default: '' },

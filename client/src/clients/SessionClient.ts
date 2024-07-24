@@ -113,8 +113,8 @@ export const joinSession = async (sessionCode: string) => {
     router.push({ name: 'home' })
     return
   }
-  if (sessionCode.length !== 5) {
-    homeErrorStore.setError('Game code must be 5 characters long.')
+  if (sessionCode.length !== 4) {
+    homeErrorStore.setError('Game code must be 4 characters long.')
     router.push({ name: 'home' })
     return
   }

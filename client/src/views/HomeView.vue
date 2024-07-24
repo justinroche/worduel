@@ -59,8 +59,8 @@ const handleJoinButton = async () => {
     homeErrorStore.setError('Please enter a game code.')
     return
   }
-  if (joinCode.value.length !== 5) {
-    homeErrorStore.setError('Game code must be 5 characters.')
+  if (joinCode.value.length !== 4) {
+    homeErrorStore.setError('Game code must be 4 characters.')
     return
   }
   joinButtonLoading.value = true
