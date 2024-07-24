@@ -103,8 +103,6 @@ export default (socket: IOSocket, io: IOServer) => {
             (word: Word) => word.wordSetter === 1
           )[0];
 
-          console.log(currentGame.words);
-
           // Emit local round state if words have been set
           if (wordThisPlayerIsGuessing) {
             socket.emit(
@@ -146,8 +144,6 @@ export default (socket: IOSocket, io: IOServer) => {
             (word: Word) => word.wordSetter === 2
           )[0];
 
-          console.log(currentGame.words);
-
           // Emit local round state if words have been set
           if (wordThisPlayerIsGuessing) {
             socket.emit(
@@ -157,8 +153,6 @@ export default (socket: IOSocket, io: IOServer) => {
             );
           }
           if (wordThisPlayerSet) {
-            console.log('setting word this player set');
-
             socket.emit(
               'rejoinSetWordThisPlayerSetLocalRoundState',
               wordThisPlayerSet.word
