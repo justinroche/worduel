@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import router from '../router'
 import InfoBox from '../components/boxes/InfoBox.vue'
 import HelpBoxContent from '../components/boxes/HelpBoxContent.vue'
 import InfoBoxContent from '../components/boxes/InfoBoxContent.vue'
@@ -9,7 +8,7 @@ import ConnectionErrorBox from '../components/boxes/ConnectionErrorBox.vue'
 import HomeErrorBox from '../components/boxes/HomeErrorBox.vue'
 import { createSession, joinSession } from '../clients/SessionClient'
 import { useHomeErrorStore } from '../stores/HomeErrorStore'
-import { useSessionStore } from '../stores/SessionStore'
+import { useCurrentViewStore } from '../stores/CurrentViewStore'
 
 const joinCode = ref('')
 const showInfoBox = ref(false)
@@ -19,7 +18,7 @@ const hostButtonLoading = ref(false)
 const joinButtonLoading = ref(false)
 
 const homeErrorStore = useHomeErrorStore()
-const sessionStore = useSessionStore()
+const currentViewStore = useCurrentViewStore()
 
 // Convert game code to uppercase
 watch(joinCode, (newValue) => {
@@ -42,10 +41,7 @@ const handleHostButton = async () => {
   hostButtonLoading.value = true
   try {
     await createSession()
-    router.push({
-      name: 'lobby',
-      params: { gameCode: sessionStore.getSessionCode },
-    })
+    currentViewStore.setCurrentView('lobby')
   } catch (error) {
     console.error('Error creating session:', error)
     homeErrorStore.setError('Failed to create session.')

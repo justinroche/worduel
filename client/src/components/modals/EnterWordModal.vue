@@ -9,7 +9,7 @@ import { setWord } from '../../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const localRoundStore = useLocalRoundStore()
-const currentRound = computed(() => sessionStore.getCurrentRound)
+const currentRound = computed(() => sessionStore.session.currentRound)
 
 const confirmButtonLoading = ref(false)
 

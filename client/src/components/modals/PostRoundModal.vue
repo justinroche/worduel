@@ -9,7 +9,7 @@ import ResultTables from '../ResultTables.vue'
 
 const sessionStore = useSessionStore()
 
-const currentRound = computed(() => sessionStore.getCurrentRound)
+const currentRound = computed(() => sessionStore.session.currentRound)
 const numberOfRounds = computed(() => sessionStore.session.rounds)
 
 const nextRoundButtonLoading = ref(false)
@@ -37,7 +37,7 @@ const handleViewGameSummaryButton = async () => {
       <scoreboard />
     </div>
     <menu-button
-      v-if="sessionStore.getPlayerIsHost && currentRound < numberOfRounds"
+      v-if="sessionStore.playerIsHost && currentRound < numberOfRounds"
       buttonText="Next Round"
       fontSize="1rem"
       buttonWidth="250px"
@@ -47,7 +47,7 @@ const handleViewGameSummaryButton = async () => {
       :loading="nextRoundButtonLoading"
     />
     <menu-button
-      v-else-if="sessionStore.getPlayerIsHost"
+      v-else-if="sessionStore.playerIsHost"
       buttonText="View Game Summary"
       fontSize="1rem"
       buttonWidth="250px"

@@ -5,10 +5,10 @@ import { getScoreFromGuessCount, getTotalScore } from '../utils/gameUtils'
 
 const sessionStore = useSessionStore()
 
-const player1Name = computed(() => sessionStore.getPlayer1Name)
-const player2Name = computed(() => sessionStore.getPlayer2Name)
-const numberOfRounds = computed(() => sessionStore.getRounds)
-const games = computed(() => sessionStore.getGames)
+const player1Name = computed(() => sessionStore.session.player1Name)
+const player2Name = computed(() => sessionStore.session.player2Name)
+const numberOfRounds = computed(() => sessionStore.session.rounds)
+const games = computed(() => sessionStore.session.games)
 
 const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
   if (

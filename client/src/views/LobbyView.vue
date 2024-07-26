@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import router from '../router'
+import { ref } from 'vue'
 import LobbyPlayersSection from '../components/lobby/LobbyPlayersSection.vue'
 import LobbyGameOptionsSection from '../components/lobby/LobbyGameOptionsSection.vue'
 import HeaderBanner from '../components/HeaderBanner.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { useSessionStore } from '../stores/SessionStore'
-import { startGame, exitSession, joinSession } from '../clients/SessionClient'
+import { useCurrentViewStore } from '../stores/CurrentViewStore'
+import { startGame, exitSession } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
-const route = useRoute()
+const currentViewStore = useCurrentViewStore()
 
-const sessionCode = computed(() => sessionStore.session.sessionCode)
-const playerIsHost = computed(() => sessionStore.playerIsHost)
-const player2Connected = computed(() => sessionStore.session.player2Connected)
 const startGameButtonLoading = ref(false)
 const exitGameButtonLoading = ref(false)
 
@@ -33,8 +29,8 @@ const handleStartGameButtonClicked = async () => {
 const handleExitLobbyButtonClicked = async () => {
   exitGameButtonLoading.value = true
   try {
-    await exitSession(playerIsHost.value ? 1 : 2)
-    router.push({ name: 'home' })
+    await exitSession(sessionStore.playerIsHost ? 1 : 2)
+    currentViewStore.setCurrentView('home')
   } catch (error) {
     console.error('Error exiting session:', error)
     // TODO: Show error message
@@ -42,17 +38,6 @@ const handleExitLobbyButtonClicked = async () => {
     exitGameButtonLoading.value = false
   }
 }
-
-onMounted(async () => {
-  if (sessionStore.getSessionCode) {
-    return
-  }
-  const gameCode = route.params.gameCode as string
-  if (!gameCode) {
-    router.push({ name: 'home' })
-  }
-  await joinSession(gameCode.toUpperCase())
-})
 </script>
 
 <template>
@@ -61,8 +46,10 @@ onMounted(async () => {
     <div class="top-row">
       <div class="lobby-section">
         <h2 class="game-code-header">Game Code</h2>
-        <p class="session-code">{{ sessionCode }}</p>
-        <p class="session-link">playworduel.com/join/{{ sessionCode }}</p>
+        <p class="session-code">{{ sessionStore.session.sessionCode }}</p>
+        <p class="session-link">
+          playworduel.com/join/{{ sessionStore.session.sessionCode }}
+        </p>
       </div>
       <div class="players-section">
         <lobby-players-section />
@@ -74,7 +61,7 @@ onMounted(async () => {
       </div>
       <div class="host-buttons-section">
         <menu-button
-          v-if="playerIsHost"
+          v-if="sessionStore.playerIsHost"
           buttonText="Start Game"
           fontSize="1rem"
           buttonWidth="250px"
@@ -82,7 +69,7 @@ onMounted(async () => {
           buttonStyle="primary"
           class="start-button"
           @click="handleStartGameButtonClicked"
-          :disabled="!player2Connected"
+          :disabled="!sessionStore.session.player2Connected"
           :loading="startGameButtonLoading"
         />
         <div v-else>

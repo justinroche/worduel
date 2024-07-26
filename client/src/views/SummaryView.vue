@@ -8,16 +8,17 @@ import Scoreboard from '../components/Scoreboard.vue'
 import LobbyGameOptionsSection from '../components/lobby/LobbyGameOptionsSection.vue'
 import RoundSummary from '../components/RoundSummary.vue'
 import HeaderBanner from '../components/HeaderBanner.vue'
-import router from '../router'
+import { useCurrentViewStore } from '../stores/CurrentViewStore'
 
 const sessionStore = useSessionStore()
+const currentViewStore = useCurrentViewStore()
 
 const exitButtonLoading = ref(false)
 
 const handleExitButton = async () => {
   exitButtonLoading.value = true
   await leaveRoom()
-  router.push({ name: 'home' })
+  currentViewStore.setCurrentView('home')
   exitButtonLoading.value = false
 }
 
@@ -55,7 +56,7 @@ const winningPlayerName = computed(() => {
       </div>
       <div class="rightContainer">
         <div
-          v-for="(round, index) in sessionStore.getRounds"
+          v-for="(round, index) in sessionStore.session.rounds"
           :key="index"
           class="roundSummary"
         >

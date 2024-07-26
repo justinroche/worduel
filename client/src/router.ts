@@ -1,38 +1,39 @@
-import {
-  createWebHistory,
-  createRouter,
-  RouteRecordRaw,
-  RouteLocation,
-} from 'vue-router'
-
-import GameView from './views/GameView.vue'
-import HomeView from './views/HomeView.vue'
-import LobbyView from './views/LobbyView.vue'
-import SummaryView from './views/SummaryView.vue'
+import { createWebHistory, createRouter, RouteRecordRaw } from 'vue-router'
+import ViewOrganizer from './views/ViewOrganizer.vue'
+import { useCurrentViewStore } from './stores/CurrentViewStore'
+import { joinSession } from './clients/SessionClient'
 
 const routes: Array<RouteRecordRaw> = [
-  { path: '/', name: 'home', component: HomeView },
   {
-    path: '/lobby/:gameCode',
-    name: 'lobby',
-    component: LobbyView,
+    path: '/',
+    name: 'view',
+    component: ViewOrganizer,
   },
-  { path: '/play/:gameCode', name: 'play', component: GameView },
-  { path: '/summary/:gameCode', name: 'summary', component: SummaryView },
   {
     path: '/join/:gameCode',
-    redirect: (to: RouteLocation) => {
-      const { gameCode } = to.params as { gameCode: string }
-      return { name: 'lobby', params: { gameCode } }
+    name: 'join',
+    component: ViewOrganizer,
+    beforeEnter: async (to, from, next) => {
+      const currentViewStore = useCurrentViewStore()
+      currentViewStore.loading = true
+
+      try {
+        await joinSession((to.params.gameCode as string).toUpperCase())
+      } catch (error) {
+        // TODO: Handle error
+      } finally {
+        next({ name: 'view' })
+        currentViewStore.loading = false
+      }
     },
   },
-  // Catch-all route to redirect to home
-  { path: '/:catchAll(.*)', redirect: { name: 'home' } },
+  {
+    path: '/:catchAll(.*)',
+    redirect: '/',
+  },
 ]
 
-const router = createRouter({
+export default createRouter({
   history: createWebHistory(),
   routes,
 })
-
-export default router

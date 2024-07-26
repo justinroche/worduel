@@ -1,7 +1,6 @@
 <script setup lang="ts">
 /* Imports */
-import { onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted } from 'vue'
 import GameTable from '../components/gameBoard/GameTable.vue'
 import Keyboard from '../components/gameBoard/Keyboard.vue'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
@@ -11,31 +10,16 @@ import EnterWordBox from '../components/modals/EnterWordModal.vue'
 import WaitingForOpponentModal from '../components/modals/WaitingForOpponentModal.vue'
 import PostRoundModal from '../components/modals/PostRoundModal.vue'
 import HeaderBanner from '../components/HeaderBanner.vue'
-import { joinSession, madeGuess } from '../clients/SessionClient'
-import router from '../router'
-
+import { madeGuess } from '../clients/SessionClient'
 const sessionStore = useSessionStore()
 const localRoundStore = useLocalRoundStore()
-const route = useRoute()
-
-onMounted(async () => {
-  window.addEventListener('keydown', handleKeyPress)
-  if (sessionStore.getSessionCode) {
-    return
-  }
-  const gameCode = route.params.gameCode as string
-  if (!gameCode) {
-    router.push({ name: 'home' })
-    return
-  }
-  await joinSession(gameCode.toUpperCase())
-})
 
 /* Computed state */
 const playerNumber = computed(() => (sessionStore.playerIsHost ? 1 : 2))
-const currentRound = computed(() => sessionStore.getCurrentRound)
 const currentGame = computed(() =>
-  sessionStore.getGames ? sessionStore.getGames[currentRound.value - 1] : null
+  sessionStore.session.games
+    ? sessionStore.session.games[sessionStore.session.currentRound - 1]
+    : null
 )
 
 const currentWords = computed(() => currentGame.value?.words)
@@ -132,10 +116,14 @@ function getResults(guess: string[], secretWord: string) {
 
   return results
 }
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyPress)
+})
 </script>
 
 <template>
-  <header-banner :title="'Round ' + currentRound" />
+  <header-banner :title="'Round ' + sessionStore.session.currentRound" />
   <div v-if="currentGame?.state === 'setting word'">
     <enter-word-box />
   </div>

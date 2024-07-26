@@ -2,16 +2,17 @@ import { useSessionStore } from '../stores/SessionStore'
 import { useLocalRoundStore } from '../stores/LocalRoundStore'
 import { useHomeErrorStore } from '../stores/HomeErrorStore'
 import { usePlayerStateStore } from '../stores/PlayerStateStore'
+import { useCurrentViewStore } from '../stores/CurrentViewStore'
 
 import { Session } from '../types/Session'
 import { emitAsync, enqueue } from '../utils/socketUtils'
 import socket from '../socket'
-import router from '../router'
 
 let sessionStore: ReturnType<typeof useSessionStore>
 let localRoundStore: ReturnType<typeof useLocalRoundStore>
 let homeErrorStore: ReturnType<typeof useHomeErrorStore>
 let playerStateStore: ReturnType<typeof usePlayerStateStore>
+let currentViewStore: ReturnType<typeof useCurrentViewStore>
 
 export const initializeSessionClient = () => {
   /* Initialize stores */
@@ -19,6 +20,7 @@ export const initializeSessionClient = () => {
   localRoundStore = useLocalRoundStore()
   homeErrorStore = useHomeErrorStore()
   playerStateStore = usePlayerStateStore()
+  currentViewStore = useCurrentViewStore()
 
   /* Socket events */
   // Session state events
@@ -32,9 +34,11 @@ export const initializeSessionClient = () => {
 
   // Session player management events
   socket.on('removePlayer2', async () => {
-    if (!sessionStore.getPlayerIsHost) {
-      await enqueue(() => emitAsync('leaveRoom', sessionStore.getSessionCode))
-      router.push({ name: 'home' })
+    if (!sessionStore.playerIsHost) {
+      await enqueue(() =>
+        emitAsync('leaveRoom', sessionStore.session.sessionCode)
+      )
+      currentViewStore.setCurrentView('home')
       homeErrorStore.setError('You were kicked from the lobby.')
     } else {
       sessionStore.session.player2Connected = false
@@ -67,28 +71,19 @@ export const initializeSessionClient = () => {
   })
 
   socket.on('goToHomeView', () => {
-    router.push({ name: 'home' })
+    currentViewStore.setCurrentView('home')
   })
 
   socket.on('goToLobbyView', () => {
-    router.push({
-      name: 'lobby',
-      params: { gameCode: sessionStore.getSessionCode },
-    })
+    currentViewStore.setCurrentView('lobby')
   })
 
   socket.on('goToGameView', () => {
-    router.push({
-      name: 'play',
-      params: { gameCode: sessionStore.getSessionCode },
-    })
+    currentViewStore.setCurrentView('game')
   })
 
   socket.on('goToSummaryView', () => {
-    router.push({
-      name: 'summary',
-      params: { gameCode: sessionStore.getSessionCode },
-    })
+    currentViewStore.setCurrentView('summary')
   })
 }
 
@@ -96,7 +91,11 @@ export const initializeSessionClient = () => {
 export const updateGameOption = (option: keyof Session, value: any) => {
   ;(sessionStore.session as any)[option] = value
   return enqueue(() =>
-    emitAsync('updateGameOption', [option, value, sessionStore.getSessionCode])
+    emitAsync('updateGameOption', [
+      option,
+      value,
+      sessionStore.session.sessionCode,
+    ])
   )
 }
 
@@ -110,12 +109,12 @@ export const createSession = async () => {
 export const joinSession = async (sessionCode: string) => {
   if (sessionCode.length === 0) {
     homeErrorStore.setError('Please enter a game code.')
-    router.push({ name: 'home' })
+    currentViewStore.setCurrentView('home')
     return
   }
   if (sessionCode.length !== 4) {
     homeErrorStore.setError('Game code must be 4 characters long.')
-    router.push({ name: 'home' })
+    currentViewStore.setCurrentView('home')
     return
   }
   return await enqueue(() =>
@@ -125,55 +124,57 @@ export const joinSession = async (sessionCode: string) => {
 
 export const exitSession = async (playerNumber: 1 | 2) => {
   return await enqueue(() =>
-    emitAsync('exitSession', [playerNumber, sessionStore.getSessionCode])
+    emitAsync('exitSession', [playerNumber, sessionStore.session.sessionCode])
   )
 }
 
 export const kickPlayer2 = async () => {
   return await enqueue(() =>
-    emitAsync('kickPlayer2', sessionStore.getSessionCode)
+    emitAsync('kickPlayer2', sessionStore.session.sessionCode)
   )
 }
 
 // Game functions
 export const startGame = async () => {
   return await enqueue(() =>
-    emitAsync('startGame', sessionStore.getSessionCode)
+    emitAsync('startGame', sessionStore.session.sessionCode)
   )
 }
 
 export const setWord = async (word: string) => {
-  const playerNumber = sessionStore.getPlayerIsHost ? 1 : 2
+  const playerNumber = sessionStore.playerIsHost ? 1 : 2
   return await enqueue(() =>
-    emitAsync('setWord', [word, playerNumber, sessionStore.getSessionCode])
+    emitAsync('setWord', [word, playerNumber, sessionStore.session.sessionCode])
   )
 }
 
 export const madeGuess = async (guess: string, results: string[]) => {
-  const playerNumber = sessionStore.getPlayerIsHost ? 1 : 2
+  const playerNumber = sessionStore.playerIsHost ? 1 : 2
   return await enqueue(() =>
     emitAsync('madeGuess', [
       guess,
       results,
       playerNumber,
-      sessionStore.getSessionCode,
+      sessionStore.session.sessionCode,
     ])
   )
 }
 
 export const nextRound = async () => {
   return await enqueue(() =>
-    emitAsync('nextRound', sessionStore.getSessionCode)
+    emitAsync('nextRound', sessionStore.session.sessionCode)
   )
 }
 
 export const endGame = async () => {
-  return await enqueue(() => emitAsync('endGame', sessionStore.getSessionCode))
+  return await enqueue(() =>
+    emitAsync('endGame', sessionStore.session.sessionCode)
+  )
 }
 
 export const leaveRoom = async () => {
   sessionStore.playerIsHost = false
   return await enqueue(() =>
-    emitAsync('leaveRoom', sessionStore.getSessionCode)
+    emitAsync('leaveRoom', sessionStore.session.sessionCode)
   )
 }

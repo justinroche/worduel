@@ -8,9 +8,10 @@ const props = defineProps<{
 }>()
 
 const sessionStore = useSessionStore()
+
 const playerIsHost = computed(() => sessionStore.playerIsHost)
 const rounds = computed(() => sessionStore.session.rounds)
-const MAX_ROUNDS = sessionStore.getMaxRounds
+const MAX_ROUNDS = sessionStore.MAX_ROUNDS
 
 const spellCheckEnabled = computed(() => sessionStore.session.spellCheckEnabled)
 const blockProfanityEnabled = computed(

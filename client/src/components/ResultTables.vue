@@ -18,7 +18,7 @@ const sessionStore = useSessionStore()
 const player1Name = computed(() => sessionStore.session.player1Name)
 const player2Name = computed(() => sessionStore.session.player2Name)
 
-const words = computed(() => sessionStore.getGames[props.round - 1].words)
+const words = computed(() => sessionStore.session.games[props.round - 1].words)
 
 const wordThatPlayer1Guessed = computed(
   () => words.value.filter((word) => word.wordSetter === 2)[0]

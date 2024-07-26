@@ -8,7 +8,7 @@ export const getScoreFromGuessCount = (guessedIn: number): number => {
 export const getRoundScore = (round: number, playerNumber: 1 | 2): number => {
   const sessionStore = useSessionStore()
 
-  const games = computed(() => sessionStore.getGames)
+  const games = computed(() => sessionStore.session.games)
 
   if (
     games.value[round - 1].words.filter(
@@ -28,7 +28,7 @@ export const getRoundScore = (round: number, playerNumber: 1 | 2): number => {
 export const getTotalScore = (playerNumber: 1 | 2) => {
   const sessionStore = useSessionStore()
 
-  const numberOfRounds = computed(() => sessionStore.getRounds)
+  const numberOfRounds = computed(() => sessionStore.session.rounds)
 
   let total = 0
   for (let i = 0; i < numberOfRounds.value; i++) {

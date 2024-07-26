@@ -4,12 +4,12 @@ import { useSessionStore } from '../stores/SessionStore'
 import GameTable from './gameBoard/GameTable.vue'
 
 const sessionStore = useSessionStore()
-const currentRound = computed(() => sessionStore.getCurrentRound)
-const opponentNumber = computed(() => (sessionStore.getPlayerIsHost ? 2 : 1))
+const currentRound = computed(() => sessionStore.session.currentRound)
+const opponentNumber = computed(() => (sessionStore.playerIsHost ? 2 : 1))
 
 const wordThatOpponentIsGuessing = computed(
   () =>
-    sessionStore.getGames[currentRound.value - 1].words.filter(
+    sessionStore.session.games[currentRound.value - 1].words.filter(
       (word) => word.wordSetter !== opponentNumber.value
     )[0]
 )
@@ -19,9 +19,9 @@ const wordThatOpponentIsGuessing = computed(
   <div class="table">
     <h3 class="player-name">
       {{
-        sessionStore.getPlayerIsHost
-          ? sessionStore.getPlayer2Name
-          : sessionStore.getPlayer1Name
+        sessionStore.playerIsHost
+          ? sessionStore.session.player2Name
+          : sessionStore.session.player1Name
       }}
     </h3>
     <game-table
