@@ -172,7 +172,7 @@ export default (socket: IOSocket, io: IOServer) => {
       }
     } catch (error: any) {
       logError(error.message);
-      socket.emit('goToHomeView')
+      socket.emit('goToHomeView');
       callback(error.message);
     }
   });
@@ -318,9 +318,16 @@ export default (socket: IOSocket, io: IOServer) => {
         const currentWord = currentGame.words.find(
           (word: Word) => word.wordSetter !== playerNumber
         );
+        const otherWord = currentGame.words.find(
+          (word: Word) => word.wordSetter === playerNumber
+        );
 
         if (!currentWord || !currentWord.guesses || !currentWord.results) {
           throw new Error("Player's word not found");
+        }
+
+        if (!otherWord || !otherWord.guesses || !otherWord.results) {
+          throw new Error("Opponent's word not found");
         }
 
         // Push the guess and results
@@ -331,12 +338,26 @@ export default (socket: IOSocket, io: IOServer) => {
         if (currentWord.word === guess || currentWord.results.length === 6) {
           currentWord.guessingComplete = true;
 
-          if (currentWord.word === guess) {
-            currentWord.guessedIn = currentWord.results.length;
-          } else currentWord.guessedIn = 7;
-
           if (currentGame.words.every((word: Word) => word.guessingComplete)) {
-            currentGame.state = 'complete';
+            if (
+              currentWord.results.length === 6 &&
+              currentWord.word !== currentWord.guesses[5]
+            ) {
+              currentWord.guessedIn = 7;
+            } else {
+              currentWord.guessedIn = currentWord.results.length;
+            }
+
+            if (
+              otherWord.results.length === 6 &&
+              otherWord.word !== otherWord.guesses[5]
+            ) {
+              otherWord.guessedIn = 7;
+            } else {
+              otherWord.guessedIn = otherWord.results.length;
+            }
+
+            if (otherWord.word) currentGame.state = 'complete';
           }
         }
 
