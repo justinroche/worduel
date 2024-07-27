@@ -9,8 +9,9 @@ import { useLocalRoundStore } from '../stores/LocalRoundStore'
 import EnterWordBox from '../components/modals/EnterWordModal.vue'
 import WaitingForOpponentModal from '../components/modals/WaitingForOpponentModal.vue'
 import PostRoundModal from '../components/modals/PostRoundModal.vue'
-import HeaderBanner from '../components/HeaderBanner.vue'
+import GameHeaderBanner from '../components/GameHeaderBanner.vue'
 import { madeGuess } from '../clients/SessionClient'
+
 const sessionStore = useSessionStore()
 const localRoundStore = useLocalRoundStore()
 
@@ -126,7 +127,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <header-banner :title="'Round ' + sessionStore.session.currentRound" />
+  <game-header-banner />
   <div v-if="currentGame?.state === 'setting word'">
     <enter-word-box />
   </div>

@@ -10,11 +10,21 @@ export const getRoundScore = (round: number, playerNumber: 1 | 2): number => {
 
   const games = computed(() => sessionStore.session.games)
 
+  console.log(games)
+
   if (
     games.value[round - 1].words.filter(
       (word) => word.wordSetter !== playerNumber
     ).length !== 0
   ) {
+    if (
+      games.value[round - 1].words.filter(
+        (word) => word.wordSetter !== playerNumber
+      )[0].guessedIn === undefined
+    ) {
+      return 0
+    }
+
     return getScoreFromGuessCount(
       games.value[round - 1].words.filter(
         (word) => word.wordSetter !== playerNumber
