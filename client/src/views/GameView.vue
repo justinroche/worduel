@@ -41,7 +41,10 @@ const handleKeyEvent = async (key: string) => {
       return
     } else {
       const guess = localRoundStore.guesses[localRoundStore.currentRow]
-      if (!isWordInDictionary(guess.join(''))) {
+      if (
+        !isWordInDictionary(guess.join('')) &&
+        sessionStore.session.spellCheckEnabled
+      ) {
         return
       }
 

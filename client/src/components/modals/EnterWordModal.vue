@@ -45,7 +45,10 @@ const handleConfirmButton = async () => {
 
   confirmButtonLoading.value = true
 
-  if (!isWordInDictionary(word.value)) {
+  if (
+    !isWordInDictionary(word.value) &&
+    sessionStore.session.spellCheckEnabled
+  ) {
     // TODO: Show error message
     confirmButtonLoading.value = false
     return
@@ -86,7 +89,7 @@ const handleConfirmButton = async () => {
       :loading="confirmButtonLoading"
       :disabled="
         word.length !== 5 ||
-        !isWordInDictionary(word) ||
+        (!isWordInDictionary(word) && sessionStore.session.spellCheckEnabled) ||
         localRoundStore.enterWordModalWaiting
       "
       :class="{
