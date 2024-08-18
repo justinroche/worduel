@@ -6,13 +6,16 @@ import Keyboard from '../components/gameBoard/Keyboard.vue'
 import { isWordInDictionary } from '../utils/dictionaryUtils'
 import { useSessionStore } from '../stores/SessionStore'
 import { useLocalRoundStore } from '../stores/LocalRoundStore'
+import { useGameBoxesStore } from '../stores/GameBoxesStore'
 import EnterWordBox from '../components/modals/EnterWordModal.vue'
 import WaitingForOpponentModal from '../components/modals/WaitingForOpponentModal.vue'
 import PostRoundModal from '../components/modals/PostRoundModal.vue'
 import GameHeaderBanner from '../components/GameHeaderBanner.vue'
+import DesktopScoreboardBox from '../components/boxes/DesktopScoreboardBox.vue'
 import { madeGuess } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
+const gameBoxesStore = useGameBoxesStore()
 const localRoundStore = useLocalRoundStore()
 
 /* Computed state */
@@ -128,6 +131,9 @@ onMounted(() => {
 
 <template>
   <game-header-banner />
+  <Transition name="slide-fade">
+    <desktop-scoreboard-box v-if="gameBoxesStore.showScoreboard" />
+  </Transition>
   <div v-if="currentGame?.state === 'setting word'">
     <enter-word-box />
   </div>
@@ -171,5 +177,15 @@ onMounted(() => {
 .keyboardContainer {
   position: absolute;
   bottom: 75px;
+}
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translate(-130%, -50%);
 }
 </style>

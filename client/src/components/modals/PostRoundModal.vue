@@ -34,7 +34,9 @@ const handleViewGameSummaryButton = async () => {
     <result-tables :round="currentRound" />
     <div class="scoreboard">
       <h3>Scoreboard</h3>
-      <scoreboard />
+      <div class="scoreboard-container">
+        <scoreboard />
+      </div>
     </div>
     <menu-button
       v-if="sessionStore.playerIsHost && currentRound < numberOfRounds"
@@ -61,6 +63,10 @@ const handleViewGameSummaryButton = async () => {
 </template>
 
 <style scoped>
+.scoreboard-container {
+  padding: 0 2.5rem;
+}
+
 .header {
   margin-top: 0;
 }

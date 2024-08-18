@@ -97,16 +97,31 @@ const player2TotalScore = computed(() => getTotalScore(2))
   color: #414d40;
 }
 
-.score-button {
-  margin-right: 50px;
-  font-family: inherit;
-  font-size: 1rem;
-}
-
 .icon-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
+}
+
+.score-button {
+  margin-right: 50px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: black;
+  border-radius: 0.25rem;
+  transition: border 0.1s ease;
+  border: 1px solid transparent;
+
+  box-sizing: border-box;
+  padding: 0.25rem 0.5rem;
+}
+
+.scores {
+  box-sizing: border-box;
+}
+
+.score-button:hover {
+  border: 1px solid black;
 }
 </style>

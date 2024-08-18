@@ -96,6 +96,7 @@ const winningPlayerName = computed(() => {
 }
 
 .leftBody {
+  width: 300px;
   padding: 1rem;
   border-radius: 0.25rem;
   border: 1px solid black;

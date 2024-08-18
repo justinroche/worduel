@@ -28,7 +28,7 @@ const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
 </script>
 
 <template>
-  <div>
+  <div class="scoreboard-container">
     <table class="scoreboard">
       <tr>
         <th class="first-col"></th>
@@ -65,9 +65,9 @@ const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
 <style scoped>
 .scoreboard {
   border-collapse: collapse;
-  min-width: 300px;
-  width: 300px;
+  table-layout: fixed;
   height: auto;
+  width: 100%;
 }
 
 .scoreboard th,
@@ -75,6 +75,10 @@ const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
   border: 1px solid black;
   padding: 4px;
   text-align: center;
+}
+
+.first-col {
+  width: 12%;
 }
 
 .scoreboard th:first-child,
@@ -98,7 +102,6 @@ const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
 .player-name {
   font-size: 1.1rem;
   line-height: 1rem;
-  width: 115px;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -111,21 +114,18 @@ tr {
   height: 40px;
 }
 
-.round-number {
+.round-number,
+.total-row,
+.score {
   font-weight: bold;
 }
 
 .score {
-  font-weight: bold;
   font-size: 1.25rem;
 }
 
 .in-progress {
   font-style: italic;
-}
-
-.total-row {
-  font-weight: bold;
 }
 
 .total-text {
