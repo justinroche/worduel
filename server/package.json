@@ -4,7 +4,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "build": "if exist .\\dist rmdir /s /q .\\dist && tsc && if not exist .\\dist\\config mkdir .\\dist\\config && copy .\\config\\.env .\\dist\\config\\",
+    "build": "if exist .\\dist rmdir /s /q .\\dist && tsc && mkdir .\\dist\\config && copy .\\src\\config\\.env .\\dist\\config\\ && mkdir .\\dist\\resources && npm run copy-resources",
     "copy-resources": "xcopy src\\resources dist\\resources /E /I",
     "start": "node dist/index.js"
   },

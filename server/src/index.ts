@@ -6,8 +6,13 @@ import { Server } from 'socket.io';
 import { logEvent, logError } from './logging/loggingUtils.js';
 import sessionSocket from './socket/sessionSocket.js';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config({ path: './config/.env' });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, './config/.env') });
 
 const app = express();
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 8080;
