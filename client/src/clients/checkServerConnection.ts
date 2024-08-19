@@ -1,5 +1,5 @@
 import { useConnectionStore } from '../stores/connection'
-import { server_host, server_port } from '../config.json'
+import { server_host, server_port } from '../../config.json'
 
 export const checkServerConnection = async () => {
   const connectionStore = useConnectionStore()
