@@ -2,7 +2,10 @@
 import { ref, computed } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
 import { useLocalRoundStore } from '../../stores/LocalRoundStore'
-import { isWordInDictionary } from '../../utils/dictionaryUtils'
+import {
+  isWordInDictionary,
+  isWordProfanity,
+} from '../../utils/dictionaryUtils'
 import MenuButton from '../MenuButton.vue'
 import Modal from './Modal.vue'
 import { setWord } from '../../clients/SessionClient'
@@ -54,6 +57,15 @@ const handleConfirmButton = async () => {
     return
   }
 
+  if (
+    isWordProfanity(word.value) &&
+    sessionStore.session.blockProfanityEnabled
+  ) {
+    // TODO: Show error message
+    confirmButtonLoading.value = false
+    return
+  }
+
   try {
     await setWord(word.value)
     localRoundStore.enterWordModalWaiting = true
@@ -90,6 +102,7 @@ const handleConfirmButton = async () => {
       :disabled="
         word.length !== 5 ||
         (!isWordInDictionary(word) && sessionStore.session.spellCheckEnabled) ||
+        (isWordProfanity(word) && sessionStore.session.blockProfanityEnabled) ||
         localRoundStore.enterWordModalWaiting
       "
       :class="{
