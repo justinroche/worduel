@@ -1,40 +1,40 @@
 <script setup lang="ts">
-import Scoreboard from '../Scoreboard.vue'
+import OpponentsTable from '../OpponentsTable.vue'
 import { useGameBoxesStore } from '../../stores/GameBoxesStore'
 
 const gameBoxesStore = useGameBoxesStore()
 </script>
 
 <template>
-  <div class="desktopScoreboardBox">
-    <h3>Scoreboard</h3>
+  <div class="desktopOpponentsTableBox">
+    <h3>Opponent's Guesses</h3>
     <div class="icon-wrapper">
       <button
-        @click="gameBoxesStore.handleToggleScoreboard"
+        @click="gameBoxesStore.handleToggleOpponentsGuesses"
         class="icon-button"
       >
         <font-awesome-icon
-          :icon="['fas', 'chevron-left']"
+          :icon="['fas', 'chevron-right']"
           size="2xl"
           class="fa-icon"
         />
       </button>
     </div>
-    <scoreboard />
+    <opponents-table />
   </div>
 </template>
 
 <style scoped>
-.desktopScoreboardBox {
+.desktopOpponentsTableBox {
   background-color: var(--floral-white);
   border: 1px solid black;
   border-radius: 0.25rem;
   padding: 1rem;
-  width: 350px;
+  width: 300px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
   position: fixed;
-  left: 20px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
 
@@ -47,7 +47,7 @@ const gameBoxesStore = useGameBoxesStore()
 .icon-wrapper {
   position: fixed;
   top: 1.05rem;
-  left: 1.5rem;
+  right: 1.5rem;
   display: flex;
   align-items: center;
 }

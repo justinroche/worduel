@@ -12,6 +12,7 @@ import WaitingForOpponentModal from '../components/modals/WaitingForOpponentModa
 import PostRoundModal from '../components/modals/PostRoundModal.vue'
 import GameHeaderBanner from '../components/GameHeaderBanner.vue'
 import DesktopScoreboardBox from '../components/boxes/DesktopScoreboardBox.vue'
+import DesktopOpponentsTableBox from '../components/boxes/DesktopOpponentsTableBox.vue'
 import { madeGuess } from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
@@ -131,8 +132,11 @@ onMounted(() => {
 
 <template>
   <game-header-banner />
-  <Transition name="slide-fade">
+  <Transition name="slide-fade-from-left">
     <desktop-scoreboard-box v-if="gameBoxesStore.showScoreboard" />
+  </Transition>
+  <Transition name="slide-fade-from-right">
+    <desktop-opponents-table-box v-if="gameBoxesStore.showOpponentsGuesses" />
   </Transition>
   <div v-if="currentGame?.state === 'setting word'">
     <enter-word-box />
@@ -179,13 +183,20 @@ onMounted(() => {
   bottom: 75px;
 }
 
-.slide-fade-enter-active,
-.slide-fade-leave-active {
+.slide-fade-from-left-enter-active,
+.slide-fade-from-left-leave-active,
+.slide-fade-from-right-enter-active,
+.slide-fade-from-right-leave-active {
   transition: all 0.5s ease;
 }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
+.slide-fade-from-left-enter-from,
+.slide-fade-from-left-leave-to {
   transform: translate(-130%, -50%);
+}
+
+.slide-fade-from-right-enter-from,
+.slide-fade-from-right-leave-to {
+  transform: translate(130%, -50%);
 }
 </style>
