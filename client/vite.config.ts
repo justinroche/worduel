@@ -5,7 +5,7 @@ import {
   server_host,
   client_port,
   server_port,
-} from './src/config.json'
+} from './config.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({
