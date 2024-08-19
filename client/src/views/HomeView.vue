@@ -129,7 +129,7 @@ const handleHelpButton = () => {
           @input="handleJoinCodeInput"
           @keydown="handleJoinCodeInput"
           placeholder="Enter code..."
-          maxlength="5"
+          maxlength="4"
           tabindex="2"
         />
         <menu-button
