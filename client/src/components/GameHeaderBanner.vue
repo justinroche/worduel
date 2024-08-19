@@ -27,7 +27,7 @@ const player2TotalScore = computed(() => getTotalScore(2))
       <h2 class="code">{{ sessionStore.session.sessionCode }}</h2>
     </div>
     <div class="banner-section center">
-      <h1 class="title">Round {{ sessionStore.session.currentRound + 1 }}</h1>
+      <h1 class="title">Round {{ sessionStore.session.currentRound }}</h1>
     </div>
     <div class="banner-section right">
       <button
