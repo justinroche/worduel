@@ -7,11 +7,16 @@ const sessionStore = useSessionStore()
 const currentRound = computed(() => sessionStore.session.currentRound)
 const opponentNumber = computed(() => (sessionStore.playerIsHost ? 2 : 1))
 
-const wordThatOpponentIsGuessing = computed(
-  () =>
-    sessionStore.session.games[currentRound.value - 1].words.filter(
-      (word) => word.wordSetter !== opponentNumber.value
-    )[0]
+const wordThatOpponentIsGuessing = computed(() =>
+  sessionStore.session.games[currentRound.value - 1].state !== 'setting word'
+    ? sessionStore.session.games[currentRound.value - 1].words.filter(
+        (word) => word.wordSetter !== opponentNumber.value
+      )[0]
+    : {
+        word: '',
+        guesses: [],
+        results: [],
+      }
 )
 </script>
 
@@ -25,16 +30,26 @@ const wordThatOpponentIsGuessing = computed(
       }}
     </h3>
     <game-table
+      v-if="
+        sessionStore.session.games[currentRound - 1].state !== 'setting word'
+      "
       :guesses="
         wordThatOpponentIsGuessing.guesses.map((guess) => guess.split(''))
       "
       :results="wordThatOpponentIsGuessing.results"
       :scale="2"
     />
-    <p class="word-answer">
+    <game-table
+      v-else
+      :guesses="new Array(6).fill(new Array(5).fill(''))"
+      :results="new Array(6).fill(new Array(5).fill(''))"
+      :scale="2"
+    />
+    <p v-if="wordThatOpponentIsGuessing.word" class="word-answer">
       (Answer: <b>{{ wordThatOpponentIsGuessing.word }}</b
       >)
     </p>
+    <p v-else class="word-answer">(Waiting...)</p>
   </div>
 </template>
 

@@ -3,6 +3,7 @@ import { useLocalRoundStore } from '../stores/LocalRoundStore'
 import { useHomeErrorStore } from '../stores/HomeErrorStore'
 import { usePlayerStateStore } from '../stores/PlayerStateStore'
 import { useCurrentViewStore } from '../stores/CurrentViewStore'
+import { useGameBoxesStore } from '../stores/GameBoxesStore'
 
 import { Session } from '../types/Session'
 import { emitAsync, enqueue } from '../utils/socketUtils'
@@ -13,6 +14,7 @@ let localRoundStore: ReturnType<typeof useLocalRoundStore>
 let homeErrorStore: ReturnType<typeof useHomeErrorStore>
 let playerStateStore: ReturnType<typeof usePlayerStateStore>
 let currentViewStore: ReturnType<typeof useCurrentViewStore>
+let gameBoxesStore: ReturnType<typeof useGameBoxesStore>
 
 export const initializeSessionClient = () => {
   /* Initialize stores */
@@ -21,6 +23,7 @@ export const initializeSessionClient = () => {
   homeErrorStore = useHomeErrorStore()
   playerStateStore = usePlayerStateStore()
   currentViewStore = useCurrentViewStore()
+  gameBoxesStore = useGameBoxesStore()
 
   /* Socket events */
   // Session state events
@@ -51,6 +54,10 @@ export const initializeSessionClient = () => {
   // Game events
   socket.on('resetLocalRoundState', () => {
     localRoundStore.reset()
+  })
+
+  socket.on('resetGameBoxesState', () => {
+    gameBoxesStore.reset()
   })
 
   socket.on(

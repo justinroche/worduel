@@ -405,6 +405,7 @@ export default (socket: IOSocket, io: IOServer) => {
       });
 
       io.to(sessionCode).emit('resetLocalRoundState');
+      io.to(sessionCode).emit('resetGameBoxesState');
       io.to(sessionCode).emit('setSession', session);
       io.to(sessionCode).emit('goToSummaryView');
 

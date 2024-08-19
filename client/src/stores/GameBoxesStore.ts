@@ -13,10 +13,16 @@ export const useGameBoxesStore = defineStore('gameBoxes', () => {
     showOpponentsGuesses.value = !showOpponentsGuesses.value
   }
 
+  const reset = () => {
+    showScoreboard.value = false
+    showOpponentsGuesses.value = false
+  }
+
   return {
     showScoreboard,
     showOpponentsGuesses,
     handleToggleScoreboard,
     handleToggleOpponentsGuesses,
+    reset,
   }
 })
