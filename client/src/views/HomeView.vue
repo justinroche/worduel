@@ -158,14 +158,14 @@ const handleHelpButton = () => {
         <button @click="handleInfoButton" class="info-button" tabindex="4">
           <font-awesome-icon
             :icon="['fas', 'circle-info']"
-            style="color: black"
+            class="fa-icon"
             size="2x"
           />
         </button>
         <button @click="handleHelpButton" class="help-button" tab-index="5">
           <font-awesome-icon
             :icon="['fas', 'circle-question']"
-            style="color: black"
+            class="fa-icon"
             size="2x"
           />
         </button>
@@ -257,8 +257,11 @@ h1 {
   padding: 0;
 }
 
-.info-button:hover .fa-circle-info,
-.help-button:hover .fa-circle-question {
+.fa-icon {
+  color: black;
+}
+
+.fa-icon:hover {
   color: #443b3d;
 }
 
