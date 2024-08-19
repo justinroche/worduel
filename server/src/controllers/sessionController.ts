@@ -1,12 +1,54 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import SessionModel, { Session } from '../models/sessionModel.js';
+import { logError } from '../logging/loggingUtils.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load profanity list
+const profanityList = new Set<string>();
+const profanityFilePath = path.join(
+  __dirname,
+  '..',
+  'resources',
+  'profanity_four.txt'
+);
+
+try {
+  const content = fs.readFileSync(profanityFilePath, 'utf-8');
+  content
+    .split('\n')
+    .forEach((word) => profanityList.add(word.trim().toLowerCase()));
+} catch (error) {
+  logError('Error loading profanity list:' + error);
+}
 
 const generateSessionCode = (): string => {
   const characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
-  let code = '';
-  for (let i = 0; i < 4; i++) {
-    code += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
+  let code: string;
+
+  do {
+    code = '';
+    for (let i = 0; i < 4; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+  } while (containsProfanity(code));
+
   return code;
+};
+
+const containsProfanity = (code: string): boolean => {
+  const lowerCode = code.toLowerCase();
+  for (let i = 0; i <= code.length - 3; i++) {
+    for (let j = i + 3; j <= code.length; j++) {
+      if (profanityList.has(lowerCode.slice(i, j))) {
+        return true;
+      }
+    }
+  }
+  return false;
 };
 
 export const createSession = async (): Promise<Session> => {
