@@ -72,7 +72,7 @@ const handleViewGameSummaryButton = async () => {
 }
 
 .scoreboard {
-  height: 300px;
+  height: 340px;
   margin-bottom: 1.25rem;
 }
 
