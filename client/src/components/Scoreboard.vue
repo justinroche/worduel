@@ -44,13 +44,17 @@ const getRoundScoreDisplay = (round: number, playerNumber: 1 | 2) => {
         <template v-if="games[round - 1].state === 'in play'">
           <td colspan="2" class="in-progress">in progress...</td>
         </template>
-        <template v-else>
+        <template v-else-if="games[round - 1].state === 'complete'">
           <td class="score">
             {{ getRoundScoreDisplay(round, 1) }}
           </td>
           <td class="score">
             {{ getRoundScoreDisplay(round, 2) }}
           </td>
+        </template>
+        <template v-else>
+          <td></td>
+          <td></td>
         </template>
       </tr>
       <tr class="total-row">
