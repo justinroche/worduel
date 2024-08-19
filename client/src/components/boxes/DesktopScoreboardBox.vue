@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import Scoreboard from '../Scoreboard.vue'
+import { useGameBoxesStore } from '../../stores/GameBoxesStore'
+
+const gameBoxesStore = useGameBoxesStore()
 </script>
 
 <template>
   <div class="desktopScoreboardBox">
     <h3>Scoreboard</h3>
+    <div class="icon-wrapper">
+      <button
+        @click="gameBoxesStore.handleToggleScoreboard"
+        class="icon-button"
+      >
+        <font-awesome-icon
+          :icon="['fas', 'chevron-left']"
+          size="xl"
+          class="fa-icon"
+        />
+      </button>
+    </div>
     <scoreboard />
   </div>
 </template>
@@ -27,6 +42,32 @@ import Scoreboard from '../Scoreboard.vue'
   flex-direction: column;
   align-items: center;
   transition: all 0.5s ease;
+}
+
+.icon-wrapper {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.fa-icon {
+  color: black;
+  transition: color 0.1s ease;
+}
+
+.fa-icon:hover {
+  color: #414d40;
 }
 
 h3 {
