@@ -40,18 +40,15 @@ const handleSubtractRoundButton = () => {
 const toggleSpellCheckEnabled = () => {
   if (playerIsHost.value && props.isLobby) {
     updateGameOption('spellCheckEnabled', !spellCheckEnabled.value)
+    if (!spellCheckEnabled.value && blockProfanityEnabled.value) {
+      updateGameOption('blockProfanityEnabled', !blockProfanityEnabled.value)
+    }
   }
 }
 
 const toggleBlockProfanity = () => {
-  if (playerIsHost.value && props.isLobby) {
+  if (playerIsHost.value && props.isLobby && spellCheckEnabled.value) {
     updateGameOption('blockProfanityEnabled', !blockProfanityEnabled.value)
-  }
-}
-
-const toggleRoundTimer = () => {
-  if (playerIsHost.value && props.isLobby) {
-    updateGameOption('roundTimerEnabled', !roundTimerEnabled.value)
   }
 }
 
@@ -108,28 +105,11 @@ const handleSubtractTimeButton = () => {
         />
       </button>
     </div>
-    <div class="game-option">
+    <div :class="{ 'grayed-out': !spellCheckEnabled }" class="game-option">
       <p>Block Profanity</p>
       <button class="game-option-button" @click="toggleBlockProfanity">
         <font-awesome-icon
           v-if="!blockProfanityEnabled"
-          :icon="['far', 'square']"
-          size="2x"
-          class="fa-icon"
-        />
-        <font-awesome-icon
-          v-else
-          :icon="['fas', 'square-check']"
-          size="2x"
-          class="fa-icon"
-        />
-      </button>
-    </div>
-    <div class="game-option">
-      <p>Round Timer</p>
-      <button class="game-option-button" @click="toggleRoundTimer">
-        <font-awesome-icon
-          v-if="!roundTimerEnabled"
           :icon="['far', 'square']"
           size="2x"
           class="fa-icon"
@@ -180,13 +160,6 @@ const handleSubtractTimeButton = () => {
       <p v-if="!blockProfanityEnabled" class="setting-label-text"><b>OFF</b></p>
       <p v-else class="setting-label-text"><b>ON</b></p>
     </div>
-    <div class="game-option">
-      <p>Round Timer</p>
-      <p v-if="!roundTimerEnabled" class="setting-label-text"><b>OFF</b></p>
-      <p v-else class="round-timer-not-host">
-        {{ roundTimerDurationFormatted }}
-      </p>
-    </div>
   </div>
 </template>
 
@@ -236,6 +209,21 @@ const handleSubtractTimeButton = () => {
 .game-option-button:hover .fa-circle-plus,
 .game-option-button:hover .fa-circle-minus {
   color: #443b3d;
+}
+
+.grayed-out {
+  p {
+    opacity: 0.4;
+  }
+
+  .fa-icon {
+    color: black;
+    opacity: 0.4;
+  }
+
+  .game-option-button {
+    cursor: default;
+  }
 }
 
 .rounds-counter {

@@ -136,7 +136,7 @@ const handleExitLobbyButtonClicked = async () => {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  padding-bottom: 25px;
+  padding-bottom: 62px;
   box-sizing: border-box;
 }
 

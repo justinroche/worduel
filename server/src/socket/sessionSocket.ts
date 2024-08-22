@@ -265,6 +265,11 @@ export default (socket: IOSocket, io: IOServer) => {
         let session = await sessionController.updateSession(sessionCode, {
           [option]: value,
         });
+        if (!session.spellCheckEnabled && session.blockProfanityEnabled) {
+          session = await sessionController.updateSession(sessionCode, {
+            blockProfanityEnabled: false,
+          });
+        }
         io.to(sessionCode).emit('setSession', session);
         callback();
       } catch (error: any) {
