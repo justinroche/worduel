@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useSessionStore } from '../stores/SessionStore'
 import { getTotalScore } from '../utils/gameUtils'
 import { useGameBoxesStore } from '../stores/GameBoxesStore'
@@ -8,6 +8,18 @@ const sessionStore = useSessionStore()
 const gameBoxesStore = useGameBoxesStore()
 const player1TotalScore = computed(() => getTotalScore(1))
 const player2TotalScore = computed(() => getTotalScore(2))
+
+const tooltipText = ref('Copy link')
+
+const copyJoinLink = () => {
+  const url = `${window.location.origin}/join/${sessionStore.session.sessionCode}`
+  navigator.clipboard.writeText(url).then(() => {
+    tooltipText.value = 'Copied!'
+    setTimeout(() => {
+      tooltipText.value = 'Copy link'
+    }, 2000) // Reset after 2 seconds
+  })
+}
 </script>
 
 <template>
@@ -24,14 +36,17 @@ const player2TotalScore = computed(() => getTotalScore(2))
           {{ player2TotalScore }}-{{ player1TotalScore }}
         </h2>
       </button>
-      <h2 class="code">{{ sessionStore.session.sessionCode }}</h2>
+      <button class="icon-button link-button" @click="copyJoinLink">
+        <h2 class="code">{{ sessionStore.session.sessionCode }}</h2>
+        <div class="tooltip">{{ tooltipText }}</div>
+      </button>
     </div>
     <div class="banner-section center">
       <h1 class="title">Round {{ sessionStore.session.currentRound }}</h1>
     </div>
     <div class="banner-section right">
       <button
-        class="icon-button"
+        class="eye-button icon-button"
         @click="gameBoxesStore.handleToggleOpponentsGuesses"
       >
         <font-awesome-icon
@@ -90,7 +105,7 @@ const player2TotalScore = computed(() => getTotalScore(2))
 
 .fa-icon {
   color: black;
-  transition: color 0.1s ease;
+  transition: color 0.05s ease;
 }
 
 .fa-icon:hover {
@@ -110,11 +125,19 @@ const player2TotalScore = computed(() => getTotalScore(2))
   font-size: 1rem;
   color: black;
   border-radius: 0.25rem;
-  transition: border 0.1s ease;
+  transition: border 0.05s ease;
   border: 1px solid transparent;
 
   box-sizing: border-box;
   padding: 0.25rem 0.5rem;
+}
+
+.link-button {
+  font-family: inherit;
+  font-size: 1rem;
+  color: black;
+  padding: 0.25rem 0.5rem;
+  position: relative;
 }
 
 .scores {
@@ -123,5 +146,28 @@ const player2TotalScore = computed(() => getTotalScore(2))
 
 .score-button:hover {
   border: 1px solid black;
+}
+
+.tooltip {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 0.25rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  position: absolute;
+  z-index: 1;
+  white-space: nowrap;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.link-button:hover .tooltip {
+  visibility: visible;
+}
+
+.eye-button {
+  width: 35px;
 }
 </style>

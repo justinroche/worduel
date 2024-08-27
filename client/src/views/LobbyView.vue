@@ -13,6 +13,7 @@ const currentViewStore = useCurrentViewStore()
 
 const startGameButtonLoading = ref(false)
 const exitGameButtonLoading = ref(false)
+const tooltipText = ref('Copy link')
 
 const handleStartGameButtonClicked = async () => {
   startGameButtonLoading.value = true
@@ -38,6 +39,16 @@ const handleExitLobbyButtonClicked = async () => {
     exitGameButtonLoading.value = false
   }
 }
+
+const copyJoinLink = () => {
+  const url = `${window.location.origin}/join/${sessionStore.session.sessionCode}`
+  navigator.clipboard.writeText(url).then(() => {
+    tooltipText.value = 'Copied!'
+    setTimeout(() => {
+      tooltipText.value = 'Copy link'
+    }, 2000) // Reset after 2 seconds
+  })
+}
 </script>
 
 <template>
@@ -47,9 +58,12 @@ const handleExitLobbyButtonClicked = async () => {
       <div class="lobby-section">
         <h2 class="game-code-header">Game Code</h2>
         <p class="session-code">{{ sessionStore.session.sessionCode }}</p>
-        <p class="session-link">
-          playworduel.com/join/{{ sessionStore.session.sessionCode }}
-        </p>
+        <button class="link-button" @click="copyJoinLink">
+          <p class="session-link">
+            playworduel.com/join/{{ sessionStore.session.sessionCode }}
+          </p>
+          <div class="tooltip">{{ tooltipText }}</div>
+        </button>
       </div>
       <div class="players-section">
         <lobby-players-section />
@@ -142,5 +156,37 @@ const handleExitLobbyButtonClicked = async () => {
 
 .start-button {
   margin-bottom: 20px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  font-family: inherit;
+  font-size: 1rem;
+  color: black;
+  position: relative;
+}
+
+.tooltip {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 0.25rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  position: absolute;
+  top: 1.5rem;
+  z-index: 1;
+  white-space: nowrap;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.link-button:hover .tooltip {
+  visibility: visible;
 }
 </style>
