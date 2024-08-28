@@ -140,6 +140,10 @@ const copyJoinLink = () => {
   position: relative;
 }
 
+.link-button:hover {
+  color: #414d40;
+}
+
 .scores {
   box-sizing: border-box;
 }

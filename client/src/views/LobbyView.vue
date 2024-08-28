@@ -170,6 +170,10 @@ const copyJoinLink = () => {
   position: relative;
 }
 
+.link-button:hover {
+  color: #414d40;
+}
+
 .tooltip {
   visibility: hidden;
   background-color: black;
