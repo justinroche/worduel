@@ -6,6 +6,7 @@ export const useSessionStore = defineStore('session', () => {
   const session = ref({} as Session)
   const playerIsHost = ref(false)
   const MAX_ROUNDS = 5
+  const player2CountingDown = ref(false)
 
   const getRoundTimerDurationFormatted = computed(() => {
     const minutes = Math.floor(session.value.roundTimerDuration / 60)
@@ -17,6 +18,7 @@ export const useSessionStore = defineStore('session', () => {
     session,
     playerIsHost,
     MAX_ROUNDS,
+    player2CountingDown,
     getRoundTimerDurationFormatted,
   }
 })

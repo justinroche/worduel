@@ -1,22 +1,39 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import LobbyPlayersSection from '../components/lobby/LobbyPlayersSection.vue'
 import LobbyGameOptionsSection from '../components/lobby/LobbyGameOptionsSection.vue'
 import HeaderBanner from '../components/HeaderBanner.vue'
 import MenuButton from '../components/MenuButton.vue'
 import { useSessionStore } from '../stores/SessionStore'
 import { useCurrentViewStore } from '../stores/CurrentViewStore'
-import { startGame, exitSession } from '../clients/SessionClient'
+import {
+  startGameCountdown,
+  startGame,
+  exitSession,
+} from '../clients/SessionClient'
 
 const sessionStore = useSessionStore()
 const currentViewStore = useCurrentViewStore()
 
 const startGameButtonLoading = ref(false)
+const startGameButtonCounting = ref(false)
+const startGameButtonText = ref('Start Game')
 const exitGameButtonLoading = ref(false)
 const tooltipText = ref('Copy link')
+const player2Countdown = ref(-1)
 
 const handleStartGameButtonClicked = async () => {
+  await startGameCountdown()
+  startGameButtonCounting.value = true
+  for (let i = 3; i > 0; i--) {
+    startGameButtonText.value = i.toString() + '...'
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  }
+
+  startGameButtonCounting.value = false
   startGameButtonLoading.value = true
+  startGameButtonText.value = 'Start Game'
+
   try {
     await startGame()
   } catch (error) {
@@ -26,6 +43,23 @@ const handleStartGameButtonClicked = async () => {
     startGameButtonLoading.value = false
   }
 }
+
+const player2StartGameCountdown = async () => {
+  for (let i = 3; i > 0; i--) {
+    player2Countdown.value = i
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  }
+  player2Countdown.value = 0
+}
+
+watch(
+  () => sessionStore.player2CountingDown,
+  (newValue) => {
+    if (newValue === true) {
+      player2StartGameCountdown()
+    }
+  }
+)
 
 const handleExitLobbyButtonClicked = async () => {
   exitGameButtonLoading.value = true
@@ -76,18 +110,24 @@ const copyJoinLink = () => {
       <div class="host-buttons-section">
         <menu-button
           v-if="sessionStore.playerIsHost"
-          buttonText="Start Game"
+          :buttonText="startGameButtonText"
           fontSize="1rem"
           buttonWidth="250px"
           buttonHeight="40px"
           buttonStyle="primary"
           class="start-button"
           @click="handleStartGameButtonClicked"
-          :disabled="!sessionStore.session.player2Connected"
+          :disabled="
+            !sessionStore.session.player2Connected || startGameButtonCounting
+          "
           :loading="startGameButtonLoading"
         />
         <div v-else>
-          <p>Waiting for host to start the game...</p>
+          <p v-if="player2Countdown === -1">
+            Waiting for host to start the game...
+          </p>
+          <p v-else-if="player2Countdown === 0">Game starting...</p>
+          <p v-else>Game starting in {{ player2Countdown }} seconds...</p>
         </div>
         <menu-button
           buttonText="Exit Lobby"

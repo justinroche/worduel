@@ -52,6 +52,12 @@ export const initializeSessionClient = () => {
   })
 
   // Game events
+  socket.on('startGameCountdown', () => {
+    if (!sessionStore.playerIsHost) {
+      sessionStore.player2CountingDown = true
+    }
+  })
+
   socket.on('resetLocalRoundState', () => {
     localRoundStore.reset()
   })
@@ -87,6 +93,7 @@ export const initializeSessionClient = () => {
 
   socket.on('goToGameView', () => {
     currentViewStore.setCurrentView('game')
+    sessionStore.player2CountingDown = false
   })
 
   socket.on('goToSummaryView', () => {
@@ -142,6 +149,12 @@ export const kickPlayer2 = async () => {
 }
 
 // Game functions
+export const startGameCountdown = async () => {
+  return await enqueue(() =>
+    emitAsync('startGameCountdown', sessionStore.session.sessionCode)
+  )
+}
+
 export const startGame = async () => {
   return await enqueue(() =>
     emitAsync('startGame', sessionStore.session.sessionCode)

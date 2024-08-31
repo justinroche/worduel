@@ -219,6 +219,17 @@ export default (socket: IOSocket, io: IOServer) => {
     }
   });
 
+  // Start game countdown -> called when host starts the game countdown
+  socket.on('startGameCountdown', async (sessionCode, callback) => {
+    try {
+      io.to(sessionCode).emit('startGameCountdown');
+      callback();
+    } catch (error: any) {
+      logError(error.message);
+      callback(error.message);
+    }
+  });
+
   // Start game -> called when host starts the game from the lobby
   socket.on('startGame', async (sessionCode, callback) => {
     try {
