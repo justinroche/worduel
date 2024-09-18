@@ -26,7 +26,7 @@ const handleStartGameButtonClicked = async () => {
   await startGameCountdown()
   startGameButtonCounting.value = true
   for (let i = 3; i > 0; i--) {
-    startGameButtonText.value = i.toString() + '...'
+    startGameButtonText.value = 'Starting in ' + i.toString() + '...'
     await new Promise((resolve) => setTimeout(resolve, 1000))
   }
 
@@ -49,7 +49,7 @@ const player2StartGameCountdown = async () => {
     player2Countdown.value = i
     await new Promise((resolve) => setTimeout(resolve, 1000))
   }
-  player2Countdown.value = 0
+  sessionStore.player2CountingDown = false
 }
 
 watch(
@@ -136,6 +136,11 @@ const copyJoinLink = () => {
           buttonHeight="40px"
           buttonStyle="secondary"
           @click="handleExitLobbyButtonClicked"
+          :disabled="
+            startGameButtonCounting ||
+            player2Countdown != -1 ||
+            startGameButtonLoading
+          "
           :loading="exitGameButtonLoading"
         />
       </div>
