@@ -102,6 +102,11 @@ const winningPlayerName = computed(() => {
   border: 1px solid black;
 }
 
+.rightContainer {
+  max-height: 601px;
+  overflow-y: hidden;
+}
+
 .scoreboard-title {
   margin-top: 0;
 }
