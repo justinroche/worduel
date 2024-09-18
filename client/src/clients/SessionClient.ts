@@ -58,6 +58,10 @@ export const initializeSessionClient = () => {
     }
   })
 
+  socket.on('startRoundCountdown', () => {
+    localRoundStore.setEnterWordModalCountingDown(true)
+  })
+
   socket.on('resetLocalRoundState', () => {
     localRoundStore.reset()
   })

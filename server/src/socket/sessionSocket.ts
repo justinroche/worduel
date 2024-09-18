@@ -309,6 +309,7 @@ export default (socket: IOSocket, io: IOServer) => {
         logAction(
           'Starting round ' + session.currentRound + ' in ' + sessionCode
         );
+        io.to(sessionCode).emit('startRoundCountdown');
         currentGame.state = 'in play';
       }
 

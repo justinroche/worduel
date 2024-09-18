@@ -138,7 +138,12 @@ onMounted(() => {
   <Transition name="slide-fade-from-right">
     <desktop-opponents-table-box v-if="gameBoxesStore.showOpponentsGuesses" />
   </Transition>
-  <div v-if="currentGame?.state === 'setting word'">
+  <div
+    v-if="
+      currentGame?.state === 'setting word' ||
+      localRoundStore.enterWordModalCountingDown === true
+    "
+  >
     <enter-word-box />
   </div>
   <div v-if="wordBeingGuessed ? wordBeingGuessed.guessingComplete : false">

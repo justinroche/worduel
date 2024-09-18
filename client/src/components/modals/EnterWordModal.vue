@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useSessionStore } from '../../stores/SessionStore'
 import { useLocalRoundStore } from '../../stores/LocalRoundStore'
 import {
@@ -15,6 +15,7 @@ const localRoundStore = useLocalRoundStore()
 const currentRound = computed(() => sessionStore.session.currentRound)
 
 const confirmButtonLoading = ref(false)
+const buttonText = ref('Confirm')
 
 const word = computed({
   get: () => localRoundStore.enterWordModalWord,
@@ -23,18 +24,30 @@ const word = computed({
   },
 })
 
-const buttonText = computed(() => {
-  return !localRoundStore.enterWordModalWaiting
-    ? 'Confirm'
-    : 'Waiting for opponent...'
-})
-
 const handleWordInput = (event: Event) => {
   // Only allow alphanumeric characters in the word input
   const input = event.target as HTMLInputElement
   const filteredValue = input.value.replace(/[^a-zA-Z]/g, '')
   word.value = filteredValue
 }
+
+const startRoundCountdown = async () => {
+  for (let i = 3; i > 0; i--) {
+    buttonText.value = 'Starting in ' + i.toString() + '...'
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  }
+  localRoundStore.setEnterWordModalCountingDown(false)
+  buttonText.value = 'Confirm'
+}
+
+watch(
+  () => localRoundStore.enterWordModalCountingDown,
+  (newValue: boolean) => {
+    if (newValue === true) {
+      startRoundCountdown()
+    }
+  }
+)
 
 const handleConfirmButton = async () => {
   if (localRoundStore.enterWordModalWaiting) {
@@ -67,6 +80,7 @@ const handleConfirmButton = async () => {
   }
 
   try {
+    buttonText.value = 'Waiting for opponent...'
     await setWord(word.value)
     localRoundStore.enterWordModalWaiting = true
   } catch (error) {
