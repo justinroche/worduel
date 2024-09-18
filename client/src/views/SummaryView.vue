@@ -112,7 +112,7 @@ const winningPlayerName = computed(() => {
 
 .exit-session-section {
   position: absolute;
-  bottom: 10vh;
+  bottom: 50px;
   right: 0;
   left: 0;
 }
