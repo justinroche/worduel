@@ -100,12 +100,25 @@ const copyJoinLink = () => {
         </button>
       </div>
       <div class="players-section">
-        <lobby-players-section />
+        <lobby-players-section
+          :isLocked="
+            startGameButtonCounting ||
+            player2Countdown != -1 ||
+            startGameButtonLoading
+          "
+        />
       </div>
     </div>
     <div class="bottom-row">
       <div class="game-options-section">
-        <lobby-game-options-section :isLobby="true" />
+        <lobby-game-options-section
+          :isLobby="true"
+          :isLocked="
+            startGameButtonCounting ||
+            player2Countdown != -1 ||
+            startGameButtonLoading
+          "
+        />
       </div>
       <div class="host-buttons-section">
         <menu-button

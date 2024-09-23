@@ -5,6 +5,7 @@ import { updateGameOption } from '../../clients/SessionClient'
 
 const props = defineProps<{
   isLobby: boolean
+  isLocked: boolean
 }>()
 
 const sessionStore = useSessionStore()
@@ -68,10 +69,13 @@ const handleSubtractTimeButton = () => {
 <template>
   <div v-if="playerIsHost && props.isLobby">
     <h2>Game Options</h2>
-    <div class="game-option">
+    <div :class="{ 'grayed-out': props.isLocked }" class="game-option">
       <p>Rounds</p>
       <div class="game-option-number-picker">
-        <button class="game-option-button" @click="handleSubtractRoundButton">
+        <button
+          class="game-option-button"
+          @click="!props.isLocked ? handleSubtractRoundButton() : null"
+        >
           <font-awesome-icon
             :icon="['fas', 'circle-chevron-left']"
             size="2x"
@@ -79,7 +83,10 @@ const handleSubtractTimeButton = () => {
           />
         </button>
         <p class="rounds-counter">{{ rounds }}</p>
-        <button class="game-option-button" @click="handleAddRoundButton">
+        <button
+          class="game-option-button"
+          @click="!props.isLocked ? handleAddRoundButton() : null"
+        >
           <font-awesome-icon
             :icon="['fas', 'circle-chevron-right']"
             size="2x"
@@ -88,9 +95,12 @@ const handleSubtractTimeButton = () => {
         </button>
       </div>
     </div>
-    <div class="game-option">
+    <div :class="{ 'grayed-out': props.isLocked }" class="game-option">
       <p>Use Spell Check</p>
-      <button class="game-option-button" @click="toggleSpellCheckEnabled">
+      <button
+        class="game-option-button"
+        @click="!props.isLocked ? toggleSpellCheckEnabled() : null"
+      >
         <font-awesome-icon
           v-if="!spellCheckEnabled"
           :icon="['far', 'square']"
@@ -105,9 +115,15 @@ const handleSubtractTimeButton = () => {
         />
       </button>
     </div>
-    <div :class="{ 'grayed-out': !spellCheckEnabled }" class="game-option">
+    <div
+      :class="{ 'grayed-out': !spellCheckEnabled || props.isLocked }"
+      class="game-option"
+    >
       <p>Block Profanity</p>
-      <button class="game-option-button" @click="toggleBlockProfanity">
+      <button
+        class="game-option-button"
+        @click="!props.isLocked ? toggleBlockProfanity() : null"
+      >
         <font-awesome-icon
           v-if="!blockProfanityEnabled"
           :icon="['far', 'square']"
@@ -122,10 +138,17 @@ const handleSubtractTimeButton = () => {
         />
       </button>
     </div>
-    <div v-if="roundTimerEnabled" class="game-option">
+    <div
+      v-if="roundTimerEnabled"
+      :class="{ 'grayed-out': props.isLocked }"
+      class="game-option"
+    >
       <p></p>
       <div class="game-option-number-picker">
-        <button class="game-option-button" @click="handleSubtractTimeButton">
+        <button
+          class="game-option-button"
+          @click="!props.isLocked ? handleSubtractTimeButton() : null"
+        >
           <font-awesome-icon
             :icon="['fas', 'circle-minus']"
             size="2x"
@@ -133,7 +156,10 @@ const handleSubtractTimeButton = () => {
           />
         </button>
         <p class="round-timer">{{ roundTimerDurationFormatted }}</p>
-        <button class="game-option-button" @click="handleAddTimeButton">
+        <button
+          class="game-option-button"
+          @click="!props.isLocked ? handleAddTimeButton() : null"
+        >
           <font-awesome-icon
             :icon="['fas', 'circle-plus']"
             size="2x"

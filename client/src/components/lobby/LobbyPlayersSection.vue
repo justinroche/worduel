@@ -13,6 +13,10 @@ const player2Connected = computed(() => sessionStore.session.player2Connected)
 const player1Editing = ref(false)
 const player2Editing = ref(false)
 
+const props = defineProps<{
+  isLocked: boolean
+}>()
+
 const handleKickButtonClicked = () => {
   kickPlayer2()
 }
@@ -63,13 +67,13 @@ window.addEventListener('keyup', (event) => {
     </div>
     <div v-else class="player-name-container">
       <p
-        @click="playerIsHost ? togglePlayer1Editing() : null"
+        @click="playerIsHost && !props.isLocked ? togglePlayer1Editing() : null"
         class="player-name"
-        :class="{ notEditable: !playerIsHost }"
+        :class="{ notEditable: !playerIsHost || props.isLocked }"
       >
         {{ player1Name }}
       </p>
-      <div v-if="playerIsHost" class="tooltip">Edit</div>
+      <div v-if="playerIsHost && !props.isLocked" class="tooltip">Edit</div>
     </div>
     <p v-if="playerIsHost" class="player-tag"><b>HOST (YOU)</b></p>
     <p v-else class="player-tag"><b>HOST</b></p>
@@ -86,13 +90,15 @@ window.addEventListener('keyup', (event) => {
     </div>
     <div v-else class="player-name-container">
       <p
-        @click="!playerIsHost ? togglePlayer2Editing() : null"
+        @click="
+          !playerIsHost && !props.isLocked ? togglePlayer2Editing() : null
+        "
         class="player-name"
-        :class="{ notEditable: playerIsHost }"
+        :class="{ notEditable: playerIsHost || props.isLocked }"
       >
         {{ player2Name }}
       </p>
-      <div v-if="!playerIsHost" class="tooltip">Edit</div>
+      <div v-if="!playerIsHost && !props.isLocked" class="tooltip">Edit</div>
     </div>
     <menu-button
       v-if="playerIsHost"
@@ -102,6 +108,7 @@ window.addEventListener('keyup', (event) => {
       buttonHeight="30px"
       buttonStyle="auburn"
       @click="handleKickButtonClicked"
+      :disabled="props.isLocked"
     />
     <p v-else class="player-tag"><b>YOU</b></p>
   </div>
